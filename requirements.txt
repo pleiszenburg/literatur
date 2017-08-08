@@ -1,0 +1,9 @@
+setuptools
+wheel
+pytest
+Sphinx
+sphinx_rtd_theme
+twine
+-e git+https://github.com/alexz-enwp/wikitools/tree/py3
+dropbox
+PyQt5
