@@ -18,5 +18,13 @@
 # specific language governing rights and limitations under the License.
 # </LICENSE_BLOCK>
 
-all:
-	pyuic5 -i 0 filerename.ui > ../src/literatur/core/filerename.py
+QTC        = pyuic5
+QTC_FLAGS  = -i 0
+QTC_SOURCE = $(wildcard *.ui)
+QTC_TARGET = $(QTC_SOURCE:%.ui=%.py)
+QTC_FLD    = ../src/literatur/ui
+
+all: uifiles
+
+uifiles: $(QTC_SOURCE)
+	$(QTC) $(QTC_FLAGS) $(QTC_SOURCE) > $(QTC_FLD)/$(QTC_TARGET)
