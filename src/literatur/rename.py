@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 """
@@ -6,7 +7,7 @@ LITERATUR
 Literature management with Python, Dropbox and MediaWiki
 https://github.com/pleiszenburg/literatur
 
-	src/literatur/core/groups.py: Groups of volumes, journals etc
+	src/literatur/rename.py: Routine for starting GUI for file renaming
 
 	Copyright (C) 2017 Sebastian M. Ernst <ernst@pleiszenburg.de>
 
@@ -25,11 +26,24 @@ specific language governing rights and limitations under the License.
 """
 
 
-from .strings import *
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# IMPORT
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+import sys
+
+from PyQt5 import QtGui
+
+from .core.renamegui import instance_class
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-# STATIC STRINGS FOR GROUPS
+# RUN GUI / APP
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-lit_book_ids = {}
+def rename_gui_start():
+
+	app = QtGui.QApplication(sys.argv)
+	app_mainwindow = instance_class()
+	app_mainwindow.show()
+	sys.exit(app.exec_())

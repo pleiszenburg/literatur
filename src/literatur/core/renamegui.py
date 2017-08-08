@@ -25,23 +25,27 @@ specific language governing rights and limitations under the License.
 """
 
 
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# IMPORT
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
 import os
 import shutil
 import pprint
 
-from PyQt4 import QtCore, QtGui
+from PyQt5 import QtCore, QtGui
 
-from lw_strings import *
-from lw_groups import *
-from lw_file import *
-from lw_filerename import Ui_lwFileRenameDialog as Ui_lwFileRenameDialog
+from .strings import *
+from .groups import *
+from .file import *
+from literatur.ui.filerename import Ui_lwFileRenameDialog
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # GUI CLASS
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-class lw_instance_class(QtGui.QDialog):
+class instance_class(QtGui.QDialog):
 
 	def __init__(self, parent=None):
 

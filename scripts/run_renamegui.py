@@ -25,12 +25,11 @@ specific language governing rights and limitations under the License.
 
 """
 
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# IMPORT
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-import sys
-
-from PyQt4 import QtGui
-
-from lw_renamegui import *
+from literatur.rename import rename_gui_start
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -39,7 +38,4 @@ from lw_renamegui import *
 
 if __name__ == "__main__":
 
-	app = QtGui.QApplication(sys.argv)
-	app_mainwindow = lw_instance_class()
-	app_mainwindow.show()
-	sys.exit(app.exec_())
+	rename_gui_start()

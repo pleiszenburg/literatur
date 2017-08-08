@@ -25,8 +25,8 @@ specific language governing rights and limitations under the License.
 """
 
 
-from lw_strings import *
-from lw_groups import *
+from .strings import *
+from .groups import *
 
 import hashlib
 import pprint
