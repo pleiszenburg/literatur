@@ -2,7 +2,7 @@
 # Literature management with Python, Dropbox and MediaWiki
 # https://github.com/pleiszenburg/literatur
 #
-#	makefile: GNU makefile for project management
+#	ui/makefile: GNU makefile for ui files
 #
 # 	Copyright (C) 2017 Sebastian M. Ernst <ernst@pleiszenburg.de>
 #
@@ -18,39 +18,5 @@
 # specific language governing rights and limitations under the License.
 # </LICENSE_BLOCK>
 
-
-docu:
-	@(cd docs; make clean; make html)
-
-gui:
-	@(cd ui; make all)
-
-release:
-	-rm dist/*
-	-rm -r src/*.egg-info
-	python setup.py sdist bdist_wheel
-	gpg --detach-sign -a dist/literatur*.whl
-	gpg --detach-sign -a dist/literatur*.tar.gz
-
-upload:
-	for filename in $$(ls dist/*.tar.gz dist/*.whl) ; do \
-		twine upload $$filename $$filename.asc ; \
-	done
-
-upload_test:
-	for filename in $$(ls dist/*.tar.gz dist/*.whl) ; do \
-		twine upload $$filename $$filename.asc -r pypitest ; \
-	done
-
-install:
-	pip install -r requirements.txt
-	pip install .
-
-install_link:
-	pip install -r requirements.txt
-	pip install -e .
-
-test:
-	make docu
-	-rm tests/__pycache__/*.pyc
-	pytest
+all:
+	pyuic5 -i 0 filerename.ui -o ../src/literature/core/filerename.py
