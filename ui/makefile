@@ -19,4 +19,4 @@
 # </LICENSE_BLOCK>
 
 all:
-	pyuic5 -i 0 filerename.ui -o ../src/literature/core/filerename.py
+	pyuic5 -i 0 filerename.ui > ../src/literatur/core/filerename.py
