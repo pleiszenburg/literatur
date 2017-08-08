@@ -70,22 +70,22 @@ class instance_class(QtWidgets.QDialog):
 		self.reloadfilelist()
 
 		# Events - selected file
-		QtCore.QObject.connect(self.ui.lwFileList, QtCore.SIGNAL("itemSelectionChanged()"), self.updateuserinput)
+		self.ui.lwFileList.itemSelectionChanged.connect(self.updateuserinput)
 
 		# Event - new filename changed
-		QtCore.QObject.connect(self.ui.lwFilenameText, QtCore.SIGNAL("textChanged()"), self.trackfilenamechange)
+		self.ui.lwFilenameText.textChanged.connect(self.trackfilenamechange)
 
 		# Events - form changed, update (new) file name
-		QtCore.QObject.connect(self.ui.lwTypeCombo, QtCore.SIGNAL("currentIndexChanged(int)"), self.updatefilename)
-		QtCore.QObject.connect(self.ui.lwYearSpin, QtCore.SIGNAL("valueChanged(int)"), self.updatefilename)
-		QtCore.QObject.connect(self.ui.lwMetaText, QtCore.SIGNAL("textChanged()"), self.updatefilename)
-		QtCore.QObject.connect(self.ui.lwFiletypeCombo, QtCore.SIGNAL("currentIndexChanged(int)"), self.updatefilename)
+		self.ui.lwTypeCombo.currentIndexChanged.connect(self.updatefilename)
+		self.ui.lwYearSpin.valueChanged.connect(self.updatefilename)
+		self.ui.lwMetaText.textChanged.connect(self.updatefilename)
+		self.ui.lwFiletypeCombo.currentIndexChanged.connect(self.updatefilename)
 
 		# Events - buttons
-		QtCore.QObject.connect(self.ui.lwClearButton, QtCore.SIGNAL("clicked()"), self.clearform)
-		QtCore.QObject.connect(self.ui.lwMvButton, QtCore.SIGNAL("clicked()"), self.movefile)
-		QtCore.QObject.connect(self.ui.lwReload, QtCore.SIGNAL("clicked()"), self.reloadfilelist)
-		QtCore.QObject.connect(self.ui.lwOpenFile, QtCore.SIGNAL("clicked()"), self.openfileinviewer)
+		self.ui.lwClearButton.clicked.connect(self.clearform)
+		self.ui.lwMvButton.clicked.connect(self.movefile)
+		self.ui.lwReload.clicked.connect(self.reloadfilelist)
+		self.ui.lwOpenFile.clicked.connect(self.openfileinviewer)
 
 
 	def openfileinviewer(self):
