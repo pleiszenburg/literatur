@@ -26,10 +26,17 @@ specific language governing rights and limitations under the License.
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# IMPORT
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+import os
+
+
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # STATIC STRINGS
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-lit_path_local = '' # TODO root path of current project, should be config
+lit_path_local = os.getcwd() # HACK TODO root path of current project, should be config
 lit_path_external = 'LIBRARY-external' # HACK compatibility for old script
 
 lit_path_subfolder_db = 'db/'

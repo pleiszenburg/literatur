@@ -90,7 +90,11 @@ class instance_class(QtWidgets.QDialog):
 
 	def openfileinviewer(self):
 
-		pdf_file = self.working_path + lit_path_subfolder_lit + self.ui.lwFileList.currentItem().data(0)
+		pdf_file = os.path.join(
+			self.working_path,
+			lit_path_subfolder_lit,
+			self.ui.lwFileList.currentItem().data(0)
+			)
 		pdf_command = external_pdfviewer_command.replace(external_pdfviewer_file, pdf_file)
 		os.system(pdf_command)
 
@@ -98,7 +102,9 @@ class instance_class(QtWidgets.QDialog):
 	def reloadfilelist(self):
 
 		self.ui.lwFileList.clear()
-		self.ui.lwFileList.addItems(get_dir_list(self.working_path + lit_path_subfolder_lit)) # Fetch from API
+		self.ui.lwFileList.addItems(get_dir_list(
+			os.path.join(self.working_path, lit_path_subfolder_lit)
+			)) # Fetch from API
 
 
 	def movefile(self):
@@ -108,12 +114,12 @@ class instance_class(QtWidgets.QDialog):
 
 		if oldname != newname:
 
-			if not os.path.isfile(self.working_path + lit_path_subfolder_lit + newname):
+			if not os.path.isfile(os.path.join(self.working_path, lit_path_subfolder_lit, newname)):
 
 				# Move to target
 				shutil.move(
-					self.working_path + lit_path_subfolder_lit + oldname,
-					self.working_path + lit_path_subfolder_lit + newname
+					os.path.join(self.working_path, lit_path_subfolder_lit, oldname),
+					os.path.join(self.working_path, lit_path_subfolder_lit, newname)
 					)
 
 				self.ui.lwFileList.currentItem().setText(newname)
