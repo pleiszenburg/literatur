@@ -1,5 +1,29 @@
-#!/usr/bin/python3.4
 # -*- coding: utf-8 -*-
+
+"""
+
+LITERATUR
+Literature management with Python, Dropbox and MediaWiki
+https://github.com/pleiszenburg/literatur
+
+	src/literatur/core/file.py: File analysis and management
+
+	Copyright (C) 2017 Sebastian M. Ernst <ernst@pleiszenburg.de>
+
+<LICENSE_BLOCK>
+The contents of this file are subject to the GNU Lesser General Public License
+Version 2.1 ("LGPL" or "License"). You may not use this file except in
+compliance with the License. You may obtain a copy of the License at
+https://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt
+https://github.com/pleiszenburg/literatur/blob/master/LICENSE
+
+Software distributed under the License is distributed on an "AS IS" basis,
+WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License for the
+specific language governing rights and limitations under the License.
+</LICENSE_BLOCK>
+
+"""
+
 
 from lw_strings import *
 from lw_groups import *
@@ -17,54 +41,54 @@ from collections import OrderedDict
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 def filename_ext(fraw):
-	
+
 	fname = ''
 	fext = ''
-	
+
 	# HACK handle upper case file formats
 	list_all = list_ext + [x.upper() for x in list_ext]
-	
+
 	# Check for known file formats
 	for ii in list_all:
 		if fraw.endswith(ii):
 			fext = ii
 			fname = fraw[:-(len(fext) + 1)]
 			break
-	
+
 	# No match, no file format ...
 	if fname == '':
 		fname = fraw
-	
+
 	return fext, fname
 
 
 def clean_string(lString): # TODO strings must be moved to header file
-	
+
 	# Remove stuff left and right
 	lString = lString.strip(' \n\t')
-	
+
 	# Tabs, underlines and line breaks etc become spaces
 	for ii in '\t\n\'"”/()+,:_—–;<=>[\\]{|}&`‘’':
 		lString = lString.replace(ii, " ")
-	
+
 	# Remove multiple spaces
 	lString = ' '.join(lString.split())
-	
+
 	# Kill special alphabets
 	for ii in list(list_letters_replace.keys()):
 		lString = lString.replace(ii, list_letters_replace[ii])
-	
+
 	# Remove remaining special characters ...
 	for ii in '!$%&*.?@^°':
 		lString = lString.replace(ii, "")
-	
+
 	# Finally spaces become dashes and vice versa
 	lString = lString.replace(" ", "-")
 	lString = lString.replace("-", " ")
-	
+
 	# Remove multiple space
 	lString = ' '.join(lString.split())
-	
+
 	return lString
 
 
@@ -73,31 +97,31 @@ def clean_string(lString): # TODO strings must be moved to header file
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 def hashfile(apath, hasher, blocksize=65536):
-	
+
 	afile = open(apath, 'rb')
-	
+
 	buf = afile.read(blocksize)
-	
+
 	while len(buf) > 0:
 		hasher.update(buf)
 		buf = afile.read(blocksize)
-	
+
 	afile.close()
-	
+
 	return hasher.hexdigest()
 
 
 def string_to_authors_dict(authors):
-	
+
 	temp_list = authors.replace('-', ' ').split(' ')
-	
+
 	authors_list = OrderedDict()
 	temp_author = ''
 	temp_author_k = ''
 	flag_first = False
 	first_author = ''
 	authors_etal = False
-	
+
 	for jj in temp_list:
 		if (jj not in list_authors_exclude) and (not jj.isdigit()) and (len(jj) > 0):
 			if jj[0].islower():
@@ -116,44 +140,44 @@ def string_to_authors_dict(authors):
 				temp_author_k = ''
 		if jj == lit_authors_etal:
 			authors_etal = True
-	
+
 	return first_author, authors_list, authors_etal
 
 
 def string_to_keywords_list(title):
-	
+
 	temp_list = title.replace('-', ' ').lower().split(' ')
-	
+
 	keywords_list = []
-	
+
 	for ii in temp_list:
 		if (ii not in keywords_list) and (ii not in list_alphabet_low) and (ii not in list_keywords_exclude):
 			if (not ii.isdigit()) and (not any(x in ii for x in string_numbers)):
 				keywords_list.append(ii)
-	
+
 	return keywords_list
 
 
 def lit_get_book_from_bookid(year, bookid):
-	
+
 	item_book = ''
 	item_editors = OrderedDict()
 	item_type = ''
-	
+
 	if bookid in lit_book_ids:
 		if year in lit_book_ids[bookid]:
 			item_book = lit_book_ids[bookid][year][lit_id_title]
 			item_type = lit_book_ids[bookid][year][lit_id_type]
 			if lit_id_editors in lit_book_ids[bookid][year]:
 				_, item_editors, _ = string_to_authors_dict(lit_book_ids[bookid][year][lit_id_editors])
-	
+
 	return item_book, item_editors, item_type
 
 
 def parse_userinput(lwInput):
-	
+
 	lwFragments = lwInput.split(input_delimiter)
-	
+
 	# Step 1: Class
 	item_class = lit_class_default
 	if len(lwFragments) > 0:
@@ -161,7 +185,7 @@ def parse_userinput(lwInput):
 		# Only known classes, otherwise default class
 		if item_class not in lit_classes:
 			item_class = lit_class_default
-	
+
 	# Step 2: Year
 	item_year = lit_year_default
 	item_bookid = ''
@@ -185,7 +209,7 @@ def parse_userinput(lwInput):
 					item_book, item_editors, item_type = lit_get_book_from_bookid(item_year, item_bookid)
 					if len(item_book_s) > 1:
 						item_section = item_book_s[1].strip(' ')
-	
+
 	# Step 3: Authors
 	item_authors_d = lit_authors_default
 	if len(lwFragments) > 2:
@@ -194,21 +218,21 @@ def parse_userinput(lwInput):
 			item_authors_d = lit_authors_default
 	# Generate author dictionary
 	item_first, item_names, item_etal = string_to_authors_dict(item_authors_d.replace(" ", "-"))
-	
+
 	# Step 4: Title
 	item_title_d = lit_title_default
 	if len(lwFragments) > 3:
 		item_title_d = clean_string(lwFragments[3])
 		if len(item_title_d) == 0:
 			item_title_d = lit_title_default
-	
+
 	# Step 5: Annotation
 	item_ann_d = lit_ann_default
 	if len(lwFragments) > 4:
 		item_ann_d = clean_string(lwFragments[4])
 		if len(item_ann_d) == 0:
 			item_ann_d = lit_ann_default
-	
+
 	# Step 6: File format
 	item_fileformat = lit_fileformat_default
 	if len(lwFragments) > 5:
@@ -216,7 +240,7 @@ def parse_userinput(lwInput):
 		item_fileformat = clean_string(item_fileformat).replace(" ", ".").lower()
 		if item_fileformat not in list_ext:
 			item_fileformat = lit_fileformat_default
-	
+
 	# Build object
 	lwObject = {
 		lit_id_class:item_class,
@@ -234,12 +258,12 @@ def parse_userinput(lwInput):
 		lit_id_ann_d:item_ann_d,
 		lit_id_fileformat:item_fileformat
 		}
-	
+
 	return lwObject
 
 
 def generate_filename(lwObject):
-	
+
 	# Left of author block: Class, year, book and section
 	lFile_lAuthor = lwObject[lit_id_class] + "_" + lwObject[lit_id_year]
 	if lwObject[lit_id_bookid] != '':
@@ -247,20 +271,20 @@ def generate_filename(lwObject):
 		if lwObject[lit_id_section] != '':
 			lFile_lAuthor += "." + lwObject[lit_id_section].replace(" ", "-")
 	lFile_lAuthor += "_"
-	
+
 	# Right of author block: Title, annotation, file format
 	lFile_rAuthor = "_" + lwObject[lit_id_title_d].replace(" ", "-")
 	if lwObject[lit_id_ann_d] != '':
 		lFile_rAuthor += "_" + lwObject[lit_id_ann_d].replace(" ", "-")
 	lFile_rAuthor += "." + lwObject[lit_id_fileformat]
-	
+
 	# Length of filename without author block
 	lFile_len = len(lFile_lAuthor) + len(lFile_rAuthor)
 	# Length of author block
 	lFile_author_len = 0
 	# Empty author string
 	lFile_Author = ''
-	
+
 	# Iterate over authors
 	check_etal = False
 	for uu in list(lwObject[lit_id_authors].keys()):
@@ -278,22 +302,22 @@ def generate_filename(lwObject):
 		lFile_author_len += len(lit_authors_etal)
 		lFile_Author += lit_authors_etal
 		check_etal = True
-	
+
 	lFile_Author = lFile_Author.strip('-')
-	
+
 	lFile = lFile_lAuthor + lFile_Author + lFile_rAuthor
-	
+
 	return lFile
 
 
 def generate_userinput(item_filename):
-	
+
 	userinput_d = []
-	
+
 	if follow_convention_guess(item_filename):
-		
+
 		lwObject, _ = filename_to_lit_object(item_filename)
-		
+
 		userinput_d.append(lwObject[lit_id_class])
 		userinput_d.append(cnt_n)
 		userinput_d.append(input_delimiter)
@@ -324,39 +348,39 @@ def generate_userinput(item_filename):
 		userinput_d.append(cnt_n)
 		userinput_d.append(lwObject[lit_id_fileformat].lower())
 		userinput_d.append(cnt_n)
-		
+
 		userinput = ''.join(userinput_d)
-		
+
 	else:
-		
+
 		fext, fname = filename_ext(item_filename)
 		userinput = cnt_n + fname + cnt_n + input_delimiter + cnt_n + fext + cnt_n
-	
+
 	return userinput
 
 
 def follow_convention_guess(item_filename):
-	
+
 	# Try *quick* guess if this might be a filename following the convention
 	isfilename = False
-	
+
 	# Breake file name into items
 	items = item_filename.split('_')
-	
+
 	if len(items) > 2:
 		if items[0] in lit_classes:
 			if len(items[1]) > 3:
 				if items[1][:4].isdigit():
 					# It likely follows the pattern
 					isfilename = True
-	
+
 	return isfilename
 
 
 def shorten_filename(item_filename):
-	
+
 	len_cut = 80
-	
+
 	if len(item_filename) > len_cut:
 		fext, fname = filename_ext(item_filename)
 		short_name = fname[:(len_cut - 10)] + '...' + fname[-6:]
@@ -364,41 +388,41 @@ def shorten_filename(item_filename):
 			short_name += '.' + fext
 	else:
 		short_name = item_filename
-	
+
 	return short_name
 
 
 def filename_to_lit_object(item_filename):
-	
+
 	# Debug messages
 	item_msg = []
-	
+
 	# Check length filename
 	if len(item_filename) > lit_filename_maxlength:
 		item_msg.append(lw_debug_filenametoolong + ': ' + shorten_filename(item_filename) + cnt_n)
-	
+
 	# Split filename and extention
 	item_fileformat, item_filename_clean = filename_ext(item_filename)
 	if item_fileformat == '':
 		item_msg.append(lw_debug_unknownformat + ': ' + shorten_filename(item_filename) + cnt_n)
-	
+
 	# Breake file name into items
 	items = item_filename_clean.split('_')
-	
+
 	# Set empty hash
 	item_hash = ''
-	
+
 	# Set empty file size
 	item_size = 0
-	
+
 	# Set empty (Dropbox) URL
 	item_url = ''
-	
+
 	# 1st item: Class
 	item_class = items[0]
 	if item_class not in lit_classes:
 		item_msg.append(lw_debug_unknownclass + ': ' + item_class + ' (' + shorten_filename(item_filename) + ')' + cnt_n)
-	
+
 	# 2nd item: Year, series, section
 	items_block = items[1].split('.')
 	item_year = items_block[0]
@@ -416,10 +440,10 @@ def filename_to_lit_object(item_filename):
 		item_section = items_block[2].replace('-', '.')
 	else:
 		item_section = ''
-	
+
 	# 3rd item: Authors
 	item_first, item_names, item_etal = string_to_authors_dict(items[2])
-	
+
 	# 4th item: Title
 	if len(items) > 3:
 		item_title = items[3].replace('-', ' ')
@@ -435,7 +459,7 @@ def filename_to_lit_object(item_filename):
 		item_flag_sp = True
 	else:
 		item_flag_sp = False
-	
+
 	# Deal with special files, frontmatters etc - TODO remove this section eventually
 	if items[2].split('-')[0] in list_publication_special:
 		item_title = '[' + items[2].replace('-', ' ') + ']'
@@ -443,7 +467,7 @@ def filename_to_lit_object(item_filename):
 		# item_flag_sp = True
 	# else:
 		# item_flag_sp = False
-	
+
 	# 5th item: Annotations (optional)
 	if len(items) > 4:
 		item_ann = items[4]
@@ -455,7 +479,7 @@ def filename_to_lit_object(item_filename):
 			item_msg.append(lw_debug_annotation + ': ' + item_ann + ' (' + shorten_filename(item_filename) + ')' + cnt_n)
 	else:
 		item_ann = ''
-	
+
 	# Build object
 	item_ii = {
 		lit_id_class:item_class,
@@ -478,86 +502,85 @@ def filename_to_lit_object(item_filename):
 		lit_id_size:item_size,
 		lit_id_hash:item_hash
 		}
-	
+
 	# Handle debug messages
 	item_msg = ''.join(item_msg)
 	item_msg = item_msg.strip(' \n\t')
-	
+
 	return item_ii, item_msg
 
 
 def lit_listpartialupdate_hashsize(list_full, working_path):
-	
+
 	list_updated = []
-	
+
 	ic = 0
-	
+
 	for ii in list_full:
-		
+
 		# Hash file content
 		ii[lit_id_hash] = hashfile(os.path.join(working_path + lit_path_subfolder_lit + ii[lit_id_filename]), hashlib.sha256())
-		
+
 		# Get file sizelString
 		ii[lit_id_size] = os.path.getsize(working_path + lit_path_subfolder_lit + ii[lit_id_filename])
-		
+
 		list_updated.append(ii)
-	
+
 		ic += 1
 		sys.stdout.write("\r" + lw_debug_hash + ": %d. " % ic)
 		sys.stdout.flush()
-	
+
 	print(cnt_n)
-	
+
 	return list_updated
 
 
 def get_dir_list(lpath):
-	
+
 	llist = []
-	
+
 	# List all files in folder
 	temp_list = os.listdir(lpath)
-	
+
 	# Clean list
 	for ii in temp_list:
 		if os.path.isfile(os.path.join(lpath, ii)) and ('desktop.ini' not in ii) and ('dropbox' not in ii):
 			llist.append(ii)
-	
+
 	# Sort them all
 	llist.sort()
-	
+
 	return llist
 
 
 def lit_get_list(working_path):
-	
+
 	ic = 0
-	
+
 	lit_list = []
 
 	# Build path to literature
 	lit_path = working_path + lit_path_subfolder_lit
-	
+
 	# Get list of files, cleaned
 	temp_list = get_dir_list(lit_path)
-	
+
 	for ii in temp_list:
-		
+
 		# Generate object
 		item_ii, item_msg = filename_to_lit_object(ii)
-		
+
 		# Append object to list
 		lit_list.append(item_ii)
-		
+
 		ic += 1
 		sys.stdout.write("\r" + lw_debug_index + ": %d. " % ic)
 		sys.stdout.flush()
-	
+
 		# Print debug messages
 		if item_msg != '':
 			print(item_msg)
-		
-	print(cnt_n)
-	
-	return lit_list
 
+	print(cnt_n)
+
+	return lit_list
