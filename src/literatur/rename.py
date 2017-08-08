@@ -32,7 +32,7 @@ specific language governing rights and limitations under the License.
 
 import sys
 
-from PyQt5 import QtGui
+from PyQt5 import QtWidgets
 
 from .core.renamegui import instance_class
 
@@ -43,7 +43,7 @@ from .core.renamegui import instance_class
 
 def rename_gui_start():
 
-	app = QtGui.QApplication(sys.argv)
+	app = QtWidgets.QApplication(sys.argv)
 	app_mainwindow = instance_class()
 	app_mainwindow.show()
 	sys.exit(app.exec_())

@@ -33,7 +33,7 @@ import os
 import shutil
 import pprint
 
-from PyQt5 import QtCore, QtGui
+from PyQt5 import QtCore, QtGui, QtWidgets
 
 from .strings import *
 from .groups import *
@@ -45,14 +45,14 @@ from literatur.ui.filerename import Ui_lwFileRenameDialog
 # GUI CLASS
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-class instance_class(QtGui.QDialog):
+class instance_class(QtWidgets.QDialog):
 
-	def __init__(self, parent=None):
+	def __init__(self, parent = None):
 
 		self.working_path = lit_path_local
 
 		# Initializing window
-		QtGui.QWidget.__init__(self, parent)
+		QtWidgets.QWidget.__init__(self, parent)
 		self.ui = Ui_lwFileRenameDialog()
 		self.ui.setupUi(self)
 
