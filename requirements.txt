@@ -4,6 +4,6 @@ pytest
 Sphinx
 sphinx_rtd_theme
 twine
--e git+https://github.com/alexz-enwp/wikitools/tree/py3
+-e git+https://github.com/alexz-enwp/wikitools.git@py3#egg=wikitools
 dropbox
 PyQt5
