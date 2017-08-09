@@ -87,7 +87,7 @@ from .core.storage import (
 	lit_write_plaintext,
 	lit_write_pprint
 	)
-from .core.timing import lw_log
+# from .core.timing import lw_log
 
 if wiki_on:
 	from .core.mediawiki import (
@@ -255,29 +255,29 @@ def report():
 def update_wiki():
 
 	lit_list_full_new = lit_read_pickle(os.path.join(PATH_ROOT, PATH_SUB_DB, FILE_DB_CURRENT))
-	lw_log('lit_list_full_new')
+	# lw_log('lit_list_full_new')
 
 	# Reorganize index
 	lit_list_by_name = lit_list_organize_by_name(lit_list_full_new)
-	lw_log('lit_list_organize_by_name')
+	# lw_log('lit_list_organize_by_name')
 	lit_list_by_keyword = lit_list_organize_by_keyword(lit_list_full_new)
-	lw_log('lit_list_organize_by_keyword')
+	# lw_log('lit_list_organize_by_keyword')
 	lit_list_by_class = lit_list_organize_by_class(lit_list_full_new)
-	lw_log('lit_list_organize_by_class')
+	# lw_log('lit_list_organize_by_class')
 	lit_list_author_relationship = lit_list_organize_author_relationship(lit_list_full_new)
-	lw_log('lit_list_organize_author_relationship')
+	# lw_log('lit_list_organize_author_relationship')
 
 	# Generate content
 	cnt_index_full = report_wiki_full(lit_list_full_new)
-	lw_log('report_wiki_full')
+	# lw_log('report_wiki_full')
 	cnt_index_by_class = report_wiki_indexbyclass(lit_list_by_class)
-	lw_log('report_wiki_indexbyclass')
+	# lw_log('report_wiki_indexbyclass')
 	cnt_index_by_name = report_wiki_indexbyname(lit_list_by_name)
-	lw_log('report_wiki_indexbyname')
+	# lw_log('report_wiki_indexbyname')
 	cnt_index_by_keyword = report_wiki_indexbykeyword(lit_list_by_keyword)
-	lw_log('report_wiki_indexbykeyword')
+	# lw_log('report_wiki_indexbykeyword')
 	cnt_author_relationship = report_wiki_authorrelationship(lit_list_author_relationship)
-	lw_log('report_wiki_authorrelationship')
+	# lw_log('report_wiki_authorrelationship')
 
 	# Write content to local files
 	lit_write_plaintext(
