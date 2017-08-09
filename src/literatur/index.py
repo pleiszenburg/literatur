@@ -169,10 +169,10 @@ def dump_index():
 		]:
 
 		try:
-			list_full = lit_read_pickle(os.path.join(path_root, PATH_SUB_DB, stage_file))
+			list_full = lit_read_pickle(os.path.join(path_root, PATH_REPO, PATH_SUB_DB, stage_file))
 			lit_write_pprint(
 				list_full,
-				os.path.join(path_root, PATH_REPO, PATH_SUB_DB, stage_file + '.txt')
+				os.path.join(path_root, PATH_REPO, PATH_SUB_REPORTS, stage_file + '.txt')
 				)
 		except:
 			pass
