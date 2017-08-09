@@ -33,11 +33,11 @@ from collections import OrderedDict
 import pprint
 import sys
 
-if networkx_on:
-	import networkx
-
 from .strings import *
 from .groups import lit_book_ids
+
+if networkx_on:
+	import networkx
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
