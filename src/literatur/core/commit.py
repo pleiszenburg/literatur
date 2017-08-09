@@ -34,7 +34,10 @@ import shutil
 import time
 import pprint
 
-from .strings import *
+from .strings import (
+	PATH_SUB_DB,
+	PATH_SUB_DBBACKUP
+	)
 from .groups import lit_book_ids
 
 
@@ -50,15 +53,15 @@ def commit_push(c_original, c_target, working_path):
 
 	# Copy original to target
 	shutil.copyfile(
-		os.path.join(working_path, lit_path_subfolder_db, c_original),
-		os.path.join(working_path, lit_path_subfolder_db, c_target)
+		os.path.join(working_path, PATH_SUB_DB, c_original),
+		os.path.join(working_path, PATH_SUB_DB, c_target)
 		)
 
 
 def commit_backup(commit_file, working_path):
 
 	# Get creation time of file
-	ctime = os.path.getmtime(os.path.join(working_path, lit_path_subfolder_db, commit_file))
+	ctime = os.path.getmtime(os.path.join(working_path, PATH_SUB_DB, commit_file))
 
 	# Form string from creation time
 	ctime_string = commit_datestring(ctime)
@@ -68,8 +71,8 @@ def commit_backup(commit_file, working_path):
 
 	# Copy file for backup
 	shutil.copyfile(
-		os.path.join(working_path, lit_path_subfolder_db, commit_file),
-		os.path.join(working_path, lit_path_subfolder_dbbackup, commit_file_target)
+		os.path.join(working_path, PATH_SUB_DB, commit_file),
+		os.path.join(working_path, PATH_SUB_DBBACKUP, commit_file_target)
 		)
 
 

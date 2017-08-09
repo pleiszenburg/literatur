@@ -36,16 +36,16 @@ import os
 # STATIC STRINGS
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-lit_path_local = os.getcwd() # HACK TODO root path of current project, should be config
-lit_path_external = 'LIBRARY-external' # HACK compatibility for old script
+PATH_ROOT = os.getcwd() # HACK TODO root path of current project, should be config
+# lit_path_external = 'LIBRARY-external' # HACK compatibility for old script
 
-lit_path_subfolder_db = 'db/'
-lit_path_subfolder_dbbackup = 'db/backup/'
-lit_path_subfolder_lit = 'lit/'
+PATH_SUB_DB = 'db'
+PATH_SUB_DBBACKUP = 'db/backup'
+PATH_SUB_LIT = 'lit'
 
-lit_path_pickle_base = 'lw_index_base.pkl'
-lit_path_pickle_old = 'lw_index.pkl'
-lit_path_pickle_new = 'lw_index_journal.pkl'
+FILE_DB_CURRENT = 'lw_index_current.pkl' # stage 1
+FILE_DB_JOURNAL = 'lw_index_journal.pkl' # stage 2
+FILE_DB_MASTER = 'lw_index_master.pkl' # stage 3
 
 lit_path_report_old_pprint_rm = 'report_old_pprint_rm.txt'
 lit_path_report_old_pprint_new = 'report_old_pprint_new.txt'

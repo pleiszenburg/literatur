@@ -31,7 +31,13 @@ specific language governing rights and limitations under the License.
 
 import os
 
-from .core.strings import *
+from .core.strings import (
+	PATH_ROOT, # TODO move into config
+	PATH_SUB_DB,
+	FILE_DB_CURRENT,
+	FILE_DB_JOURNAL,
+	FILE_DB_MASTER
+	)
 from .core.groups import lit_book_ids
 from .core.commit import (
 	commit_backup,
@@ -59,64 +65,59 @@ if dropbox_on:
 
 def check_sanity():
 
-	lit_working_path = lit_path_local # TODO read path from config
-
-	# Build new index object from file system
-	lit_list_full_new = lit_get_list(lit_working_path)
+	list_full = lit_get_list(PATH_ROOT)
 
 
 def commit_journal():
 
-	lit_working_path = lit_path_local # TODO read path from config
+	commit_backup(FILE_DB_MASTER, PATH_ROOT)
 
-	commit_backup(lit_path_pickle_base, lit_working_path)
-
-	commit_push(lit_path_pickle_old, lit_path_pickle_base, lit_working_path)
+	commit_push(FILE_DB_CURRENT, FILE_DB_MASTER, PATH_ROOT)
 
 
 def commit_master():
 
-	lit_working_path = lit_path_local # TODO read path from config
+	commit_backup(FILE_DB_CURRENT, PATH_ROOT)
 
-	commit_backup(lit_path_pickle_old, lit_working_path)
-
-	commit_push(lit_path_pickle_new, lit_path_pickle_old, lit_working_path)
+	commit_push(FILE_DB_JOURNAL, FILE_DB_CURRENT, PATH_ROOT)
 
 
 def build_index():
 
-	lit_working_path = lit_path_local # TODO read path from config
-
 	# Build index object from file system
-	lit_list_full = lit_get_list(lit_working_path)
+	list_full = lit_get_list(PATH_ROOT)
 
 	# Hash files in index
-	lit_list_full = lit_listpartialupdate_hashsize(lit_list_full, lit_working_path)
+	list_full = lit_listpartialupdate_hashsize(list_full, PATH_ROOT)
 
 	# Get dropbox links to files (else: url fields simply remain empty)
 	if dropbox_on:
-		lit_list_full = dropbox_listfullupdate(lit_list_full)
+		list_full = dropbox_listfullupdate(list_full)
 
 	# Store into commited database
-	lit_create_pickle(lit_list_full, os.path.join(lit_working_path, lit_path_subfolder_db, lit_path_pickle_old))
+	lit_create_pickle(
+		list_full,
+		os.path.join(PATH_ROOT, PATH_SUB_DB, FILE_DB_CURRENT)
+		)
 
 
 def rebuild_index():
 
-	lit_working_path = lit_path_local # TODO read path from config
-
 	# Build new index object from file system
-	lit_list_full_new = lit_get_list(lit_working_path)
+	list_full_new = lit_get_list(PATH_ROOT)
 
 	# Hash files in index
-	lit_list_full_new = lit_listpartialupdate_hashsize(lit_list_full_new, lit_working_path)
+	list_full_new = lit_listpartialupdate_hashsize(list_full_new, PATH_ROOT)
 
 	# Load old index
-	lit_list_full_old = lit_read_pickle(os.path.join(lit_working_path, lit_path_subfolder_db, lit_path_pickle_old))
+	list_full_old = lit_read_pickle(os.path.join(PATH_ROOT, PATH_SUB_DB, FILE_DB_CURRENT))
 
 	# Add Dropbox URLs to new index (fetch from Dropbox or local cache)
 	if dropbox_on:
-		lit_list_full_new = dropbox_listpartialupdate(lit_list_full_old, lit_list_full_new)
+		list_full_new = dropbox_listpartialupdate(list_full_old, list_full_new)
 
 	# Store into database journal
-	lit_create_pickle(lit_list_full_new, os.path.join(lit_working_path, lit_path_subfolder_db, lit_path_pickle_new))
+	lit_create_pickle(
+		list_full_new,
+		os.path.join(PATH_ROOT, PATH_SUB_DB, FILE_DB_JOURNAL)
+		)
