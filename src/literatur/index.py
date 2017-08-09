@@ -120,5 +120,5 @@ def rebuild_index():
 	# Store into database journal
 	lit_create_pickle(
 		list_full_new,
-		os.path.join(PATH_ROOT, PATH_SUB_DB, FILE_DB_JOURNAL)
+		os.path.join(PATH_ROOT, PATH_SUB_DB, FILE_DB_CURRENT)
 		)
