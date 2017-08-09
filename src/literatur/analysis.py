@@ -39,7 +39,6 @@ from .core.index import (
 	lit_list_get_author_relationship_graph,
 	lit_list_organize_author_relationship
 	)
-# from .core.report import *
 
 if networkx_on:
 	import networkx
