@@ -56,25 +56,6 @@ KEY_NEW = 'new'
 KEY_MV = 'mv'
 KEY_CHANGED = 'changed'
 
-lit_path_report_old_pprint_rm = 'report_old_pprint_rm.txt'
-lit_path_report_old_pprint_new = 'report_old_pprint_new.txt'
-lit_path_report_old_pprint_mv = 'report_old_pprint_mv.txt'
-lit_path_report_old_pprint_changed = 'report_old_pprint_changed.txt'
-
-lit_path_report_base_pprint_rm = 'report_base_pprint_rm.txt'
-lit_path_report_base_pprint_new = 'report_base_pprint_new.txt'
-lit_path_report_base_pprint_mv = 'report_base_pprint_mv.txt'
-lit_path_report_base_pprint_changed = 'report_base_pprint_changed.txt'
-
-lit_path_report_old_mail_new = 'report_old_mail_new.txt'
-lit_path_report_base_mail_new = 'report_base_mail_new.txt'
-
-lit_path_report_new_wikicnt_indexfull = 'report_new_wikicnt_indexfull.txt'
-lit_path_report_new_wikicnt_indexbyclass = 'report_new_wikicnt_indexbyclass.txt'
-lit_path_report_new_wikicnt_indexbyname = 'report_new_wikicnt_indexbyname.txt'
-lit_path_report_new_wikicnt_indexbykeyword = 'report_new_wikicnt_indexbykeyword.txt'
-lit_path_report_new_wikicnt_authorrelationship = 'report_new_wikicnt_authorrelationship.txt'
-
 wiki_page_indexfull = 'Literature Index Overview'
 wiki_page_indexbyclass = 'Literature Index by Class'
 wiki_page_indexbyname = 'Literature Index by Author'
