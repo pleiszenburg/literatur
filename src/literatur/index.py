@@ -36,8 +36,9 @@ from .core.strings import (
 	wiki_on, # TODO move into config
 	wiki_url, wiki_user, wiki_pwd, # TODO move into config
 	# PATH_ROOT, # TODO move into config
-	# PATH_REPO,
+	PATH_REPO,
 	PATH_SUB_DB,
+	PATH_SUB_REPORTS,
 	FILE_DB_CURRENT,
 	FILE_DB_JOURNAL,
 	FILE_DB_MASTER,
@@ -152,7 +153,7 @@ def build_index():
 	# Store into commited database
 	lit_create_pickle(
 		list_full,
-		os.path.join(path_root, PATH_SUB_DB, FILE_DB_CURRENT)
+		os.path.join(path_root, PATH_REPO, PATH_SUB_DB, FILE_DB_CURRENT)
 		)
 
 
@@ -171,7 +172,7 @@ def dump_index():
 			list_full = lit_read_pickle(os.path.join(path_root, PATH_SUB_DB, stage_file))
 			lit_write_pprint(
 				list_full,
-				os.path.join(path_root, PATH_SUB_DB, stage_file + '.txt')
+				os.path.join(path_root, PATH_REPO, PATH_SUB_DB, stage_file + '.txt')
 				)
 		except:
 			pass
@@ -183,7 +184,7 @@ def find_duplicates():
 
 	# Load current index
 	list_full = lit_read_pickle(
-		os.path.join(path_root, PATH_SUB_DB, FILE_DB_CURRENT)
+		os.path.join(path_root, PATH_REPO, PATH_SUB_DB, FILE_DB_CURRENT)
 		)
 
 	# Find duplicates
@@ -218,7 +219,7 @@ def rebuild_index():
 	list_full_new = lit_listpartialupdate_hashsize(list_full_new, path_root)
 
 	# Load old index
-	list_full_old = lit_read_pickle(os.path.join(path_root, PATH_SUB_DB, FILE_DB_CURRENT))
+	list_full_old = lit_read_pickle(os.path.join(path_root, PATH_REPO, PATH_SUB_DB, FILE_DB_CURRENT))
 
 	# Add Dropbox URLs to new index (fetch from Dropbox or local cache)
 	if dropbox_on:
@@ -227,7 +228,7 @@ def rebuild_index():
 	# Store into database journal
 	lit_create_pickle(
 		list_full_new,
-		os.path.join(path_root, PATH_SUB_DB, FILE_DB_CURRENT)
+		os.path.join(path_root, PATH_REPO, PATH_SUB_DB, FILE_DB_CURRENT)
 		)
 
 
@@ -245,7 +246,7 @@ def report():
 		]:
 
 		try:
-			list_full = lit_read_pickle(os.path.join(path_root, PATH_SUB_DB, stage_file))
+			list_full = lit_read_pickle(os.path.join(path_root, PATH_REPO, PATH_SUB_DB, stage_file))
 		except:
 			list_full = []
 
@@ -266,12 +267,12 @@ def report():
 
 			lit_write_pprint(
 				diff_dict[status_key],
-				os.path.join(path_root, PATH_SUB_DB, stage_file_old + '.diff_' + status_key + '.txt')
+				os.path.join(path_root, PATH_REPO, PATH_SUB_REPORTS, stage_file_old + '.diff_' + status_key + '.txt')
 				)
 
 		lit_write_plaintext(
 			report_mail_newfiles(diff_dict[KEY_NEW]),
-			os.path.join(path_root, PATH_SUB_DB, stage_file_old + '.mail_' + status_key + '.txt')
+			os.path.join(path_root, PATH_REPO, PATH_SUB_REPORTS, stage_file_old + '.mail_' + status_key + '.txt')
 			)
 
 
@@ -279,7 +280,7 @@ def update_wiki():
 
 	path_root = find_root_dir_with_message()
 
-	lit_list_full_new = lit_read_pickle(os.path.join(path_root, PATH_SUB_DB, FILE_DB_CURRENT))
+	lit_list_full_new = lit_read_pickle(os.path.join(path_root, PATH_REPO, PATH_SUB_DB, FILE_DB_CURRENT))
 	# lw_log('lit_list_full_new')
 
 	# Reorganize index
@@ -307,23 +308,38 @@ def update_wiki():
 	# Write content to local files
 	lit_write_plaintext(
 		cnt_index_full,
-		os.path.join(path_root, PATH_SUB_DB, 'wiki_' + wiki_page_indexfull.replace(' ', '-') + '.txt')
+		os.path.join(
+			path_root, PATH_REPO, PATH_SUB_REPORTS,
+			'wiki_' + wiki_page_indexfull.replace(' ', '-') + '.txt'
+			)
 		)
 	lit_write_plaintext(
 		cnt_index_by_class,
-		os.path.join(path_root, PATH_SUB_DB, 'wiki_' + wiki_page_indexbyclass.replace(' ', '-') + '.txt')
+		os.path.join(
+			path_root, PATH_REPO, PATH_SUB_REPORTS,
+			'wiki_' + wiki_page_indexbyclass.replace(' ', '-') + '.txt'
+			)
 		)
 	lit_write_plaintext(
 		cnt_index_by_name,
-		os.path.join(path_root, PATH_SUB_DB, 'wiki_' + wiki_page_indexbyname.replace(' ', '-') + '.txt')
+		os.path.join(
+			path_root, PATH_REPO, PATH_SUB_REPORTS,
+			'wiki_' + wiki_page_indexbyname.replace(' ', '-') + '.txt'
+			)
 		)
 	lit_write_plaintext(
 		cnt_index_by_keyword,
-		os.path.join(path_root, PATH_SUB_DB, 'wiki_' + wiki_page_indexbykeyword.replace(' ', '-') + '.txt')
+		os.path.join(
+			path_root, PATH_REPO, PATH_SUB_REPORTS,
+			'wiki_' + wiki_page_indexbykeyword.replace(' ', '-') + '.txt'
+			)
 		)
 	lit_write_plaintext(
 		cnt_author_relationship,
-		os.path.join(path_root, PATH_SUB_DB, 'wiki_' + wiki_page_authorrelationship.replace(' ', '-') + '.txt')
+		os.path.join(
+			path_root, PATH_REPO, PATH_SUB_REPORTS,
+			'wiki_' + wiki_page_authorrelationship.replace(' ', '-') + '.txt'
+			)
 		)
 
 	# Wiki kill switch
