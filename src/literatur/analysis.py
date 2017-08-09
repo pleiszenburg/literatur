@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 """
@@ -7,7 +6,7 @@ LITERATUR
 Literature management with Python, Dropbox and MediaWiki
 https://github.com/pleiszenburg/literatur
 
-	scripts/l_sanity.py: Checks repository state
+	src/literatur/analysis.py: Analyse the literature database
 
 	Copyright (C) 2017 Sebastian M. Ernst <ernst@pleiszenburg.de>
 
@@ -30,13 +29,36 @@ specific language governing rights and limitations under the License.
 # IMPORTS
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-from literatur.index import check_sanity
+import pprint
+
+from .core.strings import *
+from .core.groups import lit_book_ids
+from .core.storage import *
+from .core.index import *
+from .core.report import *
+
+if networkx_on:
+	import networkx
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-# REBUILD NEW INDEX
+# REPORT
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-if __name__ == "__main__":
+def get_author_network():
 
-	check_sanity()
+	lit_working_path = lit_path_local # TODO read path from config
+
+	# Load new index
+	lit_list_full_new = lit_read_pickle(lit_working_path + lit_path_subfolder_db + lit_path_pickle_new)
+
+	# Reorganize index
+	lit_list_author_relationship = lit_list_organize_author_relationship(lit_list_full_new)
+
+	if networkx_on:
+
+		# Generate content
+		lit_list_author_relationship_graph = lit_list_get_author_relationship_graph(lit_list_author_relationship)
+
+		# Write content to local file
+		networkx.write_graphml(lit_list_author_relationship_graph, lit_working_path + lit_path_subfolder_db + lit_path_report_new_network_authorrelationship)
