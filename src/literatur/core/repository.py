@@ -31,12 +31,36 @@ specific language governing rights and limitations under the License.
 
 import os
 
-from .strings import PATH_REPO
+from .strings import (
+	PATH_REPO,
+	PATH_SUB_DB,
+	PATH_SUB_DBBACKUP,
+	PATH_SUB_REPORTS
+	)
+
+from ..index import (
+	build_index,
+	commit_journal,
+	commit_master
+	)
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # IMPORT
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+def init_dir():
+
+	current_path = os.getcwd()
+	current_repository = os.path.join(current_path, PATH_REPO)
+	os.makedirs(current_repository)
+	for fld in [PATH_SUB_DB, PATH_SUB_DBBACKUP, PATH_SUB_REPORTS]:
+		os.makedirs(os.path.join(current_repository, fld))
+
+	build_index()
+	commit_journal()
+	commit_master()
+
 
 def find_root_dir():
 

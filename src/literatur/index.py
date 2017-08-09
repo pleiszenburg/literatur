@@ -35,7 +35,7 @@ from .core.strings import (
 	dropbox_on, # TODO move into config
 	wiki_on, # TODO move into config
 	wiki_url, wiki_user, wiki_pwd, # TODO move into config
-	PATH_ROOT, # TODO move into config
+	# PATH_ROOT, # TODO move into config
 	PATH_SUB_DB,
 	FILE_DB_CURRENT,
 	FILE_DB_JOURNAL,
@@ -80,7 +80,10 @@ from .core.report import (
 	report_wiki_indexbykeyword,
 	report_wiki_authorrelationship
 	)
-from .core.repository import find_root_dir
+from .core.repository import (
+	find_root_dir,
+	init_dir
+	)
 from .core.storage import (
 	lit_create_pickle,
 	lit_read_pickle,
@@ -185,7 +188,11 @@ def find_duplicates():
 
 def init_index():
 
-	print(find_root_dir())
+	try:
+		root_dir = find_root_dir()
+		print('You are already in a repository located at "%s".' % root_dir)
+	except:
+		init_dir()
 
 
 def rebuild_index():
