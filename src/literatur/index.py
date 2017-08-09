@@ -206,6 +206,9 @@ def init_index():
 		print('You are already in a repository located at "%s".' % root_dir)
 	except:
 		init_dir()
+		build_index()
+		commit_journal()
+		commit_master()
 
 
 def rebuild_index():

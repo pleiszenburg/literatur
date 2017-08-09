@@ -523,10 +523,10 @@ def lit_listpartialupdate_hashsize(list_full, working_path):
 	for ii in list_full:
 
 		# Hash file content
-		ii[lit_id_hash] = hashfile(os.path.join(working_path, PATH_SUB_LIT, ii[lit_id_filename]), hashlib.sha256())
+		ii[lit_id_hash] = hashfile(os.path.join(working_path, ii[lit_id_filename]), hashlib.sha256())
 
 		# Get file sizelString
-		ii[lit_id_size] = os.path.getsize(os.path.join(working_path, PATH_SUB_LIT, ii[lit_id_filename]))
+		ii[lit_id_size] = os.path.getsize(os.path.join(working_path, ii[lit_id_filename]))
 
 		list_updated.append(ii)
 
@@ -563,11 +563,8 @@ def lit_get_list(working_path):
 
 	lit_list = []
 
-	# Build path to literature
-	lit_path = os.path.join(working_path, PATH_SUB_LIT)
-
 	# Get list of files, cleaned
-	temp_list = get_dir_list(lit_path)
+	temp_list = get_dir_list(working_path)
 
 	for ii in temp_list:
 

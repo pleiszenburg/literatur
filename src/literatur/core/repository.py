@@ -39,12 +39,6 @@ from .strings import (
 	PATH_SUB_REPORTS
 	)
 
-from ..index import (
-	build_index,
-	commit_journal,
-	commit_master
-	)
-
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # IMPORT
@@ -57,10 +51,6 @@ def init_dir():
 	os.makedirs(current_repository)
 	for fld in [PATH_SUB_DB, PATH_SUB_DBBACKUP, PATH_SUB_REPORTS]:
 		os.makedirs(os.path.join(current_repository, fld))
-
-	build_index()
-	commit_journal()
-	commit_master()
 
 
 def find_root_dir():
