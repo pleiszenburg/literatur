@@ -61,4 +61,4 @@ def find_root_dir():
 			return current_path
 
 	# Nothing found
-	raise
+	raise # TODO
