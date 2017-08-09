@@ -35,10 +35,6 @@ import pprint
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-from .strings import (
-	PATH_ROOT,
-	PATH_SUB_LIT
-	)
 from .groups import *
 from .file import *
 from ..ui.filerename import Ui_lwFileRenameDialog
@@ -52,7 +48,7 @@ class instance_class(QtWidgets.QDialog):
 
 	def __init__(self, parent = None):
 
-		self.working_path = PATH_ROOT
+		self.working_path = os.getcwd()
 
 		# Initializing window
 		QtWidgets.QWidget.__init__(self, parent)
@@ -95,7 +91,6 @@ class instance_class(QtWidgets.QDialog):
 
 		pdf_file = os.path.join(
 			self.working_path,
-			PATH_SUB_LIT,
 			self.ui.lwFileList.currentItem().data(0)
 			)
 		pdf_command = external_pdfviewer_command.replace(external_pdfviewer_file, pdf_file)
@@ -105,9 +100,7 @@ class instance_class(QtWidgets.QDialog):
 	def reloadfilelist(self):
 
 		self.ui.lwFileList.clear()
-		self.ui.lwFileList.addItems(get_dir_list(
-			os.path.join(self.working_path, PATH_SUB_LIT)
-			)) # Fetch from API
+		self.ui.lwFileList.addItems(get_dir_list(self.working_path)) # Fetch from API
 
 
 	def movefile(self):
@@ -117,12 +110,12 @@ class instance_class(QtWidgets.QDialog):
 
 		if oldname != newname:
 
-			if not os.path.isfile(os.path.join(self.working_path, PATH_SUB_LIT, newname)):
+			if not os.path.isfile(os.path.join(self.working_path, newname)):
 
 				# Move to target
 				shutil.move(
-					os.path.join(self.working_path, PATH_SUB_LIT, oldname),
-					os.path.join(self.working_path, PATH_SUB_LIT, newname)
+					os.path.join(self.working_path, oldname),
+					os.path.join(self.working_path, newname)
 					)
 
 				self.ui.lwFileList.currentItem().setText(newname)
