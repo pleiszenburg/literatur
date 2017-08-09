@@ -182,6 +182,11 @@ def find_duplicates():
 	print(duplicates_hash_text + cnt_n)
 
 
+def init_index():
+
+	pass
+
+
 def rebuild_index():
 
 	# Build new index object from file system
