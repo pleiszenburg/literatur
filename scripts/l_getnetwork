@@ -7,7 +7,7 @@ LITERATUR
 Literature management with Python, Dropbox and MediaWiki
 https://github.com/pleiszenburg/literatur
 
-	scripts/l_getnetwork.py: Generates a networkmap of (co-) authors
+	scripts/l_getnetwork: Generates a networkmap of (co-) authors
 
 	Copyright (C) 2017 Sebastian M. Ernst <ernst@pleiszenburg.de>
 
