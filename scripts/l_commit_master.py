@@ -7,7 +7,7 @@ LITERATUR
 Literature management with Python, Dropbox and MediaWiki
 https://github.com/pleiszenburg/literatur
 
-	scripts/run_commit_temp.py: Commit to current
+	scripts/l_commit_master.py: Commit from journal to master
 
 	Copyright (C) 2017 Sebastian M. Ernst <ernst@pleiszenburg.de>
 
@@ -30,17 +30,13 @@ specific language governing rights and limitations under the License.
 # IMPORTS
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-from lw_strings import *
-from lw_groups import *
-from lw_commit import *
+from literatur.index import commit_master
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-# GO FOR IT!
+# COMMIT TO MASTER
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-lit_working_path = lit_path_local # TODO read path from config
+if __name__ == "__main__":
 
-commit_backup(lit_path_pickle_old, lit_working_path)
-
-commit_push(lit_path_pickle_new, lit_path_pickle_old, lit_working_path)
+	commit_master()

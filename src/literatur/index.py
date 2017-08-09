@@ -33,6 +33,10 @@ import os
 
 from .core.strings import *
 from .core.groups import lit_book_ids
+from .core.commit import (
+	commit_backup,
+	commit_push
+	)
 from .core.file import (
 	lit_get_list,
 	lit_listpartialupdate_hashsize
@@ -59,6 +63,24 @@ def check_sanity():
 
 	# Build new index object from file system
 	lit_list_full_new = lit_get_list(lit_working_path)
+
+
+def commit_journal():
+
+	lit_working_path = lit_path_local # TODO read path from config
+
+	commit_backup(lit_path_pickle_base, lit_working_path)
+
+	commit_push(lit_path_pickle_old, lit_path_pickle_base, lit_working_path)
+
+
+def commit_master():
+
+	lit_working_path = lit_path_local # TODO read path from config
+
+	commit_backup(lit_path_pickle_old, lit_working_path)
+
+	commit_push(lit_path_pickle_new, lit_path_pickle_old, lit_working_path)
 
 
 def build_index():
