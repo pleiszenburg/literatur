@@ -56,7 +56,7 @@ def report_wiki_indexbykeyword(list_by_keywords):
 	cnt_index = []
 
 	cnt_index.append(cnt_message_bot + cnt_n + cnt_n)
-	cnt_index.append('The following tables lists all entries in ' + lit_path_external + ' on Dropbox by keyword(s).' + cnt_n + cnt_n)
+	cnt_index.append('The following tables lists all entries in ' + PATH_ROOT + ' on Dropbox by keyword(s).' + cnt_n + cnt_n)
 
 	cnt_index.append(report_wiki_fragmentbyletter())
 	cnt_index.append(cnt_n + cnt_n)
@@ -114,7 +114,7 @@ def report_wiki_indexbyname(list_by_name):
 	cnt_index = []
 
 	cnt_index.append(cnt_message_bot + cnt_n + cnt_n)
-	cnt_index.append('The following tables list all entries in ' + lit_path_external + ' on Dropbox by author(s).' + cnt_n + cnt_n)
+	cnt_index.append('The following tables list all entries in ' + PATH_ROOT + ' on Dropbox by author(s).' + cnt_n + cnt_n)
 
 	cnt_index.append(report_wiki_fragmentbyletter())
 	cnt_index.append(cnt_n + cnt_n)
@@ -181,7 +181,7 @@ def report_wiki_authorrelationship(list_by_relationship):
 	cnt_index = []
 
 	cnt_index.append(cnt_message_bot + cnt_n + cnt_n)
-	cnt_index.append('The following table lists relationships between authors of documents in ' + lit_path_external + '.' + cnt_n + cnt_n)
+	cnt_index.append('The following table lists relationships between authors of documents in ' + PATH_ROOT + '.' + cnt_n + cnt_n)
 
 	cnt_index.append(report_wiki_fragmentbyletter())
 	cnt_index.append(cnt_n + cnt_n)
@@ -246,7 +246,7 @@ def report_wiki_indexbyclass(list_by_class):
 	cnt_index = []
 
 	cnt_index.append(cnt_message_bot + cnt_n + cnt_n)
-	cnt_index.append('The following tables lists SOME entries in ' + lit_path_external + ' on Dropbox by class.' + cnt_n + cnt_n)
+	cnt_index.append('The following tables lists SOME entries in ' + PATH_ROOT + ' on Dropbox by class.' + cnt_n + cnt_n)
 
 	cnt_index.append('<table class="wikitable sortable">' + cnt_n)
 
@@ -316,7 +316,7 @@ def report_wiki_full(list_full):
 	cnt_index = []
 
 	cnt_index.append(cnt_message_bot + cnt_n + cnt_n)
-	cnt_index.append('The following table lists all entries in ' + lit_path_external + ' on Dropbox.' + cnt_n + cnt_n)
+	cnt_index.append('The following table lists all entries in ' + PATH_ROOT + ' on Dropbox.' + cnt_n + cnt_n)
 
 	cnt_index.append('<table class="wikitable sortable">' + cnt_n)
 

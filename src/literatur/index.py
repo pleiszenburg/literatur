@@ -34,6 +34,7 @@ import os
 from .core.strings import (
 	dropbox_on, # TODO move into config
 	wiki_on, # TODO move into config
+	wiki_url, wiki_user, wiki_pwd, # TODO move into config
 	PATH_ROOT, # TODO move into config
 	PATH_SUB_DB,
 	FILE_DB_CURRENT,
@@ -46,7 +47,12 @@ from .core.strings import (
 	KEY_NEW,
 	KEY_MV,
 	KEY_CHANGED,
-	cnt_n
+	cnt_n,
+	wiki_page_indexfull,
+	wiki_page_indexbyclass,
+	wiki_page_indexbyname,
+	wiki_page_indexbykeyword,
+	wiki_page_authorrelationship
 	)
 from .core.groups import lit_book_ids
 from .core.commit import (
@@ -59,11 +65,20 @@ from .core.file import (
 	)
 from .core.index import (
 	lit_diff_lists,
-	lit_find_duplicates
+	lit_find_duplicates,
+	lit_list_organize_by_name,
+	lit_list_organize_by_keyword,
+	lit_list_organize_by_class,
+	lit_list_organize_author_relationship
 	)
 from .core.report import (
 	report_debug_duplicates,
-	report_mail_newfiles
+	report_mail_newfiles,
+	report_wiki_full,
+	report_wiki_indexbyclass,
+	report_wiki_indexbyname,
+	report_wiki_indexbykeyword,
+	report_wiki_authorrelationship
 	)
 from .core.storage import (
 	lit_create_pickle,
@@ -71,10 +86,14 @@ from .core.storage import (
 	lit_write_plaintext,
 	lit_write_pprint
 	)
+from .core.timing import lw_log
 
 if wiki_on:
 	from .core.mediawiki import (
-		a
+		wiki_login,
+		wiki_get_edittoken,
+		wiki_page_set_cnt,
+		wiki_logout
 		)
 if dropbox_on:
 	from .core.dropbox import (
@@ -229,7 +248,7 @@ def report():
 
 def update_wiki():
 
-	lit_list_full_new = lit_read_pickle(lit_working_path + lit_path_subfolder_db + lit_path_pickle_new)
+	lit_list_full_new = lit_read_pickle(os.path.join(PATH_ROOT, PATH_SUB_DB, FILE_DB_CURRENT))
 	lw_log('lit_list_full_new')
 
 	# Reorganize index
@@ -255,11 +274,26 @@ def update_wiki():
 	lw_log('report_wiki_authorrelationship')
 
 	# Write content to local files
-	lit_write_plaintext(cnt_index_full, lit_working_path + lit_path_subfolder_db + lit_path_report_new_wikicnt_indexfull)
-	lit_write_plaintext(cnt_index_by_class, lit_working_path + lit_path_subfolder_db + lit_path_report_new_wikicnt_indexbyclass)
-	lit_write_plaintext(cnt_index_by_name, lit_working_path + lit_path_subfolder_db + lit_path_report_new_wikicnt_indexbyname)
-	lit_write_plaintext(cnt_index_by_keyword, lit_working_path + lit_path_subfolder_db + lit_path_report_new_wikicnt_indexbykeyword)
-	lit_write_plaintext(cnt_author_relationship, lit_working_path + lit_path_subfolder_db + lit_path_report_new_wikicnt_authorrelationship)
+	lit_write_plaintext(
+		cnt_index_full,
+		os.path.join(PATH_ROOT, PATH_SUB_DB, 'wiki_' + wiki_page_indexfull.replace(' ', '-') + '.txt')
+		)
+	lit_write_plaintext(
+		cnt_index_by_class,
+		os.path.join(PATH_ROOT, PATH_SUB_DB, 'wiki_' + wiki_page_indexbyclass.replace(' ', '-') + '.txt')
+		)
+	lit_write_plaintext(
+		cnt_index_by_name,
+		os.path.join(PATH_ROOT, PATH_SUB_DB, 'wiki_' + wiki_page_indexbyname.replace(' ', '-') + '.txt')
+		)
+	lit_write_plaintext(
+		cnt_index_by_keyword,
+		os.path.join(PATH_ROOT, PATH_SUB_DB, 'wiki_' + wiki_page_indexbykeyword.replace(' ', '-') + '.txt')
+		)
+	lit_write_plaintext(
+		cnt_author_relationship,
+		os.path.join(PATH_ROOT, PATH_SUB_DB, 'wiki_' + wiki_page_authorrelationship.replace(' ', '-') + '.txt')
+		)
 
 	# Wiki kill switch
 	if wiki_on:
