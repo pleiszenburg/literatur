@@ -37,7 +37,7 @@ from .core.strings import (
 	PATH_SUB_DB,
 	FILE_DB_CURRENT,
 	FILE_DB_JOURNAL,
-	FILE_DB_MASTER
+	FILE_DB_MASTER,
 	)
 from .core.groups import lit_book_ids
 from .core.commit import (
@@ -50,7 +50,8 @@ from .core.file import (
 	)
 from .core.storage import (
 	lit_create_pickle,
-	lit_read_pickle
+	lit_read_pickle,
+	lit_write_pprint
 	)
 
 if dropbox_on:
@@ -100,6 +101,25 @@ def build_index():
 		list_full,
 		os.path.join(PATH_ROOT, PATH_SUB_DB, FILE_DB_CURRENT)
 		)
+
+
+def dump_index():
+
+	# Load all index stages and dump them into plain text
+	for stage_file in [
+		FILE_DB_CURRENT,
+		FILE_DB_JOURNAL,
+		FILE_DB_MASTER
+		]:
+
+		try:
+			list_full = lit_read_pickle(os.path.join(PATH_ROOT, PATH_SUB_DB, stage_file))
+			lit_write_pprint(
+				list_full,
+				os.path.join(PATH_ROOT, PATH_SUB_DB, stage_file + '.txt')
+				)
+		except:
+			pass
 
 
 def rebuild_index():

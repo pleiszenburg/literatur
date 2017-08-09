@@ -7,7 +7,7 @@ LITERATUR
 Literature management with Python, Dropbox and MediaWiki
 https://github.com/pleiszenburg/literatur
 
-	scripts/run_dumpdb.py: Dump DB into plain text files
+	scripts/l_dumpdb.py: Dump DB into plain text files
 
 	Copyright (C) 2017 Sebastian M. Ernst <ernst@pleiszenburg.de>
 
@@ -30,34 +30,13 @@ specific language governing rights and limitations under the License.
 # IMPORTS
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-from lw_strings import *
-from lw_groups import *
-from lw_file import *
-from lw_storage import *
-
-import pprint
+from literatur.index import dump_index
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # LOAD
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-lit_working_path = lit_path_local # TODO read path from config
+if __name__ == "__main__":
 
-# Load base index
-lit_list_full_base = lit_read_pickle(lit_working_path + lit_path_subfolder_db + lit_path_pickle_base)
-
-# Load old index
-lit_list_full_old = lit_read_pickle(lit_working_path + lit_path_subfolder_db + lit_path_pickle_old)
-
-# Load new index
-lit_list_full_new = lit_read_pickle(lit_working_path + lit_path_subfolder_db + lit_path_pickle_new)
-
-
-# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-# DUMP IN PLAIN TEXT
-# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-lit_write_pprint(lit_list_full_base, lit_working_path + lit_path_subfolder_db + lit_path_pickle_base + '.txt')
-lit_write_pprint(lit_list_full_old, lit_working_path + lit_path_subfolder_db + lit_path_pickle_old + '.txt')
-lit_write_pprint(lit_list_full_new, lit_working_path + lit_path_subfolder_db + lit_path_pickle_new + '.txt')
+	dump_index()

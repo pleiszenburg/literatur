@@ -43,9 +43,13 @@ PATH_SUB_DB = 'db'
 PATH_SUB_DBBACKUP = 'db/backup'
 PATH_SUB_LIT = 'lit'
 
-FILE_DB_CURRENT = 'lw_index_current.pkl' # stage 1
-FILE_DB_JOURNAL = 'lw_index_journal.pkl' # stage 2
-FILE_DB_MASTER = 'lw_index_master.pkl' # stage 3
+KEY_CURRENT = 'current'
+KEY_JOURNAL = 'journal'
+KEY_MASTER = 'master'
+
+FILE_DB_CURRENT = 'lw_index_%s.pkl' % KEY_CURRENT # stage 1
+FILE_DB_JOURNAL = 'lw_index_%s.pkl' % KEY_JOURNAL # stage 2
+FILE_DB_MASTER = 'lw_index_%s.pkl' % KEY_MASTER # stage 3
 
 lit_path_report_old_pprint_rm = 'report_old_pprint_rm.txt'
 lit_path_report_old_pprint_new = 'report_old_pprint_new.txt'
