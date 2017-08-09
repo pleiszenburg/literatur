@@ -30,6 +30,8 @@ specific language governing rights and limitations under the License.
 # IMPORTS
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+import os
+
 from .core.strings import *
 from .core.groups import lit_book_ids
 from .core.file import (
@@ -61,4 +63,4 @@ def build_index():
 		lit_list_full = dropbox_listfullupdate(lit_list_full)
 
 	# Store into commited database
-	lit_create_pickle(lit_list_full, lit_working_path + lit_path_subfolder_db + lit_path_pickle_old)
+	lit_create_pickle(lit_list_full, os.path.join(lit_working_path, lit_path_subfolder_db, lit_path_pickle_old))
