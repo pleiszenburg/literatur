@@ -38,10 +38,16 @@ from .core.file import (
 	lit_get_list,
 	lit_listpartialupdate_hashsize
 	)
-from .core.storage import lit_create_pickle
+from .core.storage import (
+	lit_create_pickle,
+	lit_read_pickle
+	)
 
 if dropbox_on:
-	from .core.dropbox import dropbox_listfullupdate
+	from .core.dropbox import (
+		dropbox_listfullupdate,
+		dropbox_listpartialupdate
+		)
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -64,3 +70,24 @@ def build_index():
 
 	# Store into commited database
 	lit_create_pickle(lit_list_full, os.path.join(lit_working_path, lit_path_subfolder_db, lit_path_pickle_old))
+
+
+def rebuild_index():
+
+	lit_working_path = lit_path_local # TODO read path from config
+
+	# Build new index object from file system
+	lit_list_full_new = lit_get_list(lit_working_path)
+
+	# Hash files in index
+	lit_list_full_new = lit_listpartialupdate_hashsize(lit_list_full_new, lit_working_path)
+
+	# Load old index
+	lit_list_full_old = lit_read_pickle(os.path.join(lit_working_path, lit_path_subfolder_db, lit_path_pickle_old))
+
+	# Add Dropbox URLs to new index (fetch from Dropbox or local cache)
+	if dropbox_on:
+		lit_list_full_new = dropbox_listpartialupdate(lit_list_full_old, lit_list_full_new)
+
+	# Store into database journal
+	lit_create_pickle(lit_list_full_new, os.path.join(lit_working_path, lit_path_subfolder_db, lit_path_pickle_new))
