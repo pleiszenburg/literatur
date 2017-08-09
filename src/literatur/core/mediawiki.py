@@ -25,12 +25,15 @@ specific language governing rights and limitations under the License.
 """
 
 
-from lw_strings import *
-from lw_groups import *
-
-import pprint
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# IMPORT
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 from collections import OrderedDict
+import pprint
+
+from .strings import *
+from .groups import lit_book_ids
 
 from wikitools import wiki, api, page
 

@@ -29,16 +29,15 @@ specific language governing rights and limitations under the License.
 # IMPORTS
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-from lw_strings import *
-from lw_groups import *
+from collections import OrderedDict
+import pprint
+import sys
 
 if networkx_on:
 	import networkx
 
-import pprint
-import sys
-
-from collections import OrderedDict
+from .strings import *
+from .groups import lit_book_ids
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

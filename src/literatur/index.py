@@ -7,7 +7,7 @@ LITERATUR
 Literature management with Python, Dropbox and MediaWiki
 https://github.com/pleiszenburg/literatur
 
-	scripts/run_buildlocalindex.py: Builds an index
+	src/literatur/index.py: (Re-) building the index
 
 	Copyright (C) 2017 Sebastian M. Ernst <ernst@pleiszenburg.de>
 
@@ -30,13 +30,35 @@ specific language governing rights and limitations under the License.
 # IMPORTS
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-from literatur.index import build_index
+from .core.strings import *
+from .core.groups import lit_book_ids
+from .core.file import (
+	lit_get_list,
+	lit_listpartialupdate_hashsize
+	)
+from .core.storage import lit_create_pickle
+
+if dropbox_on:
+	from .core.dropbox import dropbox_listfullupdate
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-# BUILD THE INDEX
+# EXPORT TO DB
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-if __name__ == "__main__":
+def build_index():
 
-	build_index()
+	lit_working_path = lit_path_local # TODO read path from config
+
+	# Build index object from file system
+	lit_list_full = lit_get_list(lit_working_path)
+
+	# Hash files in index
+	lit_list_full = lit_listpartialupdate_hashsize(lit_list_full, lit_working_path)
+
+	# Get dropbox links to files (else: url fields simply remain empty)
+	if dropbox_on:
+		lit_list_full = dropbox_listfullupdate(lit_list_full)
+
+	# Store into commited database
+	lit_create_pickle(lit_list_full, lit_working_path + lit_path_subfolder_db + lit_path_pickle_old)

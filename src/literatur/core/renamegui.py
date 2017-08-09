@@ -38,7 +38,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from .strings import *
 from .groups import *
 from .file import *
-from literatur.ui.filerename import Ui_lwFileRenameDialog
+from ..ui.filerename import Ui_lwFileRenameDialog
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

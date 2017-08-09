@@ -25,8 +25,9 @@ specific language governing rights and limitations under the License.
 """
 
 
-from .strings import *
-from .groups import *
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# IMPORT
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 import hashlib
 import pprint
@@ -34,6 +35,9 @@ import sys
 import os
 
 from collections import OrderedDict
+
+from .strings import *
+from .groups import lit_book_ids
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

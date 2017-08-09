@@ -29,13 +29,13 @@ specific language governing rights and limitations under the License.
 # IMPORTS
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-from lw_strings import *
-from lw_groups import *
-
 import os
 import shutil
 import time
 import pprint
+
+from .strings import *
+from .groups import lit_book_ids
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

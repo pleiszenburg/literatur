@@ -7,3 +7,4 @@ twine
 -e git+https://github.com/alexz-enwp/wikitools.git@py3#egg=wikitools
 dropbox
 PyQt5
+networkx
