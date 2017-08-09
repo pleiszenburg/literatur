@@ -38,6 +38,13 @@ from .core.strings import (
 	FILE_DB_CURRENT,
 	FILE_DB_JOURNAL,
 	FILE_DB_MASTER,
+	KEY_CURRENT,
+	KEY_JOURNAL,
+	KEY_MASTER,
+	KEY_RM,
+	KEY_NEW,
+	KEY_MV,
+	KEY_CHANGED,
 	)
 from .core.groups import lit_book_ids
 from .core.commit import (
@@ -48,9 +55,12 @@ from .core.file import (
 	lit_get_list,
 	lit_listpartialupdate_hashsize
 	)
+from .core.index import lit_diff_lists
+from .core.report import report_mail_newfiles
 from .core.storage import (
 	lit_create_pickle,
 	lit_read_pickle,
+	lit_write_plaintext,
 	lit_write_pprint
 	)
 
@@ -146,35 +156,41 @@ def rebuild_index():
 
 def report():
 
-	# Load base index
-	lit_list_full_base = lit_read_pickle(lit_working_path + lit_path_subfolder_db + lit_path_pickle_base)
+	list_full_dict = {}
 
-	# Load old index
-	lit_list_full_old = lit_read_pickle(lit_working_path + lit_path_subfolder_db + lit_path_pickle_old)
+	# Load all stages
+	for stage_key, stage_file in [
+		(KEY_CURRENT, FILE_DB_CURRENT),
+		(KEY_JOURNAL, FILE_DB_JOURNAL),
+		(KEY_MASTER, FILE_DB_MASTER)
+		]:
 
-	# Load new index
-	lit_list_full_new = lit_read_pickle(lit_working_path + lit_path_subfolder_db + lit_path_pickle_new)
+		try:
+			list_full = lit_read_pickle(os.path.join(PATH_ROOT, PATH_SUB_DB, stage_file))
+		except:
+			list_full = []
 
-	# Diff base vs new index
-	diff_base_rm, diff_base_new, diff_base_mv, diff_base_changed = lit_diff_lists(lit_list_full_base, lit_list_full_new)
+		list_full_dict[stage_key] = list_full
 
-	# Diff old vs new index
-	diff_old_rm, diff_old_new, diff_old_mv, diff_old_changed = lit_diff_lists(lit_list_full_old, lit_list_full_new)
+	# Diff the pairs
+	for stage_file_old, stage_key_old, stage_key_new in [
+		(FILE_DB_JOURNAL, KEY_JOURNAL, KEY_CURRENT),
+		(FILE_DB_MASTER, KEY_MASTER, KEY_CURRENT)
+		]:
 
-	# Store diffs
-	lit_write_pprint(diff_old_rm, lit_working_path + lit_path_subfolder_db + lit_path_report_old_pprint_rm)
-	lit_write_pprint(diff_old_new, lit_working_path + lit_path_subfolder_db + lit_path_report_old_pprint_new)
-	lit_write_pprint(diff_old_mv, lit_working_path + lit_path_subfolder_db + lit_path_report_old_pprint_mv)
-	lit_write_pprint(diff_old_changed, lit_working_path + lit_path_subfolder_db + lit_path_report_old_pprint_changed)
-	lit_write_pprint(diff_base_rm, lit_working_path + lit_path_subfolder_db + lit_path_report_base_pprint_rm)
-	lit_write_pprint(diff_base_new, lit_working_path + lit_path_subfolder_db + lit_path_report_base_pprint_new)
-	lit_write_pprint(diff_base_mv, lit_working_path + lit_path_subfolder_db + lit_path_report_base_pprint_mv)
-	lit_write_pprint(diff_base_changed, lit_working_path + lit_path_subfolder_db + lit_path_report_base_pprint_changed)
+		diff_dict = lit_diff_lists(
+			list_full_dict[stage_key_old],
+			list_full_dict[stage_key_new]
+			)
 
-	# Generate email text with new entries
-	diff_old_mail_new = report_mail_newfiles(diff_old_new)
-	diff_base_mail_new = report_mail_newfiles(diff_base_new)
+		for status_key in [KEY_MV, KEY_RM, KEY_NEW, KEY_CHANGED]:
 
-	# Store mail reports
-	lit_write_plaintext(diff_old_mail_new, lit_working_path + lit_path_subfolder_db + lit_path_report_old_mail_new)
-	lit_write_plaintext(diff_base_mail_new, lit_working_path + lit_path_subfolder_db + lit_path_report_base_mail_new)
+			lit_write_pprint(
+				diff_dict[status_key],
+				os.path.join(PATH_ROOT, PATH_SUB_DB, stage_file_old + '.diff_' + status_key + '.txt')
+				)
+
+		lit_write_plaintext(
+			report_mail_newfiles(diff_dict[KEY_NEW]),
+			os.path.join(PATH_ROOT, PATH_SUB_DB, stage_file_old + '.mail_' + status_key + '.txt')
+			)

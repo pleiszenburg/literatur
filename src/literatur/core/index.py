@@ -155,7 +155,12 @@ def lit_diff_lists(list_old, list_new):
 		if not exist_filename and not exist_hash:
 			diff_new.append(jj)
 
-	return diff_rm, diff_new, diff_mv, diff_changed
+	return {
+		KEY_RM: diff_rm,
+		KEY_NEW: diff_new,
+		KEY_MV: diff_mv,
+		KEY_CHANGED: diff_changed
+		}
 
 
 def lit_list_organize_by_class(list_full):

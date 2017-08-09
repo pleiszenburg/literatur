@@ -51,6 +51,11 @@ FILE_DB_CURRENT = 'lw_index_%s.pkl' % KEY_CURRENT # stage 1
 FILE_DB_JOURNAL = 'lw_index_%s.pkl' % KEY_JOURNAL # stage 2
 FILE_DB_MASTER = 'lw_index_%s.pkl' % KEY_MASTER # stage 3
 
+KEY_RM = 'rm'
+KEY_NEW = 'new'
+KEY_MV = 'mv'
+KEY_CHANGED = 'changed'
+
 lit_path_report_old_pprint_rm = 'report_old_pprint_rm.txt'
 lit_path_report_old_pprint_new = 'report_old_pprint_new.txt'
 lit_path_report_old_pprint_mv = 'report_old_pprint_mv.txt'
