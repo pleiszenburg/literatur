@@ -45,35 +45,45 @@ from .groups import lit_book_ids
 # ROUTINES?
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-def commit_push(c_original, c_target, working_path):
+def commit_push(commit_source, commit_target, working_path):
 
-	# If previous commit exists, kill it
-	if os.path.isfile(c_target):
-		os.remove(c_target)
+	# Get full paths
+	commit_source_path = os.path.join(working_path, PATH_SUB_DB, commit_source)
+	commit_target_path = os.path.join(working_path, PATH_SUB_DB, commit_target)
 
-	# Copy original to target
-	shutil.copyfile(
-		os.path.join(working_path, PATH_SUB_DB, c_original),
-		os.path.join(working_path, PATH_SUB_DB, c_target)
-		)
+	# Only push if source exists
+	if os.path.isfile(commit_source_path):
+
+		# If previous commit exists, kill it
+		if os.path.isfile(commit_target_path):
+			os.remove(commit_target_path)
+
+		# Copy original to target ('copyfile' will overwrite)
+		shutil.copyfile(commit_source_path, commit_target_path)
 
 
-def commit_backup(commit_file, working_path):
+def commit_backup(commit_source, working_path):
 
-	# Get creation time of file
-	ctime = os.path.getmtime(os.path.join(working_path, PATH_SUB_DB, commit_file))
+	# Full path of file which is going into backup
+	commit_source_path = os.path.join(working_path, PATH_SUB_DB, commit_source)
 
-	# Form string from creation time
-	ctime_string = commit_datestring(ctime)
+	# Run only if there is something to backup
+	if os.path.isfile(commit_source_path):
 
-	# Create new file name with creation time
-	commit_file_target = commit_file.replace('.', '_' + ctime_string + '.');
+		# Get creation time of file
+		ctime = os.path.getmtime(commit_source_path)
 
-	# Copy file for backup
-	shutil.copyfile(
-		os.path.join(working_path, PATH_SUB_DB, commit_file),
-		os.path.join(working_path, PATH_SUB_DBBACKUP, commit_file_target)
-		)
+		# Form string from creation time
+		ctime_string = commit_datestring(ctime)
+
+		# Create new file name with creation time
+		commit_target = commit_source.replace('.', '_' + ctime_string + '.')
+
+		# Get full path of backup target
+		commit_target_path = os.path.join(working_path, PATH_SUB_DBBACKUP, commit_target)
+
+		# Copy file for backup
+		shutil.copyfile(commit_source_path, commit_target_path)
 
 
 def commit_datestring(ctime):

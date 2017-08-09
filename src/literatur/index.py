@@ -71,16 +71,16 @@ def check_sanity():
 
 def commit_journal():
 
-	commit_backup(FILE_DB_MASTER, PATH_ROOT)
+	commit_backup(FILE_DB_JOURNAL, PATH_ROOT)
 
-	commit_push(FILE_DB_CURRENT, FILE_DB_MASTER, PATH_ROOT)
+	commit_push(FILE_DB_CURRENT, FILE_DB_JOURNAL, PATH_ROOT)
 
 
 def commit_master():
 
-	commit_backup(FILE_DB_CURRENT, PATH_ROOT)
+	commit_backup(FILE_DB_MASTER, PATH_ROOT)
 
-	commit_push(FILE_DB_JOURNAL, FILE_DB_CURRENT, PATH_ROOT)
+	commit_push(FILE_DB_JOURNAL, FILE_DB_MASTER, PATH_ROOT)
 
 
 def build_index():
