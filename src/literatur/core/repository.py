@@ -30,6 +30,7 @@ specific language governing rights and limitations under the License.
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 import os
+import sys
 
 from .strings import (
 	PATH_REPO,
@@ -86,3 +87,12 @@ def find_root_dir():
 
 	# Nothing found
 	raise # TODO
+
+
+def find_root_dir_with_message():
+
+	try:
+		return find_root_dir()
+	except:
+		print('You are no in a literature repository.')
+		sys.exit()

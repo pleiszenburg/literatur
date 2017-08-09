@@ -36,6 +36,7 @@ from .core.strings import (
 	wiki_on, # TODO move into config
 	wiki_url, wiki_user, wiki_pwd, # TODO move into config
 	# PATH_ROOT, # TODO move into config
+	PATH_REPO,
 	PATH_SUB_DB,
 	FILE_DB_CURRENT,
 	FILE_DB_JOURNAL,
@@ -82,6 +83,7 @@ from .core.report import (
 	)
 from .core.repository import (
 	find_root_dir,
+	find_root_dir_with_message,
 	init_dir
 	)
 from .core.storage import (
@@ -112,30 +114,36 @@ if dropbox_on:
 
 def check_sanity():
 
-	list_full = lit_get_list(PATH_ROOT)
+	list_full = lit_get_list(find_root_dir_with_message())
 
 
 def commit_journal():
 
-	commit_backup(FILE_DB_JOURNAL, PATH_ROOT)
+	path_root = find_root_dir_with_message()
 
-	commit_push(FILE_DB_CURRENT, FILE_DB_JOURNAL, PATH_ROOT)
+	commit_backup(FILE_DB_JOURNAL, path_root)
+
+	commit_push(FILE_DB_CURRENT, FILE_DB_JOURNAL, path_root)
 
 
 def commit_master():
 
-	commit_backup(FILE_DB_MASTER, PATH_ROOT)
+	path_root = find_root_dir_with_message()
 
-	commit_push(FILE_DB_JOURNAL, FILE_DB_MASTER, PATH_ROOT)
+	commit_backup(FILE_DB_MASTER, path_root)
+
+	commit_push(FILE_DB_JOURNAL, FILE_DB_MASTER, path_root)
 
 
 def build_index():
 
+	path_root = find_root_dir_with_message()
+
 	# Build index object from file system
-	list_full = lit_get_list(PATH_ROOT)
+	list_full = lit_get_list(path_root)
 
 	# Hash files in index
-	list_full = lit_listpartialupdate_hashsize(list_full, PATH_ROOT)
+	list_full = lit_listpartialupdate_hashsize(list_full, path_root)
 
 	# Get dropbox links to files (else: url fields simply remain empty)
 	if dropbox_on:
@@ -144,11 +152,13 @@ def build_index():
 	# Store into commited database
 	lit_create_pickle(
 		list_full,
-		os.path.join(PATH_ROOT, PATH_SUB_DB, FILE_DB_CURRENT)
+		os.path.join(path_root, PATH_SUB_DB, FILE_DB_CURRENT)
 		)
 
 
 def dump_index():
+
+	path_root = find_root_dir_with_message()
 
 	# Load all index stages and dump them into plain text
 	for stage_file in [
@@ -158,10 +168,10 @@ def dump_index():
 		]:
 
 		try:
-			list_full = lit_read_pickle(os.path.join(PATH_ROOT, PATH_SUB_DB, stage_file))
+			list_full = lit_read_pickle(os.path.join(path_root, PATH_SUB_DB, stage_file))
 			lit_write_pprint(
 				list_full,
-				os.path.join(PATH_ROOT, PATH_SUB_DB, stage_file + '.txt')
+				os.path.join(path_root, PATH_SUB_DB, stage_file + '.txt')
 				)
 		except:
 			pass
@@ -169,13 +179,15 @@ def dump_index():
 
 def find_duplicates():
 
+	path_root = find_root_dir_with_message()
+
 	# Load current index
 	list_full = lit_read_pickle(
-		os.path.join(PATH_ROOT, PATH_SUB_DB, FILE_DB_CURRENT)
+		os.path.join(path_root, PATH_SUB_DB, FILE_DB_CURRENT)
 		)
 
 	# Find duplicates
-	duplicates_key, duplicates_hash = lit_find_duplicates(list_full, PATH_ROOT)
+	duplicates_key, duplicates_hash = lit_find_duplicates(list_full, path_root)
 
 	# Generate reports
 	duplicates_key_text = report_debug_duplicates(duplicates_key)
@@ -197,14 +209,16 @@ def init_index():
 
 def rebuild_index():
 
+	path_root = find_root_dir_with_message()
+
 	# Build new index object from file system
-	list_full_new = lit_get_list(PATH_ROOT)
+	list_full_new = lit_get_list(path_root)
 
 	# Hash files in index
-	list_full_new = lit_listpartialupdate_hashsize(list_full_new, PATH_ROOT)
+	list_full_new = lit_listpartialupdate_hashsize(list_full_new, path_root)
 
 	# Load old index
-	list_full_old = lit_read_pickle(os.path.join(PATH_ROOT, PATH_SUB_DB, FILE_DB_CURRENT))
+	list_full_old = lit_read_pickle(os.path.join(path_root, PATH_SUB_DB, FILE_DB_CURRENT))
 
 	# Add Dropbox URLs to new index (fetch from Dropbox or local cache)
 	if dropbox_on:
@@ -213,11 +227,13 @@ def rebuild_index():
 	# Store into database journal
 	lit_create_pickle(
 		list_full_new,
-		os.path.join(PATH_ROOT, PATH_SUB_DB, FILE_DB_CURRENT)
+		os.path.join(path_root, PATH_SUB_DB, FILE_DB_CURRENT)
 		)
 
 
 def report():
+
+	path_root = find_root_dir_with_message()
 
 	list_full_dict = {}
 
@@ -229,7 +245,7 @@ def report():
 		]:
 
 		try:
-			list_full = lit_read_pickle(os.path.join(PATH_ROOT, PATH_SUB_DB, stage_file))
+			list_full = lit_read_pickle(os.path.join(path_root, PATH_SUB_DB, stage_file))
 		except:
 			list_full = []
 
@@ -250,18 +266,20 @@ def report():
 
 			lit_write_pprint(
 				diff_dict[status_key],
-				os.path.join(PATH_ROOT, PATH_SUB_DB, stage_file_old + '.diff_' + status_key + '.txt')
+				os.path.join(path_root, PATH_SUB_DB, stage_file_old + '.diff_' + status_key + '.txt')
 				)
 
 		lit_write_plaintext(
 			report_mail_newfiles(diff_dict[KEY_NEW]),
-			os.path.join(PATH_ROOT, PATH_SUB_DB, stage_file_old + '.mail_' + status_key + '.txt')
+			os.path.join(path_root, PATH_SUB_DB, stage_file_old + '.mail_' + status_key + '.txt')
 			)
 
 
 def update_wiki():
 
-	lit_list_full_new = lit_read_pickle(os.path.join(PATH_ROOT, PATH_SUB_DB, FILE_DB_CURRENT))
+	path_root = find_root_dir_with_message()
+
+	lit_list_full_new = lit_read_pickle(os.path.join(path_root, PATH_SUB_DB, FILE_DB_CURRENT))
 	# lw_log('lit_list_full_new')
 
 	# Reorganize index
@@ -289,23 +307,23 @@ def update_wiki():
 	# Write content to local files
 	lit_write_plaintext(
 		cnt_index_full,
-		os.path.join(PATH_ROOT, PATH_SUB_DB, 'wiki_' + wiki_page_indexfull.replace(' ', '-') + '.txt')
+		os.path.join(path_root, PATH_SUB_DB, 'wiki_' + wiki_page_indexfull.replace(' ', '-') + '.txt')
 		)
 	lit_write_plaintext(
 		cnt_index_by_class,
-		os.path.join(PATH_ROOT, PATH_SUB_DB, 'wiki_' + wiki_page_indexbyclass.replace(' ', '-') + '.txt')
+		os.path.join(path_root, PATH_SUB_DB, 'wiki_' + wiki_page_indexbyclass.replace(' ', '-') + '.txt')
 		)
 	lit_write_plaintext(
 		cnt_index_by_name,
-		os.path.join(PATH_ROOT, PATH_SUB_DB, 'wiki_' + wiki_page_indexbyname.replace(' ', '-') + '.txt')
+		os.path.join(path_root, PATH_SUB_DB, 'wiki_' + wiki_page_indexbyname.replace(' ', '-') + '.txt')
 		)
 	lit_write_plaintext(
 		cnt_index_by_keyword,
-		os.path.join(PATH_ROOT, PATH_SUB_DB, 'wiki_' + wiki_page_indexbykeyword.replace(' ', '-') + '.txt')
+		os.path.join(path_root, PATH_SUB_DB, 'wiki_' + wiki_page_indexbykeyword.replace(' ', '-') + '.txt')
 		)
 	lit_write_plaintext(
 		cnt_author_relationship,
-		os.path.join(PATH_ROOT, PATH_SUB_DB, 'wiki_' + wiki_page_authorrelationship.replace(' ', '-') + '.txt')
+		os.path.join(path_root, PATH_SUB_DB, 'wiki_' + wiki_page_authorrelationship.replace(' ', '-') + '.txt')
 		)
 
 	# Wiki kill switch
