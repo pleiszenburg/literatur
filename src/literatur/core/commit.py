@@ -50,15 +50,15 @@ def commit_push(c_original, c_target, working_path):
 
 	# Copy original to target
 	shutil.copyfile(
-		working_path + lit_path_subfolder_db + c_original,
-		working_path + lit_path_subfolder_db + c_target
+		os.path.join(working_path, lit_path_subfolder_db, c_original),
+		os.path.join(working_path, lit_path_subfolder_db, c_target)
 		)
 
 
 def commit_backup(commit_file, working_path):
 
 	# Get creation time of file
-	ctime = os.path.getmtime(working_path + lit_path_subfolder_db + commit_file)
+	ctime = os.path.getmtime(os.path.join(working_path, lit_path_subfolder_db, commit_file))
 
 	# Form string from creation time
 	ctime_string = commit_datestring(ctime)
@@ -68,8 +68,8 @@ def commit_backup(commit_file, working_path):
 
 	# Copy file for backup
 	shutil.copyfile(
-		working_path + lit_path_subfolder_db + commit_file,
-		working_path + lit_path_subfolder_dbbackup + commit_file_target
+		os.path.join(working_path, lit_path_subfolder_db, commit_file),
+		os.path.join(working_path, lit_path_subfolder_dbbackup, commit_file_target)
 		)
 
 
