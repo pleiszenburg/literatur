@@ -43,6 +43,8 @@ PATH_SUB_DB = 'db'
 PATH_SUB_DBBACKUP = 'db/backup'
 PATH_SUB_LIT = 'lit'
 
+PATH_REPO = '.l'
+
 KEY_CURRENT = 'current'
 KEY_JOURNAL = 'journal'
 KEY_MASTER = 'master'

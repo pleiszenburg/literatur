@@ -80,6 +80,7 @@ from .core.report import (
 	report_wiki_indexbykeyword,
 	report_wiki_authorrelationship
 	)
+from .core.repository import find_root_dir
 from .core.storage import (
 	lit_create_pickle,
 	lit_read_pickle,
@@ -184,7 +185,7 @@ def find_duplicates():
 
 def init_index():
 
-	pass
+	print(find_root_dir())
 
 
 def rebuild_index():
