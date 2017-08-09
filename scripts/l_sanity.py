@@ -7,7 +7,7 @@ LITERATUR
 Literature management with Python, Dropbox and MediaWiki
 https://github.com/pleiszenburg/literatur
 
-	scripts/run_sanity.py: Checks repository state
+	scripts/l_sanity.py: Checks repository state
 
 	Copyright (C) 2017 Sebastian M. Ernst <ernst@pleiszenburg.de>
 
@@ -30,18 +30,14 @@ specific language governing rights and limitations under the License.
 # IMPORTS
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-from lw_strings import *
-from lw_groups import *
-from lw_file import *
-
-import pprint
+from literatur.index import check_sanity
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # REBUILD NEW INDEX
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-lit_working_path = lit_path_local # TODO read path from config
 
-# Build new index object from file system
-lit_list_full_new = lit_get_list(lit_working_path)
+if __name__ == "__main__":
+
+	check_sanity()

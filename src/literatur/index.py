@@ -54,6 +54,14 @@ if dropbox_on:
 # EXPORT TO DB
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+def check_sanity():
+
+	lit_working_path = lit_path_local # TODO read path from config
+
+	# Build new index object from file system
+	lit_list_full_new = lit_get_list(lit_working_path)
+
+
 def build_index():
 
 	lit_working_path = lit_path_local # TODO read path from config
