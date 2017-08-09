@@ -85,7 +85,7 @@ lw_debug_duplicates = 'Duplicates'
 lw_debug_index = 'Index'
 lw_debug_filealreadyexists = "File already exists."
 
-lit_path_report_new_network_authorrelationship = 'author_relationship_graph.graphml'
+FILE_ANALYSIS_AUTHORNETWORKGRAPH = 'author_network_graph.graphml'
 
 wiki_on = False
 wiki_url = '' # 'http://www.somedomain.com/wiki/api.php' # Must point to MediaWiki API php-file

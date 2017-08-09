@@ -32,7 +32,13 @@ specific language governing rights and limitations under the License.
 import os
 import pprint
 
-from .core.strings import *
+from .core.strings import (
+	networkx_on, # TODO replace by config
+	PATH_ROOT,
+	PATH_SUB_DB,
+	FILE_DB_CURRENT,
+	FILE_ANALYSIS_AUTHORNETWORKGRAPH
+	)
 from .core.groups import lit_book_ids
 from .core.storage import lit_read_pickle
 from .core.index import (
@@ -50,18 +56,19 @@ if networkx_on:
 
 def get_author_network():
 
-	lit_working_path = lit_path_local # TODO read path from config
-
 	# Load new index
-	lit_list_full_new = lit_read_pickle(os.path.join(lit_working_path, lit_path_subfolder_db, lit_path_pickle_new))
+	list_full = lit_read_pickle(os.path.join(PATH_ROOT, PATH_SUB_DB, FILE_DB_CURRENT))
 
 	# Reorganize index
-	lit_list_author_relationship = lit_list_organize_author_relationship(lit_list_full_new)
+	list_author_relationship = lit_list_organize_author_relationship(list_full)
 
 	if networkx_on:
 
 		# Generate content
-		lit_list_author_relationship_graph = lit_list_get_author_relationship_graph(lit_list_author_relationship)
+		list_author_relationship_graph = lit_list_get_author_relationship_graph(list_author_relationship)
 
 		# Write content to local file
-		networkx.write_graphml(lit_list_author_relationship_graph, os.path.join(lit_working_path, lit_path_subfolder_db, lit_path_report_new_network_authorrelationship))
+		networkx.write_graphml(
+			list_author_relationship_graph,
+			os.path.join(PATH_ROOT, PATH_SUB_DB, FILE_ANALYSIS_AUTHORNETWORKGRAPH)
+			)
