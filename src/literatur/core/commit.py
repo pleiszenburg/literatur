@@ -35,6 +35,7 @@ import time
 import pprint
 
 from .strings import (
+	PATH_REPO,
 	PATH_SUB_DB,
 	PATH_SUB_DBBACKUP
 	)
@@ -48,8 +49,8 @@ from .groups import lit_book_ids
 def commit_push(commit_source, commit_target, working_path):
 
 	# Get full paths
-	commit_source_path = os.path.join(working_path, PATH_SUB_DB, commit_source)
-	commit_target_path = os.path.join(working_path, PATH_SUB_DB, commit_target)
+	commit_source_path = os.path.join(working_path, PATH_REPO, PATH_SUB_DB, commit_source)
+	commit_target_path = os.path.join(working_path, PATH_REPO, PATH_SUB_DB, commit_target)
 
 	# Only push if source exists
 	if os.path.isfile(commit_source_path):
@@ -65,7 +66,7 @@ def commit_push(commit_source, commit_target, working_path):
 def commit_backup(commit_source, working_path):
 
 	# Full path of file which is going into backup
-	commit_source_path = os.path.join(working_path, PATH_SUB_DB, commit_source)
+	commit_source_path = os.path.join(working_path, PATH_REPO, PATH_SUB_DB, commit_source)
 
 	# Run only if there is something to backup
 	if os.path.isfile(commit_source_path):
@@ -80,7 +81,7 @@ def commit_backup(commit_source, working_path):
 		commit_target = commit_source.replace('.', '_' + ctime_string + '.')
 
 		# Get full path of backup target
-		commit_target_path = os.path.join(working_path, PATH_SUB_DBBACKUP, commit_target)
+		commit_target_path = os.path.join(working_path, PATH_REPO, PATH_SUB_DBBACKUP, commit_target)
 
 		# Copy file for backup
 		shutil.copyfile(commit_source_path, commit_target_path)

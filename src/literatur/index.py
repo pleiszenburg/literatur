@@ -36,7 +36,7 @@ from .core.strings import (
 	wiki_on, # TODO move into config
 	wiki_url, wiki_user, wiki_pwd, # TODO move into config
 	# PATH_ROOT, # TODO move into config
-	PATH_REPO,
+	# PATH_REPO,
 	PATH_SUB_DB,
 	FILE_DB_CURRENT,
 	FILE_DB_JOURNAL,
