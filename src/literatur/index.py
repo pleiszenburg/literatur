@@ -45,6 +45,7 @@ from .core.strings import (
 	KEY_NEW,
 	KEY_MV,
 	KEY_CHANGED,
+	cnt_n
 	)
 from .core.groups import lit_book_ids
 from .core.commit import (
@@ -55,8 +56,14 @@ from .core.file import (
 	lit_get_list,
 	lit_listpartialupdate_hashsize
 	)
-from .core.index import lit_diff_lists
-from .core.report import report_mail_newfiles
+from .core.index import (
+	lit_diff_lists,
+	lit_find_duplicates
+	)
+from .core.report import (
+	report_debug_duplicates,
+	report_mail_newfiles
+	)
 from .core.storage import (
 	lit_create_pickle,
 	lit_read_pickle,
@@ -130,6 +137,25 @@ def dump_index():
 				)
 		except:
 			pass
+
+
+def find_duplicates():
+
+	# Load current index
+	list_full = lit_read_pickle(
+		os.path.join(PATH_ROOT, PATH_SUB_DB, FILE_DB_CURRENT)
+		)
+
+	# Find duplicates
+	duplicates_key, duplicates_hash = lit_find_duplicates(list_full, PATH_ROOT)
+
+	# Generate reports
+	duplicates_key_text = report_debug_duplicates(duplicates_key)
+	duplicates_hash_text = report_debug_duplicates(duplicates_hash)
+
+	# Print them on screen
+	print(duplicates_key_text + cnt_n)
+	print(duplicates_hash_text + cnt_n)
 
 
 def rebuild_index():
