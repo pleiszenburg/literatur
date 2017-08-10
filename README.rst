@@ -7,13 +7,14 @@
 	███████╗██║   ██║   ███████╗██║  ██║██║  ██║   ██║   ╚██████╔╝██║  ██║
 	╚══════╝╚═╝   ╚═╝   ╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝    ╚═════╝ ╚═╝  ╚═╝
 
-/lɪtəʀaˈtuːɐ̯/ *(literature: German, noun, feminine)*
+/lɪtəʀaˈtuːɐ̯/ *(German, noun, feminine: literature)*
 
 Synopsis
 ========
 
-(Scientific) literature management with (C)Python (3), Dropbox and MediaWiki.
+(Scientific) literature management with (C)Python 3, Dropbox and MediaWiki.
 Entirely offline at its core, all online functionality is optional.
+(Unix) shell friendly approach, enabling file management with `find`, `ls` and friends.
 Alpha for newcomers, production-ready for insiders. LGPL.
 
 Prerequisites
