@@ -82,7 +82,7 @@ Bugs & issues
 
 Report bugs in literatur here: `GitHub issue tracker`_
 
-.. _GitHub issue tracker: https://github.com/pleiszenburg/zugbruecke/issues
+.. _GitHub issue tracker: https://github.com/pleiszenburg/literatur/issues
 
 Miscellaneous
 =============
