@@ -7,7 +7,7 @@
 	███████╗██║   ██║   ███████╗██║  ██║██║  ██║   ██║   ╚██████╔╝██║  ██║
 	╚══════╝╚═╝   ╚═╝   ╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝    ╚═════╝ ╚═╝  ╚═╝
 
-/lɪtəʀaˈtuːɐ̯/ (literature: German, noun, feminine)
+/lɪtəʀaˈtuːɐ̯/ *(literature: German, noun, feminine)*
 
 Synopsis
 ========
