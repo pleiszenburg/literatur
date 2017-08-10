@@ -22,10 +22,10 @@ Prerequisites
 
 The following Python packages are required:
 
-- `git+https://github.com/alexz-enwp/wikitools.git@py3#egg=wikitools`
-- `dropbox`
-- `PyQt5`
-- `networkx`
+- ``git+https://github.com/alexz-enwp/wikitools.git@py3#egg=wikitools``
+- ``dropbox``
+- ``PyQt5``
+- ``networkx``
 
 Installation
 ============
