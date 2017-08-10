@@ -14,7 +14,7 @@ Synopsis
 
 (Scientific) literature management with (C)Python 3, Dropbox and MediaWiki.
 Entirely offline at its core, all online functionality is optional.
-(Unix) shell friendly approach, enabling file management with `find`, `ls` and friends.
+(Unix) shell friendly approach, enabling file management with ``find``, ``ls`` and friends.
 Alpha for newcomers, production-ready for insiders. LGPL.
 
 Prerequisites
@@ -39,21 +39,21 @@ It should be platform independent, but it really has only been tested on Linux.
 Basic usage & philosophy
 ========================
 
-Think of *git* with two hard-coded branches (`journal` and `master`) and a staging area (`current`).
-Think of the folder `.l` like you would think about `.git`.
-Find reports and analysis data in `.l/reports`.
+Think of *git* with two hard-coded branches (``journal`` and ``master``) and a staging area (``current``).
+Think of the folder ``.l`` like you would think about ``.git``.
+Find reports and analysis data in ``.l/reports``.
 
-First, run `l_init` at the root of a new repository.
-Add literature and adjust the filenames with `l_rename`.
-Check the repository state, i.e. the file names, with `l_sanity`.
-Build an index for `current` with `l_buildindex`, update it with `l_rebuildindex`.
-Commit changes to the `journal` branch with `l_commit_journal`.
-Make changes permanent by further pushing to `master` with `l_commit_master`.
-Find duplicate entries with `l_findduplicates`.
-Dump the database into plain text files with `l_dumpdb`.
-Generate all sorts of useful reports with `l_report`.
-Push the latest state of the repository to a MediaWiki server with `l_pushwiki`.
-Analyse the network of authors with `l_getnetwork`.
+First, run ``l_init`` at the root of a new repository.
+Add literature and adjust the filenames with ``l_rename``.
+Check the repository state, i.e. the file names, with ``l_sanity``.
+Build an index for ``current`` with ``l_buildindex``, update it with ``l_rebuildindex``.
+Commit changes to the ``journal`` branch with ``l_commit_journal``.
+Make changes permanent by further pushing to `master` with ``l_commit_master``.
+Find duplicate entries with ``l_findduplicates``.
+Dump the database into plain text files with ``l_dumpdb``.
+Generate all sorts of useful reports with ``l_report``.
+Push the latest state of the repository to a MediaWiki server with ``l_pushwiki``.
+Analyse the network of authors with ``l_getnetwork``.
 
 Full list of commands
 ---------------------
