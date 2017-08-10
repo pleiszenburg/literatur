@@ -36,8 +36,8 @@ Installation
 
 It should be platform independent, but it really has only been tested on Linux.
 
-Basic usage
-===========
+Basic usage & philosophy
+========================
 
 Think of *git* with two hard-coded branches (`journal` and `master`) and a staging area (`current`).
 Think of the folder `.l` like you would think about `.git`.
@@ -54,6 +54,9 @@ Dump the database into plain text files with `l_dumpdb`.
 Generate all sorts of useful reports with `l_report`.
 Push the latest state of the repository to a MediaWiki server with `l_pushwiki`.
 Analyse the network of authors with `l_getnetwork`.
+
+Full list of commands
+---------------------
 
 .. code:: bash
 
