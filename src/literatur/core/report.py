@@ -33,6 +33,8 @@ import pprint
 
 from .strings import *
 
+PATH_ROOT = '/' # HACK TODO need to point to Dropbox relative path
+
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # WIKI REPORT ROUTINES
