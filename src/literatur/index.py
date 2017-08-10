@@ -275,7 +275,7 @@ def report():
 
 		lit_write_plaintext(
 			report_mail_newfiles(diff_dict[KEY_NEW]),
-			os.path.join(path_root, PATH_REPO, PATH_SUB_REPORTS, stage_file_old + '.mail_' + status_key + '.txt')
+			os.path.join(path_root, PATH_REPO, PATH_SUB_REPORTS, stage_file_old + '.mail_' + KEY_NEW + '.txt')
 			)
 
 
