@@ -34,7 +34,7 @@ import pprint
 
 from .core.strings import (
 	networkx_on, # TODO replace by config
-	PATH_ROOT,
+	PATH_REPO,
 	PATH_SUB_DB,
 	FILE_DB_CURRENT,
 	FILE_ANALYSIS_AUTHORNETWORKGRAPH
@@ -45,6 +45,7 @@ from .core.index import (
 	lit_list_get_author_relationship_graph,
 	lit_list_organize_author_relationship
 	)
+from .core.repository import find_root_dir_with_message
 
 if networkx_on:
 	import networkx
@@ -56,8 +57,10 @@ if networkx_on:
 
 def get_author_network():
 
+	path_root = find_root_dir_with_message()
+
 	# Load new index
-	list_full = lit_read_pickle(os.path.join(PATH_ROOT, PATH_SUB_DB, FILE_DB_CURRENT))
+	list_full = lit_read_pickle(os.path.join(path_root, PATH_REPO, PATH_SUB_DB, FILE_DB_CURRENT))
 
 	# Reorganize index
 	list_author_relationship = lit_list_organize_author_relationship(list_full)
@@ -70,5 +73,5 @@ def get_author_network():
 		# Write content to local file
 		networkx.write_graphml(
 			list_author_relationship_graph,
-			os.path.join(PATH_ROOT, PATH_SUB_DB, FILE_ANALYSIS_AUTHORNETWORKGRAPH)
+			os.path.join(path_root, PATH_REPO, PATH_SUB_DB, FILE_ANALYSIS_AUTHORNETWORKGRAPH)
 			)
