@@ -35,7 +35,6 @@ import pprint
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-from .groups import *
 from .file import *
 from ..ui.filerename import Ui_lwFileRenameDialog
 

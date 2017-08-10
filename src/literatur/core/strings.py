@@ -36,13 +36,9 @@ import os
 # STATIC STRINGS
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-# PATH_ROOT = os.getcwd() # HACK TODO root path of current project, should be config
-# lit_path_external = 'LIBRARY-external' # HACK compatibility for old script
-
 PATH_SUB_DB = 'db'
 PATH_SUB_DBBACKUP = 'db/backup'
 PATH_SUB_REPORTS = 'reports'
-# PATH_SUB_LIT = 'lit'
 
 PATH_REPO = '.l'
 

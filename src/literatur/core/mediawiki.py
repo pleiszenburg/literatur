@@ -33,7 +33,6 @@ from collections import OrderedDict
 import pprint
 
 from .strings import *
-from .groups import lit_book_ids
 
 from wikitools import wiki, api, page
 

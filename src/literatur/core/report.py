@@ -32,7 +32,6 @@ specific language governing rights and limitations under the License.
 import pprint
 
 from .strings import *
-from .groups import lit_book_ids
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

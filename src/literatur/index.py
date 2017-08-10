@@ -56,7 +56,6 @@ from .core.strings import (
 	wiki_page_indexbykeyword,
 	wiki_page_authorrelationship
 	)
-from .core.groups import lit_book_ids
 from .core.commit import (
 	commit_backup,
 	commit_push

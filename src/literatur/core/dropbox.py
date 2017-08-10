@@ -26,7 +26,6 @@ specific language governing rights and limitations under the License.
 
 
 from .strings import *
-from .groups import lit_book_ids
 
 import sys
 import pprint

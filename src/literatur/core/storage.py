@@ -33,9 +33,6 @@ from collections import OrderedDict
 import pprint
 import pickle
 
-from .strings import *
-from .groups import lit_book_ids
-
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # STORAGE ROUTINES

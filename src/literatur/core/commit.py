@@ -39,7 +39,6 @@ from .strings import (
 	PATH_SUB_DB,
 	PATH_SUB_DBBACKUP
 	)
-from .groups import lit_book_ids
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
