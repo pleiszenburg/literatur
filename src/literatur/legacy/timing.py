@@ -6,7 +6,7 @@ LITERATUR
 Literature management with Python, Dropbox and MediaWiki
 https://github.com/pleiszenburg/literatur
 
-	src/literatur/core/mediawiki.py: MediaWiki support
+	src/literatur/legacy/timing.py: Helper routines for timing code
 
 	Copyright (C) 2017 Sebastian M. Ernst <ernst@pleiszenburg.de>
 
@@ -26,60 +26,46 @@ specific language governing rights and limitations under the License.
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-# IMPORT
+# IMPORTS
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-from collections import OrderedDict
-import pprint
-
-from .strings import *
-
-from wikitools import wiki, api, page
+import atexit
+from functools import reduce
+from time import process_time
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-# MEDIAWIKI ROUTINES
+# TIMING ROUTINES
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-def wiki_login(w_url, w_user, w_pwd):
+def lw_secondsToStr(t):
 
-	print("Login ...")
-	w_site = wiki.Wiki(w_url)
-	w_site.login(w_user, w_pwd)
-	print("... done.")
-
-	return w_site
+	return "%d:%02d:%02d.%03d" % reduce(lambda ll,b : divmod(ll[0],b) + ll[1:], [(t*1000,),1000,60,60])
 
 
-def wiki_logout(w_site):
+def lw_log(s, elapsed = None):
 
-	w_site.logout()
-
-
-def wiki_get_edittoken(w_site):
-
-	params = {'action':'tokens'}
-	req = api.APIRequest(w_site, params)
-	res = req.query(querycontinue = False)
-	w_site_edittoken = res['tokens']['edittoken']
-
-	print('token: ' + w_site_edittoken)
-
-	return w_site_edittoken
+	print(lw_line)
+	print(lw_secondsToStr(process_time()) + ' - ' + s)
+	if elapsed:
+		print("Elapsed time:", elapsed)
+	print(lw_line)
 
 
-def wiki_page_set_cnt(w_site, w_site_edittoken, p_title, p_content, p_summary):
+def lw_endlog():
 
-	print("Upload ...")
-	params = {
-		'action':'edit',
-		'title':p_title,
-		'summary':p_summary,
-		'text':p_content,
-		'token':w_site_edittoken
-		}
-	req = api.APIRequest(w_site, params)
-	res = req.query(querycontinue = False)
-	print("... done.")
+	lw_end = process_time()
+	elapsed = lw_end - lw_start
+	lw_log("End Program", lw_secondsToStr(elapsed))
 
-	pprint.pprint(res)
+
+def lw_now():
+
+	return lw_secondsToStr(process_time())
+
+
+lw_line = "=" * 40
+
+lw_start = process_time()
+atexit.register(lw_endlog)
+lw_log("Start Program")

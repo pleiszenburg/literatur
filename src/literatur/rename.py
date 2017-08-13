@@ -33,7 +33,7 @@ import sys
 
 from PyQt5 import QtWidgets
 
-from .core.renamegui import instance_class
+from .legacy.renamegui import instance_class
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

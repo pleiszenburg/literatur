@@ -6,7 +6,7 @@ LITERATUR
 Literature management with Python, Dropbox and MediaWiki
 https://github.com/pleiszenburg/literatur
 
-	src/literatur/core/report.py: Generates reports for emails etc
+	src/literatur/legacy/report.py: Generates reports for emails etc
 
 	Copyright (C) 2017 Sebastian M. Ernst <ernst@pleiszenburg.de>
 

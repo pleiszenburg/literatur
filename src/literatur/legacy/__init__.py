@@ -6,7 +6,7 @@ LITERATUR
 Literature management with Python, Dropbox and MediaWiki
 https://github.com/pleiszenburg/literatur
 
-	src/literatur/core/__init__.py: Core submodule init
+	src/literatur/legacy/__init__.py: Core submodule init
 
 	Copyright (C) 2017 Sebastian M. Ernst <ernst@pleiszenburg.de>
 

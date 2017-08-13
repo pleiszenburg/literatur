@@ -31,7 +31,7 @@ specific language governing rights and limitations under the License.
 
 import os
 
-from .core.strings import (
+from .legacy.strings import (
 	dropbox_on, # TODO move into config
 	wiki_on, # TODO move into config
 	wiki_url, wiki_user, wiki_pwd, # TODO move into config
@@ -56,15 +56,15 @@ from .core.strings import (
 	wiki_page_indexbykeyword,
 	wiki_page_authorrelationship
 	)
-from .core.commit import (
+from .legacy.commit import (
 	commit_backup,
 	commit_push
 	)
-from .core.file import (
+from .legacy.file import (
 	lit_get_list,
 	lit_listpartialupdate_hashsize
 	)
-from .core.index import (
+from .legacy.index import (
 	lit_diff_lists,
 	lit_find_duplicates,
 	lit_list_organize_by_name,
@@ -72,7 +72,7 @@ from .core.index import (
 	lit_list_organize_by_class,
 	lit_list_organize_author_relationship
 	)
-from .core.report import (
+from .legacy.report import (
 	report_debug_duplicates,
 	report_mail_newfiles,
 	report_wiki_full,
@@ -81,28 +81,28 @@ from .core.report import (
 	report_wiki_indexbykeyword,
 	report_wiki_authorrelationship
 	)
-from .core.repository import (
+from .legacy.repository import (
 	find_root_dir,
 	find_root_dir_with_message,
 	init_dir
 	)
-from .core.storage import (
+from .legacy.storage import (
 	lit_create_pickle,
 	lit_read_pickle,
 	lit_write_plaintext,
 	lit_write_pprint
 	)
-# from .core.timing import lw_log
+# from .legacy.timing import lw_log
 
 if wiki_on:
-	from .core.mediawiki import (
+	from .legacy.mediawiki import (
 		wiki_login,
 		wiki_get_edittoken,
 		wiki_page_set_cnt,
 		wiki_logout
 		)
 if dropbox_on:
-	from .core.dropbox import (
+	from .legacy.dropbox import (
 		dropbox_listfullupdate,
 		dropbox_listpartialupdate
 		)

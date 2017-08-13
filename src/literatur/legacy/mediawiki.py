@@ -6,7 +6,7 @@ LITERATUR
 Literature management with Python, Dropbox and MediaWiki
 https://github.com/pleiszenburg/literatur
 
-	src/literatur/core/timing.py: Helper routines for timing code
+	src/literatur/legacy/mediawiki.py: MediaWiki support
 
 	Copyright (C) 2017 Sebastian M. Ernst <ernst@pleiszenburg.de>
 
@@ -26,46 +26,60 @@ specific language governing rights and limitations under the License.
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-# IMPORTS
+# IMPORT
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-import atexit
-from functools import reduce
-from time import process_time
+from collections import OrderedDict
+import pprint
+
+from .strings import *
+
+from wikitools import wiki, api, page
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-# TIMING ROUTINES
+# MEDIAWIKI ROUTINES
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-def lw_secondsToStr(t):
+def wiki_login(w_url, w_user, w_pwd):
 
-	return "%d:%02d:%02d.%03d" % reduce(lambda ll,b : divmod(ll[0],b) + ll[1:], [(t*1000,),1000,60,60])
+	print("Login ...")
+	w_site = wiki.Wiki(w_url)
+	w_site.login(w_user, w_pwd)
+	print("... done.")
 
-
-def lw_log(s, elapsed = None):
-
-	print(lw_line)
-	print(lw_secondsToStr(process_time()) + ' - ' + s)
-	if elapsed:
-		print("Elapsed time:", elapsed)
-	print(lw_line)
+	return w_site
 
 
-def lw_endlog():
+def wiki_logout(w_site):
 
-	lw_end = process_time()
-	elapsed = lw_end - lw_start
-	lw_log("End Program", lw_secondsToStr(elapsed))
+	w_site.logout()
 
 
-def lw_now():
+def wiki_get_edittoken(w_site):
 
-	return lw_secondsToStr(process_time())
+	params = {'action':'tokens'}
+	req = api.APIRequest(w_site, params)
+	res = req.query(querycontinue = False)
+	w_site_edittoken = res['tokens']['edittoken']
+
+	print('token: ' + w_site_edittoken)
+
+	return w_site_edittoken
 
 
-lw_line = "=" * 40
+def wiki_page_set_cnt(w_site, w_site_edittoken, p_title, p_content, p_summary):
 
-lw_start = process_time()
-atexit.register(lw_endlog)
-lw_log("Start Program")
+	print("Upload ...")
+	params = {
+		'action':'edit',
+		'title':p_title,
+		'summary':p_summary,
+		'text':p_content,
+		'token':w_site_edittoken
+		}
+	req = api.APIRequest(w_site, params)
+	res = req.query(querycontinue = False)
+	print("... done.")
+
+	pprint.pprint(res)

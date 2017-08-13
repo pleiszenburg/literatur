@@ -32,20 +32,20 @@ specific language governing rights and limitations under the License.
 import os
 import pprint
 
-from .core.strings import (
+from .legacy.strings import (
 	networkx_on, # TODO replace by config
 	PATH_REPO,
 	PATH_SUB_DB,
 	FILE_DB_CURRENT,
 	FILE_ANALYSIS_AUTHORNETWORKGRAPH
 	)
-from .core.groups import lit_book_ids
-from .core.storage import lit_read_pickle
-from .core.index import (
+from .legacy.groups import lit_book_ids
+from .legacy.storage import lit_read_pickle
+from .legacy.index import (
 	lit_list_get_author_relationship_graph,
 	lit_list_organize_author_relationship
 	)
-from .core.repository import find_root_dir_with_message
+from .legacy.repository import find_root_dir_with_message
 
 if networkx_on:
 	import networkx

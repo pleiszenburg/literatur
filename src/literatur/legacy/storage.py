@@ -6,7 +6,7 @@ LITERATUR
 Literature management with Python, Dropbox and MediaWiki
 https://github.com/pleiszenburg/literatur
 
-	src/literatur/core/repository.py: Manages repositories
+	src/literatur/legacy/storage.py: Stores and reads data structures
 
 	Copyright (C) 2017 Sebastian M. Ernst <ernst@pleiszenburg.de>
 
@@ -26,63 +26,52 @@ specific language governing rights and limitations under the License.
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-# IMPORT
+# IMPORTS
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-import os
-import sys
-
-from .strings import (
-	PATH_REPO,
-	PATH_SUB_DB,
-	PATH_SUB_DBBACKUP,
-	PATH_SUB_REPORTS
-	)
+from collections import OrderedDict
+import pprint
+import pickle
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-# IMPORT
+# STORAGE ROUTINES
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-def init_dir():
+def lit_create_pickle(list_full, picklefile):
 
-	current_path = os.getcwd()
-	current_repository = os.path.join(current_path, PATH_REPO)
-	os.makedirs(current_repository)
-	for fld in [PATH_SUB_DB, PATH_SUB_DBBACKUP, PATH_SUB_REPORTS]:
-		os.makedirs(os.path.join(current_repository, fld))
+	ff = open(picklefile, 'wb+')
+	pickle.dump(list_full, ff, -1)
+	ff.close()
 
 
-def find_root_dir():
+def lit_read_pickle(picklefile):
 
-	current_path = os.getcwd()
+	ff = open(picklefile, 'rb')
+	list_full = pickle.load(ff)
+	ff.close()
 
-	# Landed directly in root?
-	if os.path.isdir(os.path.join(current_path, PATH_REPO)):
-		return current_path
-
-	while True:
-
-		# Go one up
-		new_path = os.path.abspath(os.path.join(current_path, '..'))
-		# Can't go futher up
-		if new_path == current_path:
-			break
-		# Set path
-		current_path = new_path
-
-		# Check for repo folder
-		if os.path.isdir(os.path.join(current_path, PATH_REPO)):
-			return current_path
-
-	# Nothing found
-	raise # TODO
+	return list_full
 
 
-def find_root_dir_with_message():
+def lit_write_plaintext(plaintext, textfile):
 
-	try:
-		return find_root_dir()
-	except:
-		print('You are no in a literature repository.')
-		sys.exit()
+	ff = open(textfile, "w+")
+	ff.write(plaintext) # .encode('utf-8')
+	ff.close()
+
+
+def lit_read_plaintext(textfile):
+
+	ff = open(textfile, "r")
+	plaintext = ff.read()
+	ff.close()
+
+	return plaintext
+
+
+def lit_write_pprint(p_object, pfile):
+
+	ff = open(pfile, "w+")
+	pprint.pprint(p_object, stream=ff)
+	ff.close()
