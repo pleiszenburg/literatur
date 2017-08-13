@@ -23,34 +23,3 @@ specific language governing rights and limitations under the License.
 </LICENSE_BLOCK>
 
 """
-
-
-# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-# IMPORTS
-# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-import magic
-
-
-# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-# ROUTINES
-# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-def get_file_type(filename):
-
-	# Get info from magic
-	magic_info = magic.from_file(filename)
-
-	# This will contain a unique file type string, by default empty
-	file_type = ''
-
-	# Identify a pdf document
-	if value.startswith('PDF document'):
-		file_type = 'pdf'
-
-	return file_type, magic_info
-
-
-def get_file_mimetype(filename):
-
-	return magic.from_file(filename, mime = True)
