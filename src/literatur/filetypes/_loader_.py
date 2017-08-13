@@ -6,7 +6,7 @@ LITERATUR
 Literature management with Python, Dropbox and MediaWiki
 https://github.com/pleiszenburg/literatur
 
-	src/literatur/filetypes/__init__.py: filetypes submodule init
+	src/literatur/filetypes/_loader_.py: loades available filetype plugins
 
 	Copyright (C) 2017 Sebastian M. Ernst <ernst@pleiszenburg.de>
 
@@ -24,14 +24,39 @@ specific language governing rights and limitations under the License.
 
 """
 
+
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # IMPORTS
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-from ._loader_ import get_file_types as __get_file_types__
+from importlib import import_module
+import os
+
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # LOADER ROUTINE
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-filetypes = __get_file_types__()
+def get_file_types():
+
+	plugin_name_list = __get_list_of_available_types__()
+	plugin_dict = {}
+
+	for item in plugin_name_list:
+		module = import_module('literatur.filetypes.' + item)
+		plugin_dict[item] = module.file_type
+
+	return plugin_dict
+
+
+def __get_list_of_available_types__():
+
+	ls_list = os.path.dirname(os.path.realpath(__file__))
+	candidate_list = os.listdir(ls_list)
+
+	plugin_list = []
+	for item in candidate_list:
+		if not item.startswith('_') and not item.startswith('.') and item[-3:] == '.py':
+			plugin_list.append(item[:-3])
+
+	return plugin_list

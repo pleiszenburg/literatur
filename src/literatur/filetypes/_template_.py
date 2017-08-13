@@ -29,7 +29,7 @@ specific language governing rights and limitations under the License.
 # TEMPLATE CLASS
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-class type_template():
+class template_type():
 
 
 	@staticmethod

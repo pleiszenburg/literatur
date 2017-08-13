@@ -32,14 +32,14 @@ specific language governing rights and limitations under the License.
 from pdfminer.pdfparser import PDFParser
 from pdfminer.pdfdocument import PDFDocument
 
-from ._template_ import type_template
+from ._template_ import template_type
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # ROUTINES
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-class pdf_type(type_template):
+class file_type(template_type):
 
 
 	@staticmethod
