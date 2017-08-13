@@ -41,7 +41,7 @@ from pdfminer.pdfdocument import PDFDocument
 # ROUTINES
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-def get_info():
+def get_meta_info():
 
 	filename = sys.argv[1]
 
@@ -49,4 +49,4 @@ def get_info():
 	parser = PDFParser(fp)
 	doc = PDFDocument(parser)
 
-	pp(doc.info)
+	return doc.info
