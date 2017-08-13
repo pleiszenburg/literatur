@@ -50,3 +50,12 @@ class file_type(template_type):
 		doc = PDFDocument(parser)
 
 		return doc.info
+
+
+	@staticmethod
+	def test_magic_info(magic_str):
+
+		if magic_str.startswith('PDF document'):
+			return True
+		else:
+			return False

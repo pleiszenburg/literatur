@@ -36,3 +36,9 @@ class template_type():
 	def get_meta_info():
 
 		raise NotImplementedError
+
+
+	@staticmethod
+	def test_magic_info(magic_str):
+
+		raise NotImplementedError

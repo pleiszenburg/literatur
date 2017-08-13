@@ -31,6 +31,8 @@ specific language governing rights and limitations under the License.
 
 import magic
 
+from ..filetypes import filetypes
+
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # ROUTINES
@@ -41,9 +43,10 @@ def get_file_type(filename):
 	# Get info from magic
 	magic_info = magic.from_file(filename)
 
-	# Identify a pdf document
-	if magic_info.startswith('PDF document'):
-		return 'pdf', magic_info
+	# Test magic info through all plugins, return true if one reports a match
+	for filetype in filetypes.keys():
+		if filetypes[filetype].test_magic_info(magic_info):
+			return filetype, magic_info
 
 	return None, magic_info
 
