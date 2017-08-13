@@ -45,7 +45,7 @@ def get_file_type(filename):
 	file_type = ''
 
 	# Identify a pdf document
-	if value.startswith('PDF document'):
+	if magic_info.startswith('PDF document'):
 		file_type = 'pdf'
 
 	return file_type, magic_info
