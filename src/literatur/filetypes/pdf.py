@@ -6,7 +6,7 @@ LITERATUR
 Literature management with Python, Dropbox and MediaWiki
 https://github.com/pleiszenburg/literatur
 
-	src/literatur/pdf/metainfo.py: Extracting meta info from pdf files
+	src/literatur/filetypes/pdf.py: Extracting meta info from pdf files
 
 	Copyright (C) 2017 Sebastian M. Ernst <ernst@pleiszenburg.de>
 
