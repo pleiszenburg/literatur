@@ -29,6 +29,8 @@ specific language governing rights and limitations under the License.
 # IMPORTS
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+import sys
+
 from pprint import pprint as pp
 
 from pdfminer.pdfparser import PDFParser
@@ -39,7 +41,9 @@ from pdfminer.pdfdocument import PDFDocument
 # ROUTINES
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-def get_info(filename):
+def get_info():
+
+	filename = sys.argv[1]
 
 	fp = open(filename, 'rb')
 	parser = PDFParser(fp)

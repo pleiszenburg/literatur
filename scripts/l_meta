@@ -29,7 +29,7 @@ specific language governing rights and limitations under the License.
 # IMPORTS
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-from literatur.pdf import get_info # TODO cover all filetypes, like doc, docx, ...
+from literatur.pdf.metainfo import get_info # TODO cover all filetypes, like doc, docx, ...
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
