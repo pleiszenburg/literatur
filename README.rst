@@ -26,6 +26,7 @@ The following Python packages are required:
 - ``dropbox``
 - ``PyQt5``
 - ``networkx``
+- ``python-magic``
 - ``pdfminer.six``
 
 Installation
