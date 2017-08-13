@@ -6,7 +6,7 @@ LITERATUR
 Literature management with Python, Dropbox and MediaWiki
 https://github.com/pleiszenburg/literatur
 
-	src/literatur/file/typeinfo.py: indentify file types
+	src/literatur/info.py: Routines related to type and meta info
 
 	Copyright (C) 2017 Sebastian M. Ernst <ernst@pleiszenburg.de>
 
@@ -24,30 +24,50 @@ specific language governing rights and limitations under the License.
 
 """
 
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# IMPORTS
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+import os
+from pprint import pprint as pp
+import sys
+
+from .file.typeinfo import get_file_type
+
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # IMPORTS
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-import magic
+def print_filetype():
+
+	files, nofiles = __get_arg_file_list__()
+
+	for nofile in nofiles:
+		print('The argument "%s" is not a file.' % nofile)
+
+	for filename in files:
+		print('Information for file "%s":' % filename)
+		type_info, magic_info = get_file_type(filename)
+		if type_info is not None:
+			print(' Recognized by literatur as "%s"' % type_info)
+		print(' Recognized by magic as "%s"' % magic_info)
 
 
-# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-# ROUTINES
-# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+def print_metainfo():
 
-def get_file_type(filename):
-
-	# Get info from magic
-	magic_info = magic.from_file(filename)
-
-	# Identify a pdf document
-	if magic_info.startswith('PDF document'):
-		return 'pdf', magic_info
-
-	return None, magic_info
+	pass
 
 
-def get_file_mimetype(filename):
+def __get_arg_file_list__():
 
-	return magic.from_file(filename, mime = True)
+	ret_files = []
+	ret_else = []
+
+	for argument in sys.argv[1:]:
+		if os.path.isfile(argument):
+			ret_files.append(argument)
+		else:
+			ret_else.append(argument)
+
+	return ret_files, ret_else

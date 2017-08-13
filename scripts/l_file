@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 """
@@ -6,7 +7,7 @@ LITERATUR
 Literature management with Python, Dropbox and MediaWiki
 https://github.com/pleiszenburg/literatur
 
-	src/literatur/file/typeinfo.py: indentify file types
+	scripts/l_file: Looks at magic info
 
 	Copyright (C) 2017 Sebastian M. Ernst <ernst@pleiszenburg.de>
 
@@ -24,30 +25,17 @@ specific language governing rights and limitations under the License.
 
 """
 
-
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # IMPORTS
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-import magic
+from literatur.info import print_filetype
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-# ROUTINES
+# BUILD THE INDEX
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-def get_file_type(filename):
+if __name__ == "__main__":
 
-	# Get info from magic
-	magic_info = magic.from_file(filename)
-
-	# Identify a pdf document
-	if magic_info.startswith('PDF document'):
-		return 'pdf', magic_info
-
-	return None, magic_info
-
-
-def get_file_mimetype(filename):
-
-	return magic.from_file(filename, mime = True)
+	print_filetype()
