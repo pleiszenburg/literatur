@@ -6,7 +6,7 @@ LITERATUR
 Literature management with Python, Dropbox and MediaWiki
 https://github.com/pleiszenburg/literatur
 
-	src/literatur/filetypes/pdf.py: Extracting meta info from pdf files
+	src/literatur/filetypes/_template_.py: basic filetype class
 
 	Copyright (C) 2017 Sebastian M. Ernst <ernst@pleiszenburg.de>
 
@@ -26,27 +26,13 @@ specific language governing rights and limitations under the License.
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-# IMPORTS
+# TEMPLATE CLASS
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-from pdfminer.pdfparser import PDFParser
-from pdfminer.pdfdocument import PDFDocument
-
-from ._template_ import type_template
-
-
-# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-# ROUTINES
-# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-class pdf_type(type_template):
+class type_template():
 
 
 	@staticmethod
-	def get_meta_info(filename):
+	def get_meta_info():
 
-		fp = open(filename, 'rb')
-		parser = PDFParser(fp)
-		doc = PDFDocument(parser)
-
-		return doc.info
+		raise NotImplementedError
