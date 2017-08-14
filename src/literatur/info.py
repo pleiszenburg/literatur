@@ -44,14 +44,18 @@ def print_filetype():
 	files, nofiles = __get_arg_file_list__()
 
 	for nofile in nofiles:
-		print('The argument "%s" is not a file.' % nofile)
+		pp({
+			'filename': nofile,
+			'error': 'Not a file.'
+			})
 
 	for filename in files:
-		print('Information for file "%s":' % filename)
 		type_info, magic_info = get_file_type(filename)
-		if type_info is not None:
-			print(' Recognized by literatur as "%s"' % type_info)
-		print(' Recognized by magic as "%s"' % magic_info)
+		pp({
+			'filename': filename,
+			'type': type_info,
+			'magic_info': magic_info
+			})
 
 
 def print_metainfo():
