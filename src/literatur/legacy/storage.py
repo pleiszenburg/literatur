@@ -6,7 +6,7 @@ LITERATUR
 Literature management with Python, Dropbox and MediaWiki
 https://github.com/pleiszenburg/literatur
 
-	src/literatur/rename.py: Routine for starting GUI for file renaming
+	src/literatur/legacy/storage.py: Stores and reads data structures
 
 	Copyright (C) 2017 Sebastian M. Ernst <ernst@pleiszenburg.de>
 
@@ -26,23 +26,52 @@ specific language governing rights and limitations under the License.
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-# IMPORT
+# IMPORTS
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-import sys
-
-from PyQt5 import QtWidgets
-
-from .legacy.renamegui import instance_class
+from collections import OrderedDict
+import pprint
+import pickle
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-# RUN GUI / APP
+# STORAGE ROUTINES
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-def rename_gui_start():
+def lit_create_pickle(list_full, picklefile):
 
-	app = QtWidgets.QApplication(sys.argv)
-	app_mainwindow = instance_class()
-	app_mainwindow.show()
-	sys.exit(app.exec_())
+	ff = open(picklefile, 'wb+')
+	pickle.dump(list_full, ff, -1)
+	ff.close()
+
+
+def lit_read_pickle(picklefile):
+
+	ff = open(picklefile, 'rb')
+	list_full = pickle.load(ff)
+	ff.close()
+
+	return list_full
+
+
+def lit_write_plaintext(plaintext, textfile):
+
+	ff = open(textfile, "w+")
+	ff.write(plaintext) # .encode('utf-8')
+	ff.close()
+
+
+def lit_read_plaintext(textfile):
+
+	ff = open(textfile, "r")
+	plaintext = ff.read()
+	ff.close()
+
+	return plaintext
+
+
+def lit_write_pprint(p_object, pfile):
+
+	ff = open(pfile, "w+")
+	pprint.pprint(p_object, stream=ff)
+	ff.close()

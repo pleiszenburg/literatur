@@ -6,7 +6,7 @@ LITERATUR
 Literature management with Python, Dropbox and MediaWiki
 https://github.com/pleiszenburg/literatur
 
-	src/literatur/core/renamegui.py: GUI for renaming files with name pattern
+	src/literatur/legacy/renamegui.py: GUI for renaming files with name pattern
 
 	Copyright (C) 2017 Sebastian M. Ernst <ernst@pleiszenburg.de>
 

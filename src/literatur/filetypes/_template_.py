@@ -6,7 +6,7 @@ LITERATUR
 Literature management with Python, Dropbox and MediaWiki
 https://github.com/pleiszenburg/literatur
 
-	src/literatur/rename.py: Routine for starting GUI for file renaming
+	src/literatur/filetypes/_template_.py: basic filetype class
 
 	Copyright (C) 2017 Sebastian M. Ernst <ernst@pleiszenburg.de>
 
@@ -26,23 +26,19 @@ specific language governing rights and limitations under the License.
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-# IMPORT
+# TEMPLATE CLASS
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-import sys
-
-from PyQt5 import QtWidgets
-
-from .legacy.renamegui import instance_class
+class template_type():
 
 
-# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-# RUN GUI / APP
-# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	@staticmethod
+	def get_meta_info():
 
-def rename_gui_start():
+		raise NotImplementedError
 
-	app = QtWidgets.QApplication(sys.argv)
-	app_mainwindow = instance_class()
-	app_mainwindow.show()
-	sys.exit(app.exec_())
+
+	@staticmethod
+	def test_magic_info(magic_str):
+
+		raise NotImplementedError

@@ -6,7 +6,7 @@ LITERATUR
 Literature management with Python, Dropbox and MediaWiki
 https://github.com/pleiszenburg/literatur
 
-	src/literatur/core/timing.py: Helper routines for timing code
+	src/literatur/filetypes/_loader_.py: loades available filetype plugins
 
 	Copyright (C) 2017 Sebastian M. Ernst <ernst@pleiszenburg.de>
 
@@ -29,43 +29,34 @@ specific language governing rights and limitations under the License.
 # IMPORTS
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-import atexit
-from functools import reduce
-from time import process_time
+from importlib import import_module
+import os
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-# TIMING ROUTINES
+# LOADER ROUTINE
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-def lw_secondsToStr(t):
+def get_file_types():
 
-	return "%d:%02d:%02d.%03d" % reduce(lambda ll,b : divmod(ll[0],b) + ll[1:], [(t*1000,),1000,60,60])
+	plugin_name_list = __get_list_of_available_types__()
+	plugin_dict = {}
 
+	for item in plugin_name_list:
+		module = import_module('literatur.filetypes.' + item)
+		plugin_dict[item] = module.file_type
 
-def lw_log(s, elapsed = None):
-
-	print(lw_line)
-	print(lw_secondsToStr(process_time()) + ' - ' + s)
-	if elapsed:
-		print("Elapsed time:", elapsed)
-	print(lw_line)
+	return plugin_dict
 
 
-def lw_endlog():
+def __get_list_of_available_types__():
 
-	lw_end = process_time()
-	elapsed = lw_end - lw_start
-	lw_log("End Program", lw_secondsToStr(elapsed))
+	ls_list = os.path.dirname(os.path.realpath(__file__))
+	candidate_list = os.listdir(ls_list)
 
+	plugin_list = []
+	for item in candidate_list:
+		if not item.startswith('_') and not item.startswith('.') and item[-3:] == '.py':
+			plugin_list.append(item[:-3])
 
-def lw_now():
-
-	return lw_secondsToStr(process_time())
-
-
-lw_line = "=" * 40
-
-lw_start = process_time()
-atexit.register(lw_endlog)
-lw_log("Start Program")
+	return plugin_list

@@ -8,3 +8,5 @@ twine
 dropbox
 PyQt5
 networkx
+pdfminer.six
+python-magic

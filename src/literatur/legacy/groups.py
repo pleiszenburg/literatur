@@ -6,7 +6,7 @@ LITERATUR
 Literature management with Python, Dropbox and MediaWiki
 https://github.com/pleiszenburg/literatur
 
-	src/literatur/core/storage.py: Stores and reads data structures
+	src/literatur/legacy/groups.py: Groups of volumes, journals etc
 
 	Copyright (C) 2017 Sebastian M. Ernst <ernst@pleiszenburg.de>
 
@@ -26,52 +26,14 @@ specific language governing rights and limitations under the License.
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-# IMPORTS
+# IMPORT
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-from collections import OrderedDict
-import pprint
-import pickle
+from .strings import *
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-# STORAGE ROUTINES
+# STATIC STRINGS FOR GROUPS
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-def lit_create_pickle(list_full, picklefile):
-
-	ff = open(picklefile, 'wb+')
-	pickle.dump(list_full, ff, -1)
-	ff.close()
-
-
-def lit_read_pickle(picklefile):
-
-	ff = open(picklefile, 'rb')
-	list_full = pickle.load(ff)
-	ff.close()
-
-	return list_full
-
-
-def lit_write_plaintext(plaintext, textfile):
-
-	ff = open(textfile, "w+")
-	ff.write(plaintext) # .encode('utf-8')
-	ff.close()
-
-
-def lit_read_plaintext(textfile):
-
-	ff = open(textfile, "r")
-	plaintext = ff.read()
-	ff.close()
-
-	return plaintext
-
-
-def lit_write_pprint(p_object, pfile):
-
-	ff = open(pfile, "w+")
-	pprint.pprint(p_object, stream=ff)
-	ff.close()
+lit_book_ids = {}

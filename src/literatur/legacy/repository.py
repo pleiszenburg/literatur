@@ -6,7 +6,7 @@ LITERATUR
 Literature management with Python, Dropbox and MediaWiki
 https://github.com/pleiszenburg/literatur
 
-	src/literatur/rename.py: Routine for starting GUI for file renaming
+	src/literatur/legacy/repository.py: Manages repositories
 
 	Copyright (C) 2017 Sebastian M. Ernst <ernst@pleiszenburg.de>
 
@@ -29,20 +29,60 @@ specific language governing rights and limitations under the License.
 # IMPORT
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+import os
 import sys
 
-from PyQt5 import QtWidgets
-
-from .legacy.renamegui import instance_class
+from .strings import (
+	PATH_REPO,
+	PATH_SUB_DB,
+	PATH_SUB_DBBACKUP,
+	PATH_SUB_REPORTS
+	)
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-# RUN GUI / APP
+# IMPORT
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-def rename_gui_start():
+def init_dir():
 
-	app = QtWidgets.QApplication(sys.argv)
-	app_mainwindow = instance_class()
-	app_mainwindow.show()
-	sys.exit(app.exec_())
+	current_path = os.getcwd()
+	current_repository = os.path.join(current_path, PATH_REPO)
+	os.makedirs(current_repository)
+	for fld in [PATH_SUB_DB, PATH_SUB_DBBACKUP, PATH_SUB_REPORTS]:
+		os.makedirs(os.path.join(current_repository, fld))
+
+
+def find_root_dir():
+
+	current_path = os.getcwd()
+
+	# Landed directly in root?
+	if os.path.isdir(os.path.join(current_path, PATH_REPO)):
+		return current_path
+
+	while True:
+
+		# Go one up
+		new_path = os.path.abspath(os.path.join(current_path, '..'))
+		# Can't go futher up
+		if new_path == current_path:
+			break
+		# Set path
+		current_path = new_path
+
+		# Check for repo folder
+		if os.path.isdir(os.path.join(current_path, PATH_REPO)):
+			return current_path
+
+	# Nothing found
+	raise # TODO
+
+
+def find_root_dir_with_message():
+
+	try:
+		return find_root_dir()
+	except:
+		print('You are no in a literature repository.')
+		sys.exit()

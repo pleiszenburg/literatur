@@ -6,7 +6,7 @@ LITERATUR
 Literature management with Python, Dropbox and MediaWiki
 https://github.com/pleiszenburg/literatur
 
-	src/literatur/rename.py: Routine for starting GUI for file renaming
+	src/literatur/info.py: Routines related to type and meta info
 
 	Copyright (C) 2017 Sebastian M. Ernst <ernst@pleiszenburg.de>
 
@@ -24,25 +24,73 @@ specific language governing rights and limitations under the License.
 
 """
 
-
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-# IMPORT
+# IMPORTS
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+import os
+from pprint import pprint as pp
 import sys
 
-from PyQt5 import QtWidgets
-
-from .legacy.renamegui import instance_class
+from .file.typeinfo import get_file_type
+from .filetypes import filetypes
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-# RUN GUI / APP
+# IMPORTS
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-def rename_gui_start():
+def print_filetype():
 
-	app = QtWidgets.QApplication(sys.argv)
-	app_mainwindow = instance_class()
-	app_mainwindow.show()
-	sys.exit(app.exec_())
+	files, nofiles = __get_arg_file_list__()
+
+	for nofile in nofiles:
+		pp({
+			'filename': nofile,
+			'error': 'Not a file.'
+			})
+
+	for filename in files:
+		type_info, magic_info = get_file_type(filename)
+		pp({
+			'filename': filename,
+			'type': type_info,
+			'magic_info': magic_info
+			})
+
+
+def print_metainfo():
+
+	files, nofiles = __get_arg_file_list__()
+
+	for nofile in nofiles:
+		pp({
+			'filename': nofile,
+			'error': 'Not a file.'
+			})
+
+	for filename in files:
+		type_info, magic_info = get_file_type(filename)
+		meta_info = None
+		if type_info is not None:
+			meta_info = filetypes[type_info].get_meta_info(filename)
+		pp({
+			'filename': filename,
+			'type': type_info,
+			'magic_info': magic_info,
+			'meta_info': meta_info
+			})
+
+
+def __get_arg_file_list__():
+
+	ret_files = []
+	ret_else = []
+
+	for argument in sys.argv[1:]:
+		if os.path.isfile(argument):
+			ret_files.append(argument)
+		else:
+			ret_else.append(argument)
+
+	return ret_files, ret_else

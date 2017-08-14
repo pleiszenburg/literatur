@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 """
@@ -6,7 +7,7 @@ LITERATUR
 Literature management with Python, Dropbox and MediaWiki
 https://github.com/pleiszenburg/literatur
 
-	src/literatur/rename.py: Routine for starting GUI for file renaming
+	scripts/l_meta: Shows meta information of file
 
 	Copyright (C) 2017 Sebastian M. Ernst <ernst@pleiszenburg.de>
 
@@ -24,25 +25,17 @@ specific language governing rights and limitations under the License.
 
 """
 
-
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-# IMPORT
+# IMPORTS
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-import sys
-
-from PyQt5 import QtWidgets
-
-from .legacy.renamegui import instance_class
+from literatur.info import print_metainfo
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-# RUN GUI / APP
+# BUILD THE INDEX
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-def rename_gui_start():
+if __name__ == "__main__":
 
-	app = QtWidgets.QApplication(sys.argv)
-	app_mainwindow = instance_class()
-	app_mainwindow.show()
-	sys.exit(app.exec_())
+	print_metainfo()

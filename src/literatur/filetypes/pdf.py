@@ -6,7 +6,7 @@ LITERATUR
 Literature management with Python, Dropbox and MediaWiki
 https://github.com/pleiszenburg/literatur
 
-	src/literatur/core/mediawiki.py: MediaWiki support
+	src/literatur/filetypes/pdf.py: Extracting meta info from pdf files
 
 	Copyright (C) 2017 Sebastian M. Ernst <ernst@pleiszenburg.de>
 
@@ -26,60 +26,36 @@ specific language governing rights and limitations under the License.
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-# IMPORT
+# IMPORTS
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-from collections import OrderedDict
-import pprint
+from pdfminer.pdfparser import PDFParser
+from pdfminer.pdfdocument import PDFDocument
 
-from .strings import *
-
-from wikitools import wiki, api, page
+from ._template_ import template_type
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-# MEDIAWIKI ROUTINES
+# ROUTINES
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-def wiki_login(w_url, w_user, w_pwd):
-
-	print("Login ...")
-	w_site = wiki.Wiki(w_url)
-	w_site.login(w_user, w_pwd)
-	print("... done.")
-
-	return w_site
+class file_type(template_type):
 
 
-def wiki_logout(w_site):
+	@staticmethod
+	def get_meta_info(filename):
 
-	w_site.logout()
+		fp = open(filename, 'rb')
+		parser = PDFParser(fp)
+		doc = PDFDocument(parser)
 
-
-def wiki_get_edittoken(w_site):
-
-	params = {'action':'tokens'}
-	req = api.APIRequest(w_site, params)
-	res = req.query(querycontinue = False)
-	w_site_edittoken = res['tokens']['edittoken']
-
-	print('token: ' + w_site_edittoken)
-
-	return w_site_edittoken
+		return doc.info
 
 
-def wiki_page_set_cnt(w_site, w_site_edittoken, p_title, p_content, p_summary):
+	@staticmethod
+	def test_magic_info(magic_str):
 
-	print("Upload ...")
-	params = {
-		'action':'edit',
-		'title':p_title,
-		'summary':p_summary,
-		'text':p_content,
-		'token':w_site_edittoken
-		}
-	req = api.APIRequest(w_site, params)
-	res = req.query(querycontinue = False)
-	print("... done.")
-
-	pprint.pprint(res)
+		if magic_str.startswith('PDF document'):
+			return True
+		else:
+			return False
