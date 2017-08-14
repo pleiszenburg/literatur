@@ -33,6 +33,7 @@ from pprint import pprint as pp
 import sys
 
 from .file.typeinfo import get_file_type
+from .filetypes import filetypes
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -60,7 +61,25 @@ def print_filetype():
 
 def print_metainfo():
 
-	pass
+	files, nofiles = __get_arg_file_list__()
+
+	for nofile in nofiles:
+		pp({
+			'filename': nofile,
+			'error': 'Not a file.'
+			})
+
+	for filename in files:
+		type_info, magic_info = get_file_type(filename)
+		meta_info = None
+		if type_info is not None:
+			meta_info = filetypes[type_info].get_meta_info(filename)
+		pp({
+			'filename': filename,
+			'type': type_info,
+			'magic_info': magic_info,
+			'meta_info': meta_info
+			})
 
 
 def __get_arg_file_list__():
