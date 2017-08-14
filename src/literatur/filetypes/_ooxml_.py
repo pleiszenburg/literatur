@@ -6,7 +6,7 @@ LITERATUR
 Literature management with Python, Dropbox and MediaWiki
 https://github.com/pleiszenburg/literatur
 
-	src/literatur/filetypes/__init__.py: filetypes submodule init
+	src/literatur/filetypes/_ooxml_.py: Modern MS Office formats (OOXML)
 
 	Copyright (C) 2017 Sebastian M. Ernst <ernst@pleiszenburg.de>
 
@@ -24,14 +24,29 @@ specific language governing rights and limitations under the License.
 
 """
 
+
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # IMPORTS
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-from .__loader__ import get_file_types as __get_file_types__
+import xmltodict
+import zipfile
+
+from ._template_ import template_type
+
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-# LOADER ROUTINE
+# ROUTINES
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-filetypes = __get_file_types__()
+class ooxml_type(template_type):
+
+
+	@staticmethod
+	def get_meta_info(filename):
+
+		f = zipfile.ZipFile(filename)
+		meta_info = xmltodict.parse(f.read('docProps/core.xml'))
+		f.close()
+
+		return meta_info

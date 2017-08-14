@@ -28,6 +28,7 @@ The following Python packages are required:
 - ``networkx``
 - ``python-magic``
 - ``pdfminer.six``
+- ``xmltodict``
 
 Installation
 ============

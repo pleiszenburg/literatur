@@ -6,7 +6,7 @@ LITERATUR
 Literature management with Python, Dropbox and MediaWiki
 https://github.com/pleiszenburg/literatur
 
-	src/literatur/filetypes/_loader_.py: loades available filetype plugins
+	src/literatur/filetypes/pptx.py: Modern PowerPoint formats
 
 	Copyright (C) 2017 Sebastian M. Ernst <ernst@pleiszenburg.de>
 
@@ -29,34 +29,20 @@ specific language governing rights and limitations under the License.
 # IMPORTS
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-from importlib import import_module
-import os
+from ._ooxml_ import ooxml_type
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-# LOADER ROUTINE
+# ROUTINES
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-def get_file_types():
-
-	plugin_name_list = __get_list_of_available_types__()
-	plugin_dict = {}
-
-	for item in plugin_name_list:
-		module = import_module('literatur.filetypes.' + item)
-		plugin_dict[item] = module.file_type
-
-	return plugin_dict
+class file_type(ooxml_type):
 
 
-def __get_list_of_available_types__():
+	@staticmethod
+	def test_magic_info(magic_str):
 
-	ls_list = os.path.dirname(os.path.realpath(__file__))
-	candidate_list = os.listdir(ls_list)
-
-	plugin_list = []
-	for item in candidate_list:
-		if not item.startswith('_') and not item.startswith('.') and item[-3:] == '.py':
-			plugin_list.append(item[:-3])
-
-	return plugin_list
+		if magic_str == 'Microsoft PowerPoint 2007+':
+			return True
+		else:
+			return False
