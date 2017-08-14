@@ -54,8 +54,8 @@ Make changes permanent by further pushing to `master` with ``l_commit_master``.
 Find duplicate entries with ``l_findduplicates``.
 Dump the database into plain text files with ``l_dumpdb``.
 Generate all sorts of useful reports with ``l_report``.
-Determine the type of a file with ``l_file``.
-Get meta information of file with ``l_meta``.
+Determine the type of a file with ``l_file``, JSON output.
+Get meta information from file with ``l_meta``, JSON output.
 Push the latest state of the repository to a MediaWiki server with ``l_pushwiki``.
 Analyse the network of authors with ``l_getnetwork``.
 
