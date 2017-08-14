@@ -43,7 +43,7 @@ from glob import glob
 
 
 # Bump version HERE!
-_version_ = '0.0.1'
+_version_ = '0.0.2'
 
 
 # List all versions of Python which are supported
