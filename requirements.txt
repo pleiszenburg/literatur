@@ -11,3 +11,4 @@ networkx
 pdfminer.six
 python-magic
 xmltodict
+joblib

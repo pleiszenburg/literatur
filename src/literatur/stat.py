@@ -29,7 +29,15 @@ specific language governing rights and limitations under the License.
 # IMPORT
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-from collections import OrderedDict
+from collections import (
+	Counter,
+	OrderedDict
+	)
+from joblib import (
+	Parallel,
+	delayed
+	)
+import multiprocessing
 import os
 from pathlib import PurePath
 from pprint import pprint as pp
@@ -43,6 +51,22 @@ import magic
 
 def print_stats():
 
+	file_path_list = __get_file_path_list__('.')
+
+	num_cores = multiprocessing.cpu_count()
+
+	magic_list = Parallel(n_jobs = num_cores)(delayed(magic.from_file)(item) for item in file_path_list)
+	mime_list = Parallel(n_jobs = num_cores)(delayed(magic.from_file)(item, mime = True) for item in file_path_list)
+
+	magic_dict = Counter(magic_list)
+	mime_dict = Counter(mime_list)
+
+	pp(OrderedDict(sorted(magic_dict.items(), key = lambda t: t[1])))
+	pp(OrderedDict(sorted(mime_dict.items(), key = lambda t: t[1])))
+
+
+def __get_file_path_list__(working_path):
+
 	ignore_dir_list = [
 		'.l',
 		'.git'
@@ -52,10 +76,9 @@ def print_stats():
 		'.directory'
 		]
 
-	magic_dict = {}
-	mime_dict = {}
+	file_path_list = []
 
-	for path, dir_list, file_list in os.walk('.'):
+	for path, dir_list, file_list in os.walk(working_path):
 		for filename in file_list:
 
 			# ignore a bunch of folders
@@ -67,20 +90,6 @@ def print_stats():
 			if filename in ignore_file_list:
 				continue
 
-			file_path = os.path.join(path, filename)
+			file_path_list.append(os.path.join(path, filename))
 
-			file_magic = magic.from_file(file_path)
-			file_mime = magic.from_file(file_path, mime = True)
-
-			if file_magic in magic_dict.keys():
-				magic_dict[file_magic] += 1
-			else:
-				magic_dict[file_magic] = 1
-
-			if file_mime in mime_dict.keys():
-				mime_dict[file_mime] += 1
-			else:
-				mime_dict[file_mime] = 1
-
-	pp(OrderedDict(sorted(magic_dict.items(), key = lambda t: t[1])))
-	pp(OrderedDict(sorted(mime_dict.items(), key = lambda t: t[1])))
+	return file_path_list

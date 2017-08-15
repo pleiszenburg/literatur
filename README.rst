@@ -29,6 +29,7 @@ The following Python packages are required:
 - ``python-magic``
 - ``pdfminer.six``
 - ``xmltodict``
+- ``joblib``
 
 Installation
 ============
