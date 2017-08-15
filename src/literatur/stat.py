@@ -39,4 +39,6 @@ from pprint import pprint as pp
 
 def print_stats():
 
-	pp([a for a in os.walk('.')])
+	for path, dir_list, file_list in os.walk('.'):
+		for filename in file_list:
+			print(os.path.join(path, filename))
