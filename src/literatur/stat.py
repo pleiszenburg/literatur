@@ -42,6 +42,11 @@ import magic
 
 def print_stats():
 
+	ignore_dir_list = [
+		'.l',
+		'.git'
+		]
+
 	magic_dict = {}
 	mime_dict = {}
 
@@ -49,7 +54,7 @@ def print_stats():
 		for filename in file_list:
 
 			path_list = PurePath(path).parts
-			if '.l' in path_list or '.git' in path_list:
+			if any(item in ignore_dir_list for item in path_list):
 				continue
 
 			file_path = os.path.join(path, filename)
