@@ -29,6 +29,7 @@ specific language governing rights and limitations under the License.
 # IMPORT
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+from collections import OrderedDict
 import os
 from pathlib import PurePath
 from pprint import pprint as pp
@@ -46,6 +47,10 @@ def print_stats():
 		'.l',
 		'.git'
 		]
+	ignore_file_list = [
+		'desktop.ini',
+		'.directory'
+		]
 
 	magic_dict = {}
 	mime_dict = {}
@@ -53,8 +58,13 @@ def print_stats():
 	for path, dir_list, file_list in os.walk('.'):
 		for filename in file_list:
 
+			# ignore a bunch of folders
 			path_list = PurePath(path).parts
 			if any(item in ignore_dir_list for item in path_list):
+				continue
+
+			# ignore a bunch of files
+			if filename in ignore_file_list:
 				continue
 
 			file_path = os.path.join(path, filename)
@@ -72,5 +82,5 @@ def print_stats():
 			else:
 				mime_dict[file_mime] = 1
 
-	pp(magic_dict)
-	pp(mime_dict)
+	pp(OrderedDict(sorted(magic_dict.items(), key = lambda t: t[1])))
+	pp(OrderedDict(sorted(mime_dict.items(), key = lambda t: t[1])))
