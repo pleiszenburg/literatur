@@ -30,6 +30,7 @@ specific language governing rights and limitations under the License.
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 import os
+from pathlib import PurePath
 from pprint import pprint as pp
 
 import magic
@@ -46,6 +47,10 @@ def print_stats():
 
 	for path, dir_list, file_list in os.walk('.'):
 		for filename in file_list:
+
+			path_list = PurePath(path).parts
+			if '.l' in path_list or '.git' in path_list:
+				continue
 
 			file_path = os.path.join(path, filename)
 
