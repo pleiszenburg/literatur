@@ -58,6 +58,7 @@ Generate all sorts of useful reports with ``l_report``.
 Determine the type of a file with ``l_file``, JSON output.
 Get meta information from file with ``l_meta``, JSON output.
 Push the latest state of the repository to a MediaWiki server with ``l_pushwiki``.
+Show repository statistics with ``l_stat``.
 Analyse the network of authors with ``l_getnetwork``.
 
 Full list of commands
@@ -74,6 +75,7 @@ Full list of commands
 	l_findduplicates
 	l_dumpdb
 	l_report
+	l_stat
 	l_getnetwork
 	l_pushwiki
 	l_rename
