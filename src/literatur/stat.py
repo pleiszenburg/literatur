@@ -32,6 +32,8 @@ specific language governing rights and limitations under the License.
 import os
 from pprint import pprint as pp
 
+import magic
+
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # ROUTINES
@@ -39,6 +41,26 @@ from pprint import pprint as pp
 
 def print_stats():
 
+	magic_dict = {}
+	mime_dict = {}
+
 	for path, dir_list, file_list in os.walk('.'):
 		for filename in file_list:
-			print(os.path.join(path, filename))
+
+			file_path = os.path.join(path, filename)
+
+			file_magic = magic.from_file(file_path)
+			file_mime = magic.from_file(file_path, mime = True)
+
+			if file_magic in magic_dict.keys():
+				magic_dict[file_magic] += 1
+			else:
+				magic_dict[file_magic] = 1
+
+			if file_mime in mime_dict.keys():
+				mime_dict[file_mime] += 1
+			else:
+				mime_dict[file_mime] = 1
+
+	pp(magic_dict)
+	pp(mime_dict)
