@@ -23,3 +23,28 @@ specific language governing rights and limitations under the License.
 </LICENSE_BLOCK>
 
 """
+
+
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# IMPORT
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+import os
+
+from .hash import get_file_hash
+
+
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# ROUTINES
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+def get_file_info(in_path):
+
+	stat_info = os.stat(in_path)
+
+	return {
+		'mode': stat_info.st_mode,
+		'inode': stat_info.st_ino,
+		'size': stat_info.st_size,
+		'mtime': stat_info.st_mtime_ns
+		}

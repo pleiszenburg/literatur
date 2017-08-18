@@ -36,7 +36,7 @@ import hashlib
 # ROUTINES
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-def get_hash(in_path):
+def get_file_hash(in_path):
 
 	blocksize = 65536
 	hasher = hashlib.sha256()
