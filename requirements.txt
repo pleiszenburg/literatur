@@ -12,3 +12,4 @@ pdfminer.six
 python-magic
 xmltodict
 joblib
+tqdm

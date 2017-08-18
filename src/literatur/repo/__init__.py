@@ -29,10 +29,18 @@ specific language governing rights and limitations under the License.
 # IMPORT
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+import multiprocessing
 import os
 from pathlib import PurePath
+from pprint import pformat as pf
 import sys
 
+import tqdm
+
+from ..file import (
+	get_file_info,
+	get_file_hash
+	)
 from ..const import (
 	IGNORE_DIR_LIST,
 	IGNORE_FILE_LIST,
@@ -41,6 +49,8 @@ from ..const import (
 	PATH_SUB_DBBACKUP,
 	PATH_SUB_REPORTS
 	)
+
+NUM_CORES = multiprocessing.cpu_count()
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -66,6 +76,13 @@ def init_repo():
 
 	# Build initial index of paths and filenames
 	repo_filepathtuple_list = get_recursive_filepathtuple_list(current_path)
+
+	# Get filesystem info for all files
+	repo_indexdict_list = __get_file_info_parallel__(repo_filepathtuple_list)
+
+	f = open('../test_out.txt', 'w')
+	f.write(pf(repo_indexdict_list))
+	f.close()
 
 
 def get_recursive_filepathtuple_list(in_path):
@@ -122,3 +139,13 @@ def find_root_dir_with_message():
 	except:
 		print('You are no in a literature repository.')
 		sys.exit()
+
+
+def __get_file_info_parallel__(filepathtuple_list):
+
+	file_count = len(filepathtuple_list)
+
+	with multiprocessing.Pool(processes = NUM_CORES) as p:
+		indexdict_list = list(tqdm.tqdm(p.imap(get_file_info, filepathtuple_list), total = file_count))
+
+	return indexdict_list

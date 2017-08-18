@@ -38,11 +38,14 @@ from .hash import get_file_hash
 # ROUTINES
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-def get_file_info(in_path):
+def get_file_info(in_path_tuple):
 
+	in_path = os.path.join(*in_path_tuple)
 	stat_info = os.stat(in_path)
 
 	return {
+		'path': in_path_tuple[0],
+		'filename': in_path_tuple[1],
 		'mode': stat_info.st_mode,
 		'inode': stat_info.st_ino,
 		'size': stat_info.st_size,
