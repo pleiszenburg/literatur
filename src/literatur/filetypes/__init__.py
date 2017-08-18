@@ -28,17 +28,10 @@ specific language governing rights and limitations under the License.
 # IMPORTS
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-from .__loader__ import get_file_types as __get_file_types__
 from .__typeinfo__ import (
 	get_literatur_type_from_filename,
 	get_literatur_type_from_magicinfo,
 	get_magicinfo,
-	get_mimetype
+	get_mimetype,
+	filetypes
 	)
-
-
-# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-# LOADER ROUTINE
-# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-filetypes = __get_file_types__()
