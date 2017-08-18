@@ -82,6 +82,9 @@ def init_repo():
 	# Get filesystem info for all files
 	repo_indexdict_list = __get_file_info_parallel__(repo_filepathtuple_list)
 
+	# Hash all files
+	repo_indexdict_list = __get_file_hash_parallel__(repo_indexdict_list)
+
 	# Store index
 	__store_index__(repo_indexdict_list, current_path)
 
@@ -140,6 +143,22 @@ def find_root_dir_with_message():
 	except:
 		print('You are no in a literature repository.')
 		sys.exit()
+
+
+def __get_file_hash_parallel__(in_indexdict_list):
+
+	file_count = len(in_indexdict_list)
+
+	with multiprocessing.Pool(processes = NUM_CORES) as p:
+		out_indexdict_list = list(tqdm.tqdm(p.imap(__add_hash_to_file_dict__, in_indexdict_list), total = file_count))
+
+	return out_indexdict_list
+
+
+def __add_hash_to_file_dict__(file_dict):
+
+	file_dict['hash'] = get_file_hash((file_dict['path'], file_dict['filename']))
+	return file_dict
 
 
 def __get_file_info_parallel__(filepathtuple_list):
