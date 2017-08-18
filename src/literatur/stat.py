@@ -39,10 +39,11 @@ from joblib import (
 	)
 import multiprocessing
 import os
-from pathlib import PurePath
 from pprint import pprint as pp
 
 import magic
+
+from .repo import get_recursive_filepathtuple_list
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -51,7 +52,8 @@ import magic
 
 def print_stats():
 
-	file_path_list = __get_file_path_list__('.')
+	filepathtuple_list = get_recursive_filepathtuple_list('.')
+	file_path_list = [os.path.join(*item) for item in filepathtuple_list]
 
 	num_cores = multiprocessing.cpu_count()
 
@@ -63,33 +65,3 @@ def print_stats():
 
 	pp(OrderedDict(sorted(magic_dict.items(), key = lambda t: t[1])))
 	pp(OrderedDict(sorted(mime_dict.items(), key = lambda t: t[1])))
-
-
-def __get_file_path_list__(working_path):
-
-	ignore_dir_list = [
-		'.l',
-		'.git'
-		]
-	ignore_file_list = [
-		'desktop.ini',
-		'.directory'
-		]
-
-	file_path_list = []
-
-	for path, dir_list, file_list in os.walk(working_path):
-		for filename in file_list:
-
-			# ignore a bunch of folders
-			path_list = PurePath(path).parts
-			if any(item in ignore_dir_list for item in path_list):
-				continue
-
-			# ignore a bunch of files
-			if filename in ignore_file_list:
-				continue
-
-			file_path_list.append(os.path.join(path, filename))
-
-	return file_path_list

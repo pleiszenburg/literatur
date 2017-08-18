@@ -34,3 +34,12 @@ PATH_SUB_DBBACKUP = 'db/backup'
 PATH_SUB_REPORTS = 'reports'
 
 PATH_REPO = '.l'
+
+IGNORE_DIR_LIST = [
+	PATH_REPO,
+	'.git'
+	]
+IGNORE_FILE_LIST = [
+	'desktop.ini',
+	'.directory'
+	]

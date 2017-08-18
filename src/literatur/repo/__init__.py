@@ -30,9 +30,12 @@ specific language governing rights and limitations under the License.
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 import os
+from pathlib import PurePath
 import sys
 
 from ..const import (
+	IGNORE_DIR_LIST,
+	IGNORE_FILE_LIST,
 	PATH_REPO,
 	PATH_SUB_DB,
 	PATH_SUB_DBBACKUP,
@@ -55,6 +58,27 @@ def init_dir():
 		os.makedirs(os.path.join(current_repository, fld))
 
 	# TODO initial index
+
+
+def get_recursive_filepathtuple_list(in_path):
+
+	filepathtuple_list = []
+
+	for path, dir_list, file_list in os.walk(in_path):
+		for filename in file_list:
+
+			# ignore a bunch of folders
+			path_list = PurePath(path).parts
+			if any(item in IGNORE_DIR_LIST for item in path_list):
+				continue
+
+			# ignore a bunch of files
+			if filename in IGNORE_FILE_LIST:
+				continue
+
+			filepathtuple_list.append((os.path.relpath(path, in_path), filename))
+
+	return filepathtuple_list
 
 
 def find_root_dir():
