@@ -49,7 +49,13 @@ from ..const import (
 
 def init_dir():
 
-	# TODO check: Am I in existing repo?
+	# Am I in existing repo?
+	try:
+		root_dir = find_root_dir()
+		print('You already are in an existing literature repository.')
+		raise # TODO
+	except:
+		pass
 
 	current_path = os.getcwd()
 	current_repository = os.path.join(current_path, PATH_REPO)
