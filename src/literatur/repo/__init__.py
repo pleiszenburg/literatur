@@ -32,6 +32,7 @@ specific language governing rights and limitations under the License.
 import multiprocessing
 import os
 from pathlib import PurePath
+import pickle
 from pprint import pformat as pf
 import sys
 
@@ -42,6 +43,7 @@ from ..file import (
 	get_file_hash
 	)
 from ..const import (
+	FILE_DB_CURRENT,
 	IGNORE_DIR_LIST,
 	IGNORE_FILE_LIST,
 	PATH_REPO,
@@ -80,9 +82,8 @@ def init_repo():
 	# Get filesystem info for all files
 	repo_indexdict_list = __get_file_info_parallel__(repo_filepathtuple_list)
 
-	f = open('../test_out.txt', 'w')
-	f.write(pf(repo_indexdict_list))
-	f.close()
+	# Store index
+	__store_index__(repo_indexdict_list, current_path)
 
 
 def get_recursive_filepathtuple_list(in_path):
@@ -149,3 +150,10 @@ def __get_file_info_parallel__(filepathtuple_list):
 		indexdict_list = list(tqdm.tqdm(p.imap(get_file_info, filepathtuple_list), total = file_count))
 
 	return indexdict_list
+
+
+def __store_index__(indexdict_list, root_dir):
+
+	f = open(os.path.join(root_dir, PATH_REPO, PATH_SUB_DB, FILE_DB_CURRENT), 'wb+')
+	pickle.dump(indexdict_list, f, -1)
+	f.close()
