@@ -47,7 +47,7 @@ from ..const import (
 # IMPORT
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-def init_dir():
+def init_repo():
 
 	# Am I in existing repo?
 	try:
@@ -57,13 +57,15 @@ def init_dir():
 	except:
 		pass
 
+	# Create folders for repo meta data
 	current_path = os.getcwd()
 	current_repository = os.path.join(current_path, PATH_REPO)
 	os.makedirs(current_repository)
 	for fld in [PATH_SUB_DB, PATH_SUB_DBBACKUP, PATH_SUB_REPORTS]:
 		os.makedirs(os.path.join(current_repository, fld))
 
-	# TODO initial index
+	# Build initial index of paths and filenames
+	repo_filepathtuple_list = get_recursive_filepathtuple_list(current_path)
 
 
 def get_recursive_filepathtuple_list(in_path):
