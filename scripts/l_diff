@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 """
@@ -6,7 +7,7 @@ LITERATUR
 Literature management with Python, Dropbox and MediaWiki
 https://github.com/pleiszenburg/literatur
 
-	src/literatur/file/__init__.py: handle individual files
+	scripts/l_diff: Show diff against last commit
 
 	Copyright (C) 2017 Sebastian M. Ernst <ernst@pleiszenburg.de>
 
@@ -24,28 +25,17 @@ specific language governing rights and limitations under the License.
 
 """
 
-
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-# IMPORT
+# IMPORTS
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-import os
-
-from .hash import get_file_hash
+from literatur.repo import script_diff
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-# ROUTINES
+# BUILD THE INDEX
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-def get_file_info(in_path_tuple):
+if __name__ == "__main__":
 
-	in_path = os.path.join(*in_path_tuple)
-	stat_info = os.stat(in_path)
-
-	return {
-		'mode': stat_info.st_mode,
-		'inode': stat_info.st_ino,
-		'size': stat_info.st_size,
-		'mtime': stat_info.st_mtime_ns
-		}
+	script_diff()

@@ -34,6 +34,7 @@ import os
 from pathlib import PurePath
 import pickle
 from pprint import pformat as pf
+from pprint import pprint as pp
 import sys
 
 import tqdm
@@ -114,48 +115,80 @@ def script_init():
 	# Init empty database
 	__store_index__([], current_path)
 
-	# Build initial index of paths and filenames
-	repo_filepathtuple_list = __get_recursive_filepathtuple_list__(current_path)
-
-	# Get filesystem info for all files
-	repo_indexdict_list = __get_file_info_parallel__(repo_filepathtuple_list)
-
-	# Hash all files
-	repo_indexdict_list = __get_file_hash_parallel__(repo_indexdict_list)
-
-	# Store index
-	__store_index__(repo_indexdict_list, current_path)
+	# # Build initial index of paths and filenames
+	# repo_filepathtuple_list = __get_recursive_filepathtuple_list__(current_path)
+	#
+	# # Get filesystem info for all files
+	# repo_indexdict_list = __get_file_info_parallel__(repo_filepathtuple_list)
+	#
+	# # Hash all files
+	# repo_indexdict_list = __get_file_hash_parallel__(repo_indexdict_list)
+	#
+	# # Store index
+	# __store_index__(repo_indexdict_list, current_path)
 
 
 def script_diff():
 
-	pass
+	root_dir = find_root_dir_with_message()
+	old_indexdict_list = __load_index__(root_dir)
+
+	# Build new index of paths and filenames
+	new_filepathtuple_list = __get_recursive_filepathtuple_list__(root_dir)
+	# Convert index into list of entries
+	new_entries_list = [__convert_filepathtuple_to_entry__(item) for item in new_filepathtuple_list]
+	# Get filesystem info for all entires
+	new_entries_list = __get_entry_info_on_list__(new_entries_list)
+
+	pp(new_entries_list)
 
 
-def __add_hash_to_file_dict__(file_dict):
+def __convert_filepathtuple_to_entry__(filepath_tuple):
 
-	file_dict['hash'] = get_file_hash((file_dict['path'], file_dict['filename']))
-	return file_dict
+	return {
+		'file': {
+			'path': filepath_tuple[0],
+			'name': filepath_tuple[1]
+			}
+		}
 
 
-def __get_file_hash_parallel__(in_indexdict_list):
+def __get_entry_hash_on_item__(entry):
 
-	file_count = len(in_indexdict_list)
+	entry['file'].update({
+		'hash': get_file_hash((entry['file']['path'], entry['file']['name']))
+		})
+	return entry
+
+
+def __get_entry_hash_on_list__(in_entry_list):
+
+	entry_count = len(in_entry_list)
 
 	with multiprocessing.Pool(processes = NUM_CORES) as p:
-		out_indexdict_list = list(tqdm.tqdm(p.imap(__add_hash_to_file_dict__, in_indexdict_list), total = file_count))
+		out_indexdict_list = list(tqdm.tqdm(p.imap(
+			__get_entry_hash_on_item__, __entry_iterator__(in_entry_list)
+			), total = entry_count))
 
 	return out_indexdict_list
 
 
-def __get_file_info_parallel__(filepathtuple_list):
+def __get_entry_info_on_item__(entry):
 
-	file_count = len(filepathtuple_list)
+	entry['file'].update(get_file_info((entry['file']['path'], entry['file']['name'])))
+	return entry
+
+
+def __get_entry_info_on_list__(in_entry_list):
+
+	entry_count = len(in_entry_list)
 
 	with multiprocessing.Pool(processes = NUM_CORES) as p:
-		indexdict_list = list(tqdm.tqdm(p.imap(get_file_info, filepathtuple_list), total = file_count))
+		out_entry_list = list(tqdm.tqdm(p.imap(
+			__get_entry_info_on_item__, __entry_iterator__(in_entry_list)
+			), total = entry_count))
 
-	return indexdict_list
+	return out_entry_list
 
 
 def __get_recursive_filepathtuple_list__(in_path):
@@ -177,6 +210,21 @@ def __get_recursive_filepathtuple_list__(in_path):
 			filepathtuple_list.append((os.path.relpath(path, in_path), filename))
 
 	return filepathtuple_list
+
+
+def __entry_iterator__(entries_list):
+
+	for entry in entries_list:
+		yield entry
+
+
+def __load_index__(root_dir):
+
+	f = open(os.path.join(root_dir, PATH_REPO, PATH_SUB_DB, FILE_DB_CURRENT), 'rb')
+	indexdict_list = pickle.load(f)
+	f.close()
+
+	return indexdict_list
 
 
 def __store_index__(indexdict_list, root_dir):
