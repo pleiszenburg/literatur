@@ -59,36 +59,6 @@ NUM_CORES = multiprocessing.cpu_count()
 # IMPORT
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-def init_repo():
-
-	# Am I in existing repo?
-	try:
-		root_dir = find_root_dir()
-		print('You already are in an existing literature repository.')
-		raise # TODO
-	except:
-		pass
-
-	# Create folders for repo meta data
-	current_path = os.getcwd()
-	current_repository = os.path.join(current_path, PATH_REPO)
-	os.makedirs(current_repository)
-	for fld in [PATH_SUB_DB, PATH_SUB_DBBACKUP, PATH_SUB_REPORTS]:
-		os.makedirs(os.path.join(current_repository, fld))
-
-	# Build initial index of paths and filenames
-	repo_filepathtuple_list = __get_recursive_filepathtuple_list__(current_path)
-
-	# Get filesystem info for all files
-	repo_indexdict_list = __get_file_info_parallel__(repo_filepathtuple_list)
-
-	# Hash all files
-	repo_indexdict_list = __get_file_hash_parallel__(repo_indexdict_list)
-
-	# Store index
-	__store_index__(repo_indexdict_list, current_path)
-
-
 def find_root_dir():
 
 	current_path = os.getcwd()
@@ -122,6 +92,44 @@ def find_root_dir_with_message():
 	except:
 		print('You are no in a literature repository.')
 		sys.exit()
+
+
+def script_init():
+
+	# Am I in existing repo?
+	try:
+		root_dir = find_root_dir()
+		print('You already are in an existing literature repository.')
+		raise # TODO
+	except:
+		pass
+
+	# Create folders for repo meta data
+	current_path = os.getcwd()
+	current_repository = os.path.join(current_path, PATH_REPO)
+	os.makedirs(current_repository)
+	for fld in [PATH_SUB_DB, PATH_SUB_DBBACKUP, PATH_SUB_REPORTS]:
+		os.makedirs(os.path.join(current_repository, fld))
+
+	# Init empty database
+	__store_index__([], current_path)
+
+	# Build initial index of paths and filenames
+	repo_filepathtuple_list = __get_recursive_filepathtuple_list__(current_path)
+
+	# Get filesystem info for all files
+	repo_indexdict_list = __get_file_info_parallel__(repo_filepathtuple_list)
+
+	# Hash all files
+	repo_indexdict_list = __get_file_hash_parallel__(repo_indexdict_list)
+
+	# Store index
+	__store_index__(repo_indexdict_list, current_path)
+
+
+def script_diff():
+
+	pass
 
 
 def __add_hash_to_file_dict__(file_dict):
