@@ -77,7 +77,7 @@ def init_repo():
 		os.makedirs(os.path.join(current_repository, fld))
 
 	# Build initial index of paths and filenames
-	repo_filepathtuple_list = get_recursive_filepathtuple_list(current_path)
+	repo_filepathtuple_list = __get_recursive_filepathtuple_list__(current_path)
 
 	# Get filesystem info for all files
 	repo_indexdict_list = __get_file_info_parallel__(repo_filepathtuple_list)
@@ -87,27 +87,6 @@ def init_repo():
 
 	# Store index
 	__store_index__(repo_indexdict_list, current_path)
-
-
-def get_recursive_filepathtuple_list(in_path):
-
-	filepathtuple_list = []
-
-	for path, dir_list, file_list in os.walk(in_path):
-		for filename in file_list:
-
-			# ignore a bunch of folders
-			path_list = PurePath(path).parts
-			if any(item in IGNORE_DIR_LIST for item in path_list):
-				continue
-
-			# ignore a bunch of files
-			if filename in IGNORE_FILE_LIST:
-				continue
-
-			filepathtuple_list.append((os.path.relpath(path, in_path), filename))
-
-	return filepathtuple_list
 
 
 def find_root_dir():
@@ -145,6 +124,12 @@ def find_root_dir_with_message():
 		sys.exit()
 
 
+def __add_hash_to_file_dict__(file_dict):
+
+	file_dict['hash'] = get_file_hash((file_dict['path'], file_dict['filename']))
+	return file_dict
+
+
 def __get_file_hash_parallel__(in_indexdict_list):
 
 	file_count = len(in_indexdict_list)
@@ -155,12 +140,6 @@ def __get_file_hash_parallel__(in_indexdict_list):
 	return out_indexdict_list
 
 
-def __add_hash_to_file_dict__(file_dict):
-
-	file_dict['hash'] = get_file_hash((file_dict['path'], file_dict['filename']))
-	return file_dict
-
-
 def __get_file_info_parallel__(filepathtuple_list):
 
 	file_count = len(filepathtuple_list)
@@ -169,6 +148,27 @@ def __get_file_info_parallel__(filepathtuple_list):
 		indexdict_list = list(tqdm.tqdm(p.imap(get_file_info, filepathtuple_list), total = file_count))
 
 	return indexdict_list
+
+
+def __get_recursive_filepathtuple_list__(in_path):
+
+	filepathtuple_list = []
+
+	for path, dir_list, file_list in os.walk(in_path):
+		for filename in file_list:
+
+			# ignore a bunch of folders
+			path_list = PurePath(path).parts
+			if any(item in IGNORE_DIR_LIST for item in path_list):
+				continue
+
+			# ignore a bunch of files
+			if filename in IGNORE_FILE_LIST:
+				continue
+
+			filepathtuple_list.append((os.path.relpath(path, in_path), filename))
+
+	return filepathtuple_list
 
 
 def __store_index__(indexdict_list, root_dir):

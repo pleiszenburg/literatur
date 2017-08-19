@@ -43,7 +43,7 @@ from pprint import pprint as pp
 
 import magic
 
-from .repo import get_recursive_filepathtuple_list
+from .repo import __get_recursive_filepathtuple_list__ as get_recursive_filepathtuple_list
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
