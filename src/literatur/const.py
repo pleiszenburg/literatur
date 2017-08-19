@@ -51,3 +51,8 @@ KEY_MASTER = 'master'
 FILE_DB_CURRENT = 'lw_index_%s.pkl' % KEY_CURRENT # stage 1
 FILE_DB_JOURNAL = 'lw_index_%s.pkl' % KEY_JOURNAL # stage 2
 FILE_DB_MASTER = 'lw_index_%s.pkl' % KEY_MASTER # stage 3
+
+STATUS_UC = 0
+STATUS_RM = 1
+STATUS_NW = 2
+STATUS_CH = 3

@@ -29,6 +29,7 @@ specific language governing rights and limitations under the License.
 # IMPORT
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+from functools import partial
 import multiprocessing
 import os
 from pathlib import PurePath
@@ -50,7 +51,11 @@ from ..const import (
 	PATH_REPO,
 	PATH_SUB_DB,
 	PATH_SUB_DBBACKUP,
-	PATH_SUB_REPORTS
+	PATH_SUB_REPORTS,
+	STATUS_UC,
+	STATUS_RM,
+	STATUS_NW,
+	STATUS_CH
 	)
 
 NUM_CORES = multiprocessing.cpu_count()
@@ -140,7 +145,47 @@ def script_diff():
 	# Get filesystem info for all entires
 	new_entries_list = __get_entry_info_on_list__(new_entries_list)
 
-	pp(new_entries_list)
+	# Compare old list vs new list
+	uc_list, rm_list, nw_list, ch_list = __compare_entry_lists__(old_entries_list, new_entries_list)
+
+	pp({
+		'rm': rm_list,
+		'nw': nw_list,
+		'ch': ch_list,
+		'uc': uc_list
+		})
+
+
+def __compare_entry_lists__(a_entry_list, b_entry_list):
+
+	# OUT: Missing (no name match AND no hash match)
+	diff_rm_list = []
+	# OUT: New (new name AND new hash)
+	diff_nw_list = []
+	# OUT: Changed (name match AND new hash)
+	diff_ch_list = []
+	# OUT: UN-Changed (everything matches)
+	diff_uc_list = []
+
+	b_entry_count = len(b_entry_list)
+	find_entry_in_list_partial = partial(__find_entry_in_list__, a_entry_list)
+
+	with multiprocessing.Pool(processes = NUM_CORES) as p:
+		compared_entries_list = list(tqdm.tqdm(p.imap(
+			find_entry_in_list_partial, __entry_iterator__(b_entry_list)
+			), total = b_entry_count))
+
+	for entry in compared_entries_list:
+		if entry['status'] == STATUS_UC:
+			diff_uc_list.append(entry)
+		elif entry['status'] == STATUS_RM:
+			diff_rm_list.append(entry)
+		elif entry['status'] == STATUS_NW:
+			diff_nw_list.append(entry)
+		elif entry['status'] == STATUS_CH:
+			diff_ch_list.append(entry)
+
+	return diff_uc_list, diff_rm_list, diff_nw_list, diff_ch_list
 
 
 def __convert_filepathtuple_to_entry__(filepath_tuple):
@@ -151,6 +196,17 @@ def __convert_filepathtuple_to_entry__(filepath_tuple):
 			'name': filepath_tuple[1]
 			}
 		}
+
+
+def __entry_iterator__(entries_list):
+
+	for entry in entries_list:
+		yield entry
+
+
+def __find_entry_in_list__(entry_list, in_entry):
+
+	pass
 
 
 def __get_entry_hash_on_item__(entry):
@@ -210,12 +266,6 @@ def __get_recursive_filepathtuple_list__(in_path):
 			filepathtuple_list.append((os.path.relpath(path, in_path), filename))
 
 	return filepathtuple_list
-
-
-def __entry_iterator__(entries_list):
-
-	for entry in entries_list:
-		yield entry
 
 
 def __load_index__(root_dir):
