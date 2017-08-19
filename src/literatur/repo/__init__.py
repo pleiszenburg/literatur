@@ -131,7 +131,7 @@ def script_init():
 def script_diff():
 
 	root_dir = find_root_dir_with_message()
-	old_indexdict_list = __load_index__(root_dir)
+	old_entries_list = __load_index__(root_dir)
 
 	# Build new index of paths and filenames
 	new_filepathtuple_list = __get_recursive_filepathtuple_list__(root_dir)
