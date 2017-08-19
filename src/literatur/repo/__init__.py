@@ -171,8 +171,8 @@ def __compare_entry_lists__(a_entry_list, b_entry_list):
 	find_entry_in_list_partial = partial(__find_entry_in_list__, a_entry_list)
 
 	with multiprocessing.Pool(processes = NUM_CORES) as p:
-		compared_entries_list = list(tqdm.tqdm(p.imap(
-			find_entry_in_list_partial, __entry_iterator__(b_entry_list)
+		compared_entries_list = list(tqdm.tqdm(p.imap_unordered(
+			find_entry_in_list_partial, __entry_iterator__(b_entry_list), __get_optimal_chunksize__(b_entry_count)
 			), total = b_entry_count))
 
 	for entry in compared_entries_list:
@@ -222,8 +222,8 @@ def __get_entry_hash_on_list__(in_entry_list):
 	entry_count = len(in_entry_list)
 
 	with multiprocessing.Pool(processes = NUM_CORES) as p:
-		out_indexdict_list = list(tqdm.tqdm(p.imap(
-			__get_entry_hash_on_item__, __entry_iterator__(in_entry_list)
+		out_indexdict_list = list(tqdm.tqdm(p.imap_unordered(
+			__get_entry_hash_on_item__, __entry_iterator__(in_entry_list), __get_optimal_chunksize__(entry_count)
 			), total = entry_count))
 
 	return out_indexdict_list
@@ -240,11 +240,20 @@ def __get_entry_info_on_list__(in_entry_list):
 	entry_count = len(in_entry_list)
 
 	with multiprocessing.Pool(processes = NUM_CORES) as p:
-		out_entry_list = list(tqdm.tqdm(p.imap(
-			__get_entry_info_on_item__, __entry_iterator__(in_entry_list)
+		out_entry_list = list(tqdm.tqdm(p.imap_unordered(
+			__get_entry_info_on_item__, __entry_iterator__(in_entry_list), __get_optimal_chunksize__(entry_count)
 			), total = entry_count))
 
 	return out_entry_list
+
+
+def __get_optimal_chunksize__(items_count):
+
+	chunksize = int(float(items_count) / (float(NUM_CORES) * 3.0))
+	if chunksize < 1:
+		chunksize = 1
+
+	return chunksize
 
 
 def __get_recursive_filepathtuple_list__(in_path):
