@@ -30,6 +30,7 @@ specific language governing rights and limitations under the License.
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 from functools import partial
+import hashlib
 import multiprocessing
 import os
 from pathlib import PurePath
@@ -137,6 +138,7 @@ def script_diff():
 
 	root_dir = find_root_dir_with_message()
 	old_entries_list = __load_index__(root_dir)
+	os.chdir(root_dir)
 
 	# Build new index of paths and filenames
 	new_filepathtuple_list = __get_recursive_filepathtuple_list__(root_dir)
@@ -144,6 +146,8 @@ def script_diff():
 	new_entries_list = [__convert_filepathtuple_to_entry__(item) for item in new_filepathtuple_list]
 	# Get filesystem info for all entires
 	new_entries_list = __get_entry_info_on_list__(new_entries_list)
+	# Generate ID fields
+	new_entries_list = __add_id_field_on_list__(new_entries_list)
 
 	# Compare old list vs new list
 	uc_list, rm_list, nw_list, ch_list = __compare_entry_lists__(old_entries_list, new_entries_list)
@@ -156,29 +160,73 @@ def script_diff():
 		})
 
 
+def __add_id_field_on_entry__(entry):
+
+	entry.update({'id': __get_entry_id__(entry)})
+	return entry
+
+
+def __add_id_field_on_list__(in_entry_list):
+
+	entry_count = len(in_entry_list)
+
+	with multiprocessing.Pool(processes = NUM_CORES) as p:
+		out_indexdict_list = list(tqdm.tqdm(p.imap_unordered(
+			__add_id_field_on_entry__,
+			__entry_iterator__(in_entry_list),
+			__get_optimal_chunksize__(entry_count)
+			), total = entry_count))
+
+	return out_indexdict_list
+
+
 def __compare_entry_lists__(a_entry_list, b_entry_list):
 
 	# OUT: Missing (no name match AND no hash match)
 	diff_rm_list = []
 	# OUT: New (new name AND new hash)
 	diff_nw_list = []
-	# OUT: Changed (name match AND new hash)
+	# OUT: Moved (inode match AND size match and mtime match)
+	diff_ch_list = []
+	# OUT: Changed (name match AND path match)
 	diff_ch_list = []
 	# OUT: UN-Changed (everything matches)
 	diff_uc_list = []
 
+	# Get number of entries in new list
 	b_entry_count = len(b_entry_list)
-	find_entry_in_list_partial = partial(__find_entry_in_list__, a_entry_list)
 
+	# Find unchanged entries
+	find_entry_unchanged_in_list_partial = partial(__find_entry_unchanged_in_list__, a_entry_list)
+	with multiprocessing.Pool(processes = NUM_CORES) as p:
+		diff_uc_list = list(tqdm.tqdm(p.imap_unordered(
+			find_entry_unchanged_in_list_partial,
+			__entry_iterator__(b_entry_list),
+			__get_optimal_chunksize__(b_entry_count)
+			), total = b_entry_count))
+	# Remove None entries from list
+	diff_uc_list = [entry for entry in diff_uc_list if entry is not None]
+
+	# Reduce b_entry_list by removing unchanged entries
+	b_entry_dict = {entry['file']['id']: entry for entry in b_entry_count}
+	for entry in diff_uc_list:
+		b_entry_dict.pop(entry['file']['id'])
+	b_entry_list = [item[key] for key in b_entry_dict.keys()]
+
+	# Get number of remaining entries in new list
+	b_entry_count = len(b_entry_list)
+
+	# Find changed and new entries
+	find_entry_changed_in_list_partial = partial(__find_entry_changed_in_list__, a_entry_list)
 	with multiprocessing.Pool(processes = NUM_CORES) as p:
 		compared_entries_list = list(tqdm.tqdm(p.imap_unordered(
-			find_entry_in_list_partial, __entry_iterator__(b_entry_list), __get_optimal_chunksize__(b_entry_count)
+			find_entry_changed_in_list_partial,
+			__entry_iterator__(b_entry_list),
+			__get_optimal_chunksize__(b_entry_count)
 			), total = b_entry_count))
 
 	for entry in compared_entries_list:
-		if entry['status'] == STATUS_UC:
-			diff_uc_list.append(entry)
-		elif entry['status'] == STATUS_RM:
+		if entry['status'] == STATUS_RM:
 			diff_rm_list.append(entry)
 		elif entry['status'] == STATUS_NW:
 			diff_nw_list.append(entry)
@@ -204,9 +252,89 @@ def __entry_iterator__(entries_list):
 		yield entry
 
 
-def __find_entry_in_list__(entry_list, in_entry):
+def __find_entry_changed_in_list__(entry_list, in_entry):
+	"""
+	`entry_list` is expected to be hashed!
+	`in_entry` is expected to be missing hashes!
+	Returns tuple: id of old entry, id of new entry, entry dict with report
+	"""
 
-	pass
+	in_entry_id = __get_entry_id__(in_entry)
+
+	# Match all except path and hash
+	match = {
+		'name': [],
+		'path': [],
+		'inode': [],
+		'size': [],
+		'mtime': [],
+		}
+	match_key_list = list(match.keys())
+	in_entry_file_key_list = list(in_entry['file'].keys())
+	in_entry_file = in_entry['file']
+
+	# Iterate and find the matches
+	for entry in entry_list:
+		for match_key in match_key_list:
+			if match_key in in_entry_file_key_list:
+				if in_entry_file[match_key] == entry['file'][match_key]
+					match[match_key].append(in_entry)
+
+	# Size and mtime matches, likely moved to new path or renamed
+	for size_entry in match['size']:
+		for mtime_entry in match['mtime']:
+			for inode_entry in match['inode']:
+				if size_entry['file']['id'] == mtime_entry['file']['id'] == inode_entry['file']['id']:
+					entry = inode_entry
+					entry.update({'status': STATUS_CH})
+					entry.update({'_file': in_entry['file']})
+					entry.update({'report': __get_entry_change_report__(entry)})
+					return (entry['file']['id'], in_entry_id, entry)
+
+	# From now on, it can be assumed that the file has been changed - let's hash the new one
+	in_entry['file'].update({
+		'hash': get_file_hash((in_entry['file']['path'], in_entry['file']['name']))
+		})
+	in_entry_hash = in_entry['file']['hash']
+
+	# To be on the safe side, let's look for the hash
+	for entry in entry_list:
+		if entry['file']['hash'] == in_entry_hash:
+			entry.update({'status': STATUS_CH})
+			entry.update({'_file': in_entry['file']})
+			entry.update({'report': __get_entry_change_report__(entry)})
+			return entry
+
+	# Old name, old path, file changed
+	for name_entry in match['name']:
+		for path_entry in match['path']:
+			if name_entry['file']['id'] == path_entry['file']['id']:
+				entry = name_entry
+				entry.update({'status': STATUS_CH})
+				entry.update({'_file': in_entry['file']})
+				entry.update({'report': __get_entry_change_report__(entry)})
+				return entry
+
+
+def __find_entry_unchanged_in_list__(entry_list, in_entry):
+	"""
+	`entry_list` is expected to be hashed!
+	`in_entry` is expected to be missing hashes!
+	Returns tuple: id of old entry, old entry dict
+	"""
+
+	in_entry_id = __get_entry_id__(in_entry)
+	for entry in entry_list:
+		if entry['file']['id'] == in_entry_id:
+			entry.update({'status': STATUS_UC})
+			return in_entry_id, entry
+
+	return (None, None)
+
+
+def __get_entry_change_report__(entry):
+
+	return [] # TODO
 
 
 def __get_entry_hash_on_item__(entry):
@@ -227,6 +355,17 @@ def __get_entry_hash_on_list__(in_entry_list):
 			), total = entry_count))
 
 	return out_indexdict_list
+
+
+def __get_entry_id__(entry):
+
+	field_key_list = ['name', 'path', 'mode', 'inode', 'size', 'mtime']
+	field_value_list = [str(entry[key]) for key in field_key_list]
+	field_value_str = ' '.join(field_value_list)
+
+	hash_object = hashlib.sha256(field_value_str.encode())
+
+	return hash_object.hexdigest()
 
 
 def __get_entry_info_on_item__(entry):
