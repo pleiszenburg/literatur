@@ -49,7 +49,7 @@ from ..parallel import run_in_parallel_with_return
 
 def create_index_from_path(
 	root_dir,
-	get_hash = False, get_magic = False, get_type = False, analyze_cnt = False
+	switch_dict = {}
 	):
 
 	# Store current CWD
@@ -62,11 +62,13 @@ def create_index_from_path(
 	# Convert index into list of entries
 	entries_list = [convert_filepathtuple_to_entry(item) for item in filepathtuple_list]
 
+	# Fill switch_dict with defaults
+	for switch in ['hash', 'magic', 'type']:
+		if switch not in switch_dict.keys():
+			switch_dict[switch] = False
+
 	# Prepare configured index helper
-	index_parallel_helper_partial = partial(
-		__index_parallel_helper__,
-		get_hash, get_magic, get_type, analyze_cnt
-		)
+	index_parallel_helper_partial = partial(__index_parallel_helper__, switch_dict)
 	# Run index helper in parallel
 	entries_list = run_in_parallel_with_return(
 		index_parallel_helper_partial,
@@ -80,19 +82,17 @@ def create_index_from_path(
 
 
 def __index_parallel_helper__(
-	get_hash, get_magic, get_type, analyze_cnt,
+	switch_dict,
 	entry
 	):
 
 	add_info_to_entry(entry)
 	add_id_to_entry(entry)
-	if get_hash:
+	if switch_dict['hash']:
 		add_hash_to_entry(entry)
-	if get_magic:
+	if switch_dict['magic']:
 		add_magic_to_entry(entry)
-	if get_type:
+	if switch_dict['type']:
 		add_type_to_entry(entry)
-	if analyze_cnt:
-		pass
 
 	return entry
