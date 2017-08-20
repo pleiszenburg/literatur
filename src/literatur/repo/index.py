@@ -32,7 +32,6 @@ import os
 
 from .entry import (
 	add_id_field_on_list,
-	compare_entry_lists,
 	convert_filepathtuple_to_entry,
 	get_entry_hash_on_list,
 	get_entry_info_on_list
