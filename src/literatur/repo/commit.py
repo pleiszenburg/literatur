@@ -56,11 +56,11 @@ def commit(working_path, target):
 	else:
 		raise #
 
-	__commit_backup__(commit_b, working_path)
-	__commit_push__(commit_a, commit_b, working_path)
+	__backup__(commit_b, working_path)
+	__push__(commit_a, commit_b, working_path)
 
 
-def __commit_backup__(commit_source, working_path):
+def __backup__(commit_source, working_path):
 
 	# Full path of file which is going into backup
 	commit_source_path = os.path.join(working_path, PATH_REPO, PATH_SUB_DB, commit_source)
@@ -72,7 +72,7 @@ def __commit_backup__(commit_source, working_path):
 		ctime = os.path.getmtime(commit_source_path)
 
 		# Form string from creation time
-		ctime_string = __commit_datestring__(ctime)
+		ctime_string = __datestring__(ctime)
 
 		# Create new file name with creation time
 		commit_target = commit_source.replace('.', '_' + ctime_string + '.')
@@ -84,7 +84,7 @@ def __commit_backup__(commit_source, working_path):
 		shutil.copyfile(commit_source_path, commit_target_path)
 
 
-def __commit_datestring__(ctime):
+def __datestring__(ctime):
 
 	# Get time in sec, convert to GMT and time object
 	ctime_object = time.gmtime(ctime)
@@ -97,7 +97,7 @@ def __commit_datestring__(ctime):
 	return ctime_string
 
 
-def __commit_push__(commit_source, commit_target, working_path):
+def __push__(commit_source, commit_target, working_path):
 
 	# Get full paths
 	commit_source_path = os.path.join(working_path, PATH_REPO, PATH_SUB_DB, commit_source)
