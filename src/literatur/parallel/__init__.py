@@ -6,7 +6,7 @@ LITERATUR
 Literature management with Python, Dropbox and MediaWiki
 https://github.com/pleiszenburg/literatur
 
-	src/literatur/repo/__init__.py: Repository management
+	src/literatur/parallel/__init__.py: Parallel computing routines
 
 	Copyright (C) 2017 Sebastian M. Ernst <ernst@pleiszenburg.de>
 
@@ -29,7 +29,36 @@ specific language governing rights and limitations under the License.
 # IMPORT
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-from .scripts import (
-	script_init,
-	script_diff
-	)
+import multiprocessing
+
+import tqdm
+
+NUM_CORES = multiprocessing.cpu_count()
+
+
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# ROUTINES
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+def get_optimal_chunksize(items_count):
+
+	chunksize = int(float(items_count) / (float(NUM_CORES) * 3.0))
+	if chunksize < 1:
+		chunksize = 1
+
+	return chunksize
+
+
+def run_in_parallel_with_return(func_handle, parameter_list):
+
+		parameter_count = len(parameter_list)
+
+		with multiprocessing.Pool(processes = NUM_CORES) as p:
+
+			return_list = list(tqdm.tqdm(p.imap_unordered(
+				func_handle,
+				(parameter for parameter in parameter_list),
+				get_optimal_chunksize(parameter_count)
+				), total = parameter_count))
+
+		return return_list

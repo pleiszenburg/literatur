@@ -6,7 +6,7 @@ LITERATUR
 Literature management with Python, Dropbox and MediaWiki
 https://github.com/pleiszenburg/literatur
 
-	src/literatur/repo/__init__.py: Repository management
+	src/literatur/repo/fs.py: File system indexing related stuff
 
 	Copyright (C) 2017 Sebastian M. Ernst <ernst@pleiszenburg.de>
 
@@ -24,12 +24,39 @@ specific language governing rights and limitations under the License.
 
 """
 
-
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # IMPORT
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-from .scripts import (
-	script_init,
-	script_diff
+import os
+from pathlib import PurePath
+
+from ..const import (
+	IGNORE_DIR_LIST,
+	IGNORE_FILE_LIST
 	)
+
+
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# ROUTINES
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+def get_recursive_filepathtuple_list(in_path):
+
+	filepathtuple_list = []
+
+	for path, dir_list, file_list in os.walk(in_path):
+		for filename in file_list:
+
+			# ignore a bunch of folders
+			path_list = PurePath(path).parts
+			if any(item in IGNORE_DIR_LIST for item in path_list):
+				continue
+
+			# ignore a bunch of files
+			if filename in IGNORE_FILE_LIST:
+				continue
+
+			filepathtuple_list.append((os.path.relpath(path, in_path), filename))
+
+	return filepathtuple_list
