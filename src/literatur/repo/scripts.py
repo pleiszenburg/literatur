@@ -92,6 +92,16 @@ def script_diff():
 		})
 
 
+def script_filetype():
+
+	pass
+
+
+def script_metainfo():
+
+	pass
+
+
 def script_stats():
 
 	try:

@@ -29,7 +29,7 @@ specific language governing rights and limitations under the License.
 # IMPORTS
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-from literatur.info import print_filetype
+from literatur.repo import script_filetype
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -38,4 +38,4 @@ from literatur.info import print_filetype
 
 if __name__ == "__main__":
 
-	print_filetype()
+	script_filetype()
