@@ -182,16 +182,16 @@ def __add_id_field_on_list__(in_entry_list):
 
 def __compare_entry_lists__(a_entry_list, b_entry_list):
 
+	# OUT: UN-Changed (everything matches)
+	diff_uc_list = []
 	# OUT: Missing (no name match AND no hash match)
 	diff_rm_list = []
 	# OUT: New (new name AND new hash)
 	diff_nw_list = []
 	# OUT: Moved (inode match AND size match and mtime match)
-	diff_ch_list = []
+	diff_mv_list = []
 	# OUT: Changed (name match AND path match)
 	diff_ch_list = []
-	# OUT: UN-Changed (everything matches)
-	diff_uc_list = []
 
 	# Get number of entries in new list
 	b_entry_count = len(b_entry_list)
@@ -204,13 +204,16 @@ def __compare_entry_lists__(a_entry_list, b_entry_list):
 			__entry_iterator__(b_entry_list),
 			__get_optimal_chunksize__(b_entry_count)
 			), total = b_entry_count))
-	# Remove None entries from list
+	# Split the return tuples
+	diff_uc_id_list, diff_uc_list = map(list, zip(*diff_uc_list))
+	# Remove None entries from lists
+	diff_uc_id_list = [entry_id for entry_id in diff_uc_id_list if entry_id is not None]
 	diff_uc_list = [entry for entry in diff_uc_list if entry is not None]
 
 	# Reduce b_entry_list by removing unchanged entries
 	b_entry_dict = {entry['file']['id']: entry for entry in b_entry_count}
-	for entry in diff_uc_list:
-		b_entry_dict.pop(entry['file']['id'])
+	for entry_id in diff_uc_id_list:
+		b_entry_dict.pop(entry_id)
 	b_entry_list = [item[key] for key in b_entry_dict.keys()]
 
 	# Get number of remaining entries in new list
@@ -303,7 +306,7 @@ def __find_entry_changed_in_list__(entry_list, in_entry):
 			entry.update({'status': STATUS_CH})
 			entry.update({'_file': in_entry['file']})
 			entry.update({'report': __get_entry_change_report__(entry)})
-			return entry
+			return (entry['file']['id'], in_entry_id, entry)
 
 	# Old name, old path, file changed
 	for name_entry in match['name']:
@@ -313,7 +316,7 @@ def __find_entry_changed_in_list__(entry_list, in_entry):
 				entry.update({'status': STATUS_CH})
 				entry.update({'_file': in_entry['file']})
 				entry.update({'report': __get_entry_change_report__(entry)})
-				return entry
+				return (entry['file']['id'], in_entry_id, entry)
 
 
 def __find_entry_unchanged_in_list__(entry_list, in_entry):
@@ -327,7 +330,7 @@ def __find_entry_unchanged_in_list__(entry_list, in_entry):
 	for entry in entry_list:
 		if entry['file']['id'] == in_entry_id:
 			entry.update({'status': STATUS_UC})
-			return in_entry_id, entry
+			return (in_entry_id, entry)
 
 	return (None, None)
 
