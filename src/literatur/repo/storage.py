@@ -30,6 +30,7 @@ specific language governing rights and limitations under the License.
 
 import os
 import pickle
+from pprint import pprint as pp
 
 from ..const import (
 	FILE_DB_CURRENT,
@@ -107,8 +108,15 @@ def load_index(root_dir):
 	return indexdict_list
 
 
-def store_index(indexdict_list, root_dir):
+def store_index(indexdict_list, root_dir, mode = 'pickle.bin'):
 
-	f = open(os.path.join(root_dir, PATH_REPO, PATH_SUB_DB, FILE_DB_CURRENT), 'wb+')
-	pickle.dump(indexdict_list, f, -1)
-	f.close()
+	if mode == 'pickle.bin':
+		f = open(os.path.join(root_dir, PATH_REPO, PATH_SUB_DB, FILE_DB_CURRENT), 'wb+')
+		pickle.dump(indexdict_list, f, -1)
+		f.close()
+	elif mode == 'json.txt':
+		f = open(os.path.join(root_dir, PATH_REPO, PATH_SUB_REPORTS, FILE_DB_CURRENT + '.txt'), 'w+')
+		pp(indexdict_list, stream = f)
+		f.close()
+	else:
+		raise # TODO

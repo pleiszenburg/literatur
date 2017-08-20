@@ -30,7 +30,7 @@ specific language governing rights and limitations under the License.
 # IMPORTS
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-from literatur.index import dump_index
+from literatur.repo import script_dump
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -39,4 +39,4 @@ from literatur.index import dump_index
 
 if __name__ == "__main__":
 
-	dump_index()
+	script_dump()

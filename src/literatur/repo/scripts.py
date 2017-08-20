@@ -97,6 +97,18 @@ def script_diff():
 		})
 
 
+def script_dump():
+
+	try:
+		root_dir = find_root_dir_with_message(need_to_find = True)
+	except:
+		sys.exit()
+
+	entries_list = load_index(root_dir)
+
+	store_index(entries_list, root_dir, mode = 'json.txt')
+
+
 def script_metainfo():
 
 	files, nofiles = get_arg_file_list()
