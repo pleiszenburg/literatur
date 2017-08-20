@@ -28,6 +28,10 @@ specific language governing rights and limitations under the License.
 # IMPORT
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+from collections import (
+	Counter,
+	OrderedDict
+	)
 import os
 from pprint import pprint as pp
 
@@ -86,4 +90,18 @@ def script_diff():
 
 def script_stats():
 
-	pass
+	try:
+		root_dir = find_root_dir_with_message(need_to_find = True)
+	except:
+		sys.exit()
+
+	entries_list = load_index(root_dir)
+
+	magic_list = [entry['file']['magic'] for entry in entries_list]
+	mime_list = [entry['file']['mime'] for entry in entries_list]
+
+	magic_dict = Counter(magic_list)
+	mime_dict = Counter(mime_list)
+
+	pp(OrderedDict(sorted(magic_dict.items(), key = lambda t: t[1])))
+	pp(OrderedDict(sorted(mime_dict.items(), key = lambda t: t[1])))

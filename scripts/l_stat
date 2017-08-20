@@ -30,7 +30,7 @@ specific language governing rights and limitations under the License.
 # IMPORTS
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-from literatur.stat import print_stats
+from literatur.repo import script_stats
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -39,4 +39,4 @@ from literatur.stat import print_stats
 
 if __name__ == "__main__":
 
-	print_stats()
+	script_stats()
