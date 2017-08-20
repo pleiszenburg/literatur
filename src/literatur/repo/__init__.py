@@ -239,6 +239,9 @@ def __compare_entry_lists__(a_entry_list, b_entry_list):
 
 
 
+
+
+
 	# Find changed and new entries
 	find_entry_changed_in_list_partial = partial(__find_entry_changed_in_list__, a_entry_list)
 	with multiprocessing.Pool(processes = NUM_CORES) as p:
@@ -292,20 +295,6 @@ def __find_entry_changed_in_list__(entry_list, in_entry):
 				if in_entry_file[match_key] == entry['file'][match_key]
 					match[match_key].append(in_entry)
 
-	# From now on, it can be assumed that the file has been changed - let's hash the new one
-	in_entry['file'].update({
-		'hash': get_file_hash((in_entry['file']['path'], in_entry['file']['name']))
-		})
-	in_entry_hash = in_entry['file']['hash']
-
-	# To be on the safe side, let's look for the hash
-	for entry in entry_list:
-		if entry['file']['hash'] == in_entry_hash:
-			entry.update({'status': STATUS_CH})
-			entry.update({'_file': in_entry['file']})
-			entry.update({'report': __get_entry_change_report__(entry)})
-			return (entry['file']['id'], in_entry_id, entry)
-
 	# Old name, old path, file changed
 	for name_entry in match['name']:
 		for path_entry in match['path']:
@@ -315,6 +304,8 @@ def __find_entry_changed_in_list__(entry_list, in_entry):
 				entry.update({'_file': in_entry['file']})
 				entry.update({'report': __get_entry_change_report__(entry)})
 				return (entry['file']['id'], in_entry_id, entry)
+
+	return (None, None, None)
 
 
 def __find_entry_moved_in_list__(entry_list, in_entry):
@@ -353,6 +344,32 @@ def __find_entry_moved_in_list__(entry_list, in_entry):
 					entry.update({'_file': in_entry['file']})
 					entry.update({'report': __get_entry_change_report__(entry)})
 					return (entry['file']['id'], in_entry_id, entry)
+
+	return (None, None, None)
+
+
+def __find_entry_rewritten_in_list__(entry_list, in_entry):
+	"""
+	`entry_list` is expected to be hashed!
+	`in_entry` is expected to be missing hashes!
+	Returns tuple: id of old entry, id of new entry, entry dict with report
+	"""
+
+	in_entry_id = __get_entry_id__(in_entry)
+
+	# Hash new file
+	in_entry['file'].update({
+		'hash': get_file_hash((in_entry['file']['path'], in_entry['file']['name']))
+		})
+	in_entry_hash = in_entry['file']['hash']
+
+	# Let's look for the hash
+	for entry in entry_list:
+		if entry['file']['hash'] == in_entry_hash:
+			entry.update({'status': STATUS_MV})
+			entry.update({'_file': in_entry['file']})
+			entry.update({'report': __get_entry_change_report__(entry)})
+			return (entry['file']['id'], in_entry_id, entry)
 
 	return (None, None, None)
 
