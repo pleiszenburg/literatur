@@ -351,7 +351,9 @@ def __get_entry_hash_on_list__(in_entry_list):
 
 	with multiprocessing.Pool(processes = NUM_CORES) as p:
 		out_indexdict_list = list(tqdm.tqdm(p.imap_unordered(
-			__get_entry_hash_on_item__, __entry_iterator__(in_entry_list), __get_optimal_chunksize__(entry_count)
+			__get_entry_hash_on_item__,
+			__entry_iterator__(in_entry_list),
+			__get_optimal_chunksize__(entry_count)
 			), total = entry_count))
 
 	return out_indexdict_list
@@ -380,7 +382,9 @@ def __get_entry_info_on_list__(in_entry_list):
 
 	with multiprocessing.Pool(processes = NUM_CORES) as p:
 		out_entry_list = list(tqdm.tqdm(p.imap_unordered(
-			__get_entry_info_on_item__, __entry_iterator__(in_entry_list), __get_optimal_chunksize__(entry_count)
+			__get_entry_info_on_item__,
+			__entry_iterator__(in_entry_list),
+			__get_optimal_chunksize__(entry_count)
 			), total = entry_count))
 
 	return out_entry_list
