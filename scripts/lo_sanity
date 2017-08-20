@@ -7,7 +7,7 @@ LITERATUR
 Literature management with Python, Dropbox and MediaWiki
 https://github.com/pleiszenburg/literatur
 
-	scripts/l_buildindex: Builds an index
+	scripts/lo_sanity: [OLD] Checks repository state
 
 	Copyright (C) 2017 Sebastian M. Ernst <ernst@pleiszenburg.de>
 
@@ -30,13 +30,13 @@ specific language governing rights and limitations under the License.
 # IMPORTS
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-from literatur.index import build_index
+from literatur.index import check_sanity
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-# BUILD THE INDEX
+# REBUILD NEW INDEX
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 if __name__ == "__main__":
 
-	build_index()
+	check_sanity()
