@@ -34,6 +34,7 @@ from collections import (
 	)
 import os
 from pprint import pprint as pp
+import sys
 
 from .entry import compare_entry_lists
 from .index import (

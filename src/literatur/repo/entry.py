@@ -30,7 +30,6 @@ specific language governing rights and limitations under the License.
 
 from functools import partial
 import hashlib
-import sys
 
 from ..file import (
 	get_file_info,
