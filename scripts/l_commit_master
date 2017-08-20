@@ -30,7 +30,7 @@ specific language governing rights and limitations under the License.
 # IMPORTS
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-from literatur.index import commit_master
+from literatur.repo import script_commit
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -39,4 +39,4 @@ from literatur.index import commit_master
 
 if __name__ == "__main__":
 
-	commit_master()
+	script_commit('master')

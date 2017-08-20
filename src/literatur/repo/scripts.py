@@ -41,6 +41,10 @@ from .entry import (
 	compare_entry_lists,
 	convert_filepathtuple_to_entry
 	)
+from .commit import (
+	commit_push,
+	commit_backup
+	)
 from .index import (
 	create_index_from_path,
 	update_index
@@ -73,6 +77,22 @@ def script_init():
 
 	# Init empty database
 	store_index([], current_path)
+
+
+def script_commit(target = 'journal'):
+
+	try:
+		root_dir = find_root_dir_with_message(need_to_find = True)
+	except:
+		sys.exit()
+
+	if target == 'journal':
+		commit_a, commit_b = FILE_DB_CURRENT, FILE_DB_JOURNAL
+	elif target == 'master':
+		commit_a, commit_b = FILE_DB_JOURNAL, FILE_DB_MASTER
+
+	commit_backup(commit_b, path_root)
+	commit_push(commit_a, commit_b, path_root)
 
 
 def script_diff():
