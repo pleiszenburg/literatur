@@ -183,7 +183,7 @@ def __add_id_field_on_list__(in_entry_list):
 def __compare_entry_lists__(a_entry_list, b_entry_list):
 
 	# OUT: UN-Changed (everything matches)
-	diff_uc_list = []
+	# diff_uc_list = []
 	# OUT: Missing (no name match AND no hash match)
 	diff_rm_list = []
 	# OUT: New (new name AND new hash)
@@ -267,10 +267,7 @@ def __find_entry_changed_in_list__(entry_list, in_entry):
 	# Match all except path and hash
 	match = {
 		'name': [],
-		'path': [],
-		'inode': [],
-		'size': [],
-		'mtime': [],
+		'path': []
 		}
 	match_key_list = list(match.keys())
 	in_entry_file_key_list = list(in_entry['file'].keys())
@@ -282,17 +279,6 @@ def __find_entry_changed_in_list__(entry_list, in_entry):
 			if match_key in in_entry_file_key_list:
 				if in_entry_file[match_key] == entry['file'][match_key]
 					match[match_key].append(in_entry)
-
-	# Size and mtime matches, likely moved to new path or renamed
-	for size_entry in match['size']:
-		for mtime_entry in match['mtime']:
-			for inode_entry in match['inode']:
-				if size_entry['file']['id'] == mtime_entry['file']['id'] == inode_entry['file']['id']:
-					entry = inode_entry
-					entry.update({'status': STATUS_CH})
-					entry.update({'_file': in_entry['file']})
-					entry.update({'report': __get_entry_change_report__(entry)})
-					return (entry['file']['id'], in_entry_id, entry)
 
 	# From now on, it can be assumed that the file has been changed - let's hash the new one
 	in_entry['file'].update({
@@ -317,6 +303,46 @@ def __find_entry_changed_in_list__(entry_list, in_entry):
 				entry.update({'_file': in_entry['file']})
 				entry.update({'report': __get_entry_change_report__(entry)})
 				return (entry['file']['id'], in_entry_id, entry)
+
+
+def __find_entry_moved_in_list__(entry_list, in_entry):
+	"""
+	`entry_list` is expected to be hashed!
+	`in_entry` is expected to be missing hashes!
+	Returns tuple: id of old entry, id of new entry, entry dict with report
+	"""
+
+	in_entry_id = __get_entry_id__(in_entry)
+
+	# Match all except path and hash
+	match = {
+		'inode': [],
+		'size': [],
+		'mtime': [],
+		}
+	match_key_list = list(match.keys())
+	in_entry_file_key_list = list(in_entry['file'].keys())
+	in_entry_file = in_entry['file']
+
+	# Iterate and find the matches
+	for entry in entry_list:
+		for match_key in match_key_list:
+			if match_key in in_entry_file_key_list:
+				if in_entry_file[match_key] == entry['file'][match_key]
+					match[match_key].append(in_entry)
+
+	# Size, mtime and inode match, likely moved to new path or renamed
+	for size_entry in match['size']:
+		for mtime_entry in match['mtime']:
+			for inode_entry in match['inode']:
+				if size_entry['file']['id'] == mtime_entry['file']['id'] == inode_entry['file']['id']:
+					entry = inode_entry
+					entry.update({'status': STATUS_CH})
+					entry.update({'_file': in_entry['file']})
+					entry.update({'report': __get_entry_change_report__(entry)})
+					return (entry['file']['id'], in_entry_id, entry)
+
+	return (None, None, None)
 
 
 def __find_entry_unchanged_in_list__(entry_list, in_entry):
