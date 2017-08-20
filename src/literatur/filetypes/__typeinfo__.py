@@ -30,6 +30,7 @@ specific language governing rights and limitations under the License.
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 import magic
+import os
 
 from .__loader__ import get_file_types as __get_file_types__
 
@@ -47,7 +48,7 @@ filetypes = __get_file_types__()
 
 def get_literatur_type_from_filename(filename):
 
-	return get_literatur_type_from_magicinfo(get_magicinfo(filename))
+	return get_literatur_type_from_magicinfo(get_magicinfo(('', filename)))
 
 
 def get_literatur_type_from_magicinfo(magic_info):
@@ -60,11 +61,11 @@ def get_literatur_type_from_magicinfo(magic_info):
 	return None
 
 
-def get_magicinfo(filename):
+def get_magicinfo(filepath_tuple):
 
-	return magic.from_file(filename)
+	return magic.from_file(os.path.join(*filepath_tuple))
 
 
-def get_mimetype(filename):
+def get_mimetype(filepath_tuple):
 
-	return magic.from_file(filename, mime = True)
+	return magic.from_file(os.path.join(*filepath_tuple), mime = True)

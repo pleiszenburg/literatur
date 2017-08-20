@@ -82,3 +82,8 @@ def script_diff():
 		'uc': uc_list,
 		'mv': mv_list
 		})
+
+
+def script_stats():
+
+	pass

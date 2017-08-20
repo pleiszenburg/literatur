@@ -31,5 +31,6 @@ specific language governing rights and limitations under the License.
 
 from .scripts import (
 	script_init,
-	script_diff
+	script_diff,
+	script_stats
 	)

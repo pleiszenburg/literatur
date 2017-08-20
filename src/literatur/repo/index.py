@@ -28,22 +28,29 @@ specific language governing rights and limitations under the License.
 # IMPORT
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+from functools import partial
 import os
 
 from .entry import (
-	add_id_field_on_list,
 	convert_filepathtuple_to_entry,
-	get_entry_hash_on_list,
-	get_entry_info_on_list
+	add_id_to_entry,
+	add_info_to_entry,
+	add_hash_to_entry,
+	add_magic_to_entry,
+	add_type_to_entry
 	)
 from .fs import get_recursive_filepathtuple_list
+from ..parallel import run_in_parallel_with_return
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # ROUTINES
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-def create_index_from_path(root_dir, hash_files = False):
+def create_index_from_path(
+	root_dir,
+	get_hash = False, get_magic = False, get_type = False, analyze_cnt = False
+	):
 
 	# Store current CWD
 	old_cwd = os.getcwd()
@@ -54,16 +61,38 @@ def create_index_from_path(root_dir, hash_files = False):
 	filepathtuple_list = get_recursive_filepathtuple_list(root_dir)
 	# Convert index into list of entries
 	entries_list = [convert_filepathtuple_to_entry(item) for item in filepathtuple_list]
-	# Get filesystem info for all entires
-	entries_list = get_entry_info_on_list(entries_list)
-	# Generate ID fields
-	entries_list = add_id_field_on_list(entries_list)
 
-	# Hash files (optional)
-	if hash_files:
-		entries_list = get_entry_hash_on_list(entries_list)
+	# Prepare configured index helper
+	index_parallel_helper_partial = partial(
+		__index_parallel_helper__,
+		get_hash, get_magic, get_type, analyze_cnt
+		)
+	# Run index helper in parallel
+	entries_list = run_in_parallel_with_return(
+		index_parallel_helper_partial,
+		entries_list
+		)
 
 	# Restore old CWD
 	os.chdir(old_cwd)
 
 	return entries_list
+
+
+def __index_parallel_helper__(
+	get_hash, get_magic, get_type, analyze_cnt,
+	entry
+	):
+
+	add_info_to_entry(entry)
+	add_id_to_entry(entry)
+	if get_hash:
+		add_hash_to_entry(entry)
+	if get_magic:
+		add_magic_to_entry(entry)
+	if get_type:
+		add_type_to_entry(entry)
+	if analyze_cnt:
+		pass
+
+	return entry

@@ -36,6 +36,11 @@ from ..file import (
 	get_file_info,
 	get_file_hash
 	)
+from ..filetypes import (
+	get_literatur_type_from_magicinfo,
+	get_magicinfo,
+	get_mimetype
+	)
 from ..const import (
 	STATUS_UC,
 	STATUS_RM,
@@ -50,15 +55,41 @@ from ..parallel import run_in_parallel_with_return
 # ROUTINES
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-def add_id_field_on_entry(entry):
+def add_id_to_entry(entry):
 
 	entry['file'].update({'id': get_entry_id(entry)})
-	return entry
 
 
-def add_id_field_on_list(in_entry_list):
+def add_info_to_entry(entry):
 
-	return run_in_parallel_with_return(add_id_field_on_entry, in_entry_list)
+	entry['file'].update(get_file_info((entry['file']['path'], entry['file']['name'])))
+
+
+def add_hash_to_entry(entry):
+
+	entry['file'].update({
+		'hash': get_file_hash((entry['file']['path'], entry['file']['name']))
+		})
+
+
+def add_magic_to_entry(entry):
+
+	entry['file'].update({
+		'mime': get_mimetype((entry['file']['path'], entry['file']['name'])),
+		'magic': get_magicinfo((entry['file']['path'], entry['file']['name']))
+		})
+
+
+def add_type_to_entry(entry):
+
+	if 'magic' in entry['file'].keys():
+		magic_info = entry['file']['magic']
+	else:
+		magic_info = get_magicinfo((entry['file']['path'], entry['file']['name']))
+
+	entry['file'].update({
+		'type': get_literatur_type_from_magicinfo(magic_info)
+		})
 
 
 def compare_entry_lists(a_entry_list, b_entry_list):
@@ -203,10 +234,7 @@ def find_entry_rewritten_in_list(entry_list, in_entry):
 	in_entry_id = get_entry_id(in_entry)
 
 	# Hash new file
-	in_entry['file'].update({
-		'hash': get_file_hash((in_entry['file']['path'], in_entry['file']['name']))
-		})
-	in_entry_hash = in_entry['file']['hash']
+	add_hash_to_entry(in_entry)
 
 	# Let's look for the hash
 	for entry in entry_list:
@@ -240,19 +268,6 @@ def get_entry_change_report(entry):
 	return [] # TODO
 
 
-def get_entry_hash_on_item(entry):
-
-	entry['file'].update({
-		'hash': get_file_hash((entry['file']['path'], entry['file']['name']))
-		})
-	return entry
-
-
-def get_entry_hash_on_list(in_entry_list):
-
-	return run_in_parallel_with_return(get_entry_hash_on_item, in_entry_list)
-
-
 def get_entry_id(entry):
 
 	field_key_list = ['name', 'path', 'mode', 'inode', 'size', 'mtime']
@@ -262,17 +277,3 @@ def get_entry_id(entry):
 	hash_object = hashlib.sha256(field_value_str.encode())
 
 	return hash_object.hexdigest()
-
-
-def get_entry_info_on_item(entry):
-
-	entry['file'].update(get_file_info((entry['file']['path'], entry['file']['name'])))
-	return entry
-
-
-def get_entry_info_on_list(in_entry_list):
-
-	return run_in_parallel_with_return(
-		get_entry_info_on_item,
-		in_entry_list
-		)
