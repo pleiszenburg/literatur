@@ -164,7 +164,7 @@ def script_diff():
 
 def __add_id_field_on_entry__(entry):
 
-	entry.update({'id': __get_entry_id__(entry)})
+	entry['file'].update({'id': __get_entry_id__(entry)})
 	return entry
 
 
@@ -188,12 +188,12 @@ def __compare_entry_lists__(a_entry_list, b_entry_list):
 		entry_dict = {entry['file']['id']: entry for entry in entry_list}
 		for entry_id in id_list:
 			entry_dict.pop(entry_id)
-		return [item[key] for key in entry_dict.keys()]
+		return [entry_dict[key] for key in entry_dict.keys()]
 
 	def remove_none_from_list(in_list):
 		return [value for value in in_list if value is not None]
 
-	def diff_by_func(func_handle):
+	def diff_by_func(func_handle, a_entry_list, b_entry_list):
 		# Find relevant entries
 		b_entry_count = len(b_entry_list)
 		func_handle_partial = partial(func_handle, a_entry_list)
@@ -205,16 +205,25 @@ def __compare_entry_lists__(a_entry_list, b_entry_list):
 				), total = b_entry_count))
 		# Split the return tuples
 		a_id_list, b_id_list, diff_list = map(list, zip(*diff_list))
-		# Reduce a_entry_list and b_entry_list by removing unchanged entries
-		a_entry_list = reduce_by_id_list(a_entry_list, remove_none_from_list(a_id_list))
-		b_entry_list = reduce_by_id_list(b_entry_list, remove_none_from_list(b_id_list))
 		# Return result
-		return remove_none_from_list(diff_list)
+		return (
+			remove_none_from_list(diff_list),
+			reduce_by_id_list(a_entry_list, remove_none_from_list(a_id_list)),
+			reduce_by_id_list(b_entry_list, remove_none_from_list(b_id_list))
+			)
 
-	diff_uc_list = diff_by_func(__find_entry_unchanged_in_list__)
-	diff_mv_list = diff_by_func(__find_entry_moved_in_list__)
-	diff_rw_list = diff_by_func(__find_entry_rewritten_in_list__)
-	diff_ch_list = diff_by_func(__find_entry_changed_in_list__)
+	diff_uc_list, a_entry_list, b_entry_list = diff_by_func(
+		__find_entry_unchanged_in_list__, a_entry_list, b_entry_list
+		)
+	diff_mv_list, a_entry_list, b_entry_list = diff_by_func(
+		__find_entry_moved_in_list__, a_entry_list, b_entry_list
+		)
+	diff_rw_list, a_entry_list, b_entry_list = diff_by_func(
+		__find_entry_rewritten_in_list__, a_entry_list, b_entry_list
+		)
+	diff_ch_list, a_entry_list, b_entry_list = diff_by_func(
+		__find_entry_changed_in_list__, a_entry_list, b_entry_list
+		)
 	diff_rm_list = a_entry_list
 	diff_nw_list = b_entry_list
 
@@ -259,7 +268,7 @@ def __find_entry_changed_in_list__(entry_list, in_entry):
 	for entry in entry_list:
 		for match_key in match_key_list:
 			if match_key in in_entry_file_key_list:
-				if in_entry_file[match_key] == entry['file'][match_key]
+				if in_entry_file[match_key] == entry['file'][match_key]:
 					match[match_key].append(in_entry)
 
 	# Old name, old path, file changed
@@ -298,7 +307,7 @@ def __find_entry_moved_in_list__(entry_list, in_entry):
 	for entry in entry_list:
 		for match_key in match_key_list:
 			if match_key in in_entry_file_key_list:
-				if in_entry_file[match_key] == entry['file'][match_key]
+				if in_entry_file[match_key] == entry['file'][match_key]:
 					match[match_key].append(in_entry)
 
 	# Size, mtime and inode match, likely moved to new path or renamed
@@ -387,7 +396,7 @@ def __get_entry_hash_on_list__(in_entry_list):
 def __get_entry_id__(entry):
 
 	field_key_list = ['name', 'path', 'mode', 'inode', 'size', 'mtime']
-	field_value_list = [str(entry[key]) for key in field_key_list]
+	field_value_list = [str(entry['file'][key]) for key in field_key_list]
 	field_value_str = ' '.join(field_value_list)
 
 	hash_object = hashlib.sha256(field_value_str.encode())
