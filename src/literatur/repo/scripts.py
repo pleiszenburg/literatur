@@ -41,10 +41,7 @@ from .entry import (
 	compare_entry_lists,
 	convert_filepathtuple_to_entry
 	)
-from .commit import (
-	commit_push,
-	commit_backup
-	)
+from .commit import commit
 from .index import (
 	create_index_from_path,
 	update_index
@@ -86,13 +83,7 @@ def script_commit(target = 'journal'):
 	except:
 		sys.exit()
 
-	if target == 'journal':
-		commit_a, commit_b = FILE_DB_CURRENT, FILE_DB_JOURNAL
-	elif target == 'master':
-		commit_a, commit_b = FILE_DB_JOURNAL, FILE_DB_MASTER
-
-	commit_backup(commit_b, path_root)
-	commit_push(commit_a, commit_b, path_root)
+	commit(root_dir, target)
 
 
 def script_diff():

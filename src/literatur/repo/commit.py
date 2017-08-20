@@ -34,6 +34,9 @@ import shutil
 import time
 
 from ..const import (
+	FILE_DB_CURRENT,
+	FILE_DB_JOURNAL,
+	FILE_DB_MASTER,
 	PATH_REPO,
 	PATH_SUB_DB,
 	PATH_SUB_DBBACKUP
@@ -44,24 +47,20 @@ from ..const import (
 # ROUTINES?
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-def commit_push(commit_source, commit_target, working_path):
+def commit(working_path, target):
 
-	# Get full paths
-	commit_source_path = os.path.join(working_path, PATH_REPO, PATH_SUB_DB, commit_source)
-	commit_target_path = os.path.join(working_path, PATH_REPO, PATH_SUB_DB, commit_target)
+	if target == 'journal':
+		commit_a, commit_b = FILE_DB_CURRENT, FILE_DB_JOURNAL
+	elif target == 'master':
+		commit_a, commit_b = FILE_DB_JOURNAL, FILE_DB_MASTER
+	else:
+		raise #
 
-	# Only push if source exists
-	if os.path.isfile(commit_source_path):
-
-		# If previous commit exists, kill it
-		if os.path.isfile(commit_target_path):
-			os.remove(commit_target_path)
-
-		# Copy original to target ('copyfile' will overwrite)
-		shutil.copyfile(commit_source_path, commit_target_path)
+	__commit_backup__(commit_b, working_path)
+	__commit_push__(commit_a, commit_b, working_path)
 
 
-def commit_backup(commit_source, working_path):
+def __commit_backup__(commit_source, working_path):
 
 	# Full path of file which is going into backup
 	commit_source_path = os.path.join(working_path, PATH_REPO, PATH_SUB_DB, commit_source)
@@ -96,3 +95,20 @@ def __commit_datestring__(ctime):
 		)
 
 	return ctime_string
+
+
+def __commit_push__(commit_source, commit_target, working_path):
+
+	# Get full paths
+	commit_source_path = os.path.join(working_path, PATH_REPO, PATH_SUB_DB, commit_source)
+	commit_target_path = os.path.join(working_path, PATH_REPO, PATH_SUB_DB, commit_target)
+
+	# Only push if source exists
+	if os.path.isfile(commit_source_path):
+
+		# If previous commit exists, kill it
+		if os.path.isfile(commit_target_path):
+			os.remove(commit_target_path)
+
+		# Copy original to target ('copyfile' will overwrite)
+		shutil.copyfile(commit_source_path, commit_target_path)
