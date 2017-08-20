@@ -36,6 +36,7 @@ import os
 from pprint import pprint as pp
 import sys
 
+from .args import get_arg_file_list
 from .entry import compare_entry_lists
 from .index import (
 	create_index_from_path,
@@ -94,12 +95,47 @@ def script_diff():
 
 def script_filetype():
 
-	pass
+	files, nofiles = get_arg_file_list()
+
+	for nofile in nofiles:
+		pp({
+			'filename': nofile,
+			'error': 'Not a file.'
+			})
+
+	for filename in files:
+		magic_info = get_magicinfo(filename)
+		type_info = get_literatur_type_from_magicinfo(magic_info)
+		pp({
+			'filename': filename,
+			'type': type_info,
+			'magic_info': magic_info
+			})
+
 
 
 def script_metainfo():
 
-	pass
+	files, nofiles = get_arg_file_list()
+
+	for nofile in nofiles:
+		pp({
+			'filename': nofile,
+			'error': 'Not a file.'
+			})
+
+	for filename in files:
+		magic_info = get_magicinfo(filename)
+		type_info = get_literatur_type_from_magicinfo(magic_info)
+		meta_info = None
+		if type_info is not None:
+			meta_info = filetypes[type_info].get_meta_info(filename)
+		pp({
+			'filename': filename,
+			'type': type_info,
+			'magic_info': magic_info,
+			'meta_info': meta_info
+			})
 
 
 def script_stats():
