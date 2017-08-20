@@ -34,10 +34,12 @@ from pprint import pprint as pp
 
 from .entry import (
 	add_switched_to_entry_and_return,
+	compare_entry_lists,
 	convert_filepathtuple_to_entry,
 	merge_entry_file_info_and_return
 	)
 from .fs import get_recursive_filepathtuple_list
+from .storage import load_index
 from ..parallel import run_in_parallel_with_return
 
 

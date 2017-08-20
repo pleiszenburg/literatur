@@ -72,32 +72,43 @@ def add_hash_to_entry(entry):
 		})
 
 
-def add_hash_to_entry(entry):
-
-	entry['file'].update({
-		'hash': get_file_hash((entry['file']['path'], entry['file']['name']))
-		})
-
-
-def add_magic_to_entry_and_return(entry):
+def add_hash_to_entry_and_return(entry):
 
 	add_hash_to_entry(entry)
 	return entry
 
 
+def add_magic_to_entry(entry):
+
+	entry['file'].update({
+		'magic': get_magicinfo((entry['file']['path'], entry['file']['name'])),
+		'mime': get_mimetype((entry['file']['path'], entry['file']['name']))
+		})
+
+
 def add_switched_to_entry(entry, switch_dict = {}):
 
+	routines_dict = {
+		'hash': add_hash_to_entry,
+		'magic': add_magic_to_entry,
+		'type': add_magic_to_entry
+		}
+
 	if 'all' not in switch_dict.keys():
-		switch_dict['all'] = False
+		keys = switch_dict.keys()
+	else:
+		if switch_dict['all']:
+			keys = routines_dict.keys()
+		else:
+			switch_dict.pop('all')
+			keys = switch_dict.keys()
 
 	add_info_to_entry(entry)
 	add_id_to_entry(entry)
-	if (switch_dict['hash'] or switch_dict['all']) and 'hash' not in entry['file'].keys():
-		add_hash_to_entry(entry)
-	if (switch_dict['magic'] or switch_dict['all']) and 'magic' not in entry['file'].keys():
-		add_magic_to_entry(entry)
-	if (switch_dict['type'] or switch_dict['all']) and 'type' not in entry['file'].keys():
-		add_type_to_entry(entry)
+
+	for key in keys:
+		if key not in entry['file'].keys():
+			routines_dict[key](entry)
 
 
 def add_switched_to_entry_and_return(entry, switch_dict = {}):
@@ -155,7 +166,7 @@ def compare_entry_lists(a_entry_list, b_entry_list):
 
 	# Hash remaining b-list files
 	b_entry_list = run_in_parallel_with_return(
-		add_magic_to_entry_and_return, b_entry_list
+		add_hash_to_entry_and_return, b_entry_list
 		)
 
 	# Find files, which have likely been written to a new inode
