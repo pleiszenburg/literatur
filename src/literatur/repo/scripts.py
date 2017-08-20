@@ -36,7 +36,10 @@ import os
 from pprint import pprint as pp
 
 from .entry import compare_entry_lists
-from .index import create_index_from_path
+from .index import (
+	create_index_from_path,
+	update_index
+	)
 from .storage import (
 	init_repo_folders,
 	find_root_dir_with_message,
@@ -105,3 +108,15 @@ def script_stats():
 
 	pp(OrderedDict(sorted(magic_dict.items(), key = lambda t: t[1])))
 	pp(OrderedDict(sorted(mime_dict.items(), key = lambda t: t[1])))
+
+
+def script_update():
+
+	try:
+		root_dir = find_root_dir_with_message(need_to_find = True)
+	except:
+		sys.exit()
+
+	updated_entries_list = update_index(root_dir)
+
+	store_index(updated_entries_list, root_dir)

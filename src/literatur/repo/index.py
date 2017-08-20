@@ -30,14 +30,12 @@ specific language governing rights and limitations under the License.
 
 from functools import partial
 import os
+from pprint import pprint as pp
 
 from .entry import (
+	add_switched_to_entry_and_return,
 	convert_filepathtuple_to_entry,
-	add_id_to_entry,
-	add_info_to_entry,
-	add_hash_to_entry,
-	add_magic_to_entry,
-	add_type_to_entry
+	merge_entry_file_info_and_return
 	)
 from .fs import get_recursive_filepathtuple_list
 from ..parallel import run_in_parallel_with_return
@@ -67,11 +65,9 @@ def create_index_from_path(
 		if switch not in switch_dict.keys():
 			switch_dict[switch] = False
 
-	# Prepare configured index helper
-	index_parallel_helper_partial = partial(__index_parallel_helper__, switch_dict)
 	# Run index helper in parallel
 	entries_list = run_in_parallel_with_return(
-		index_parallel_helper_partial,
+		partial(add_switched_to_entry_and_return, switch_dict = switch_dict),
 		entries_list
 		)
 
@@ -81,18 +77,34 @@ def create_index_from_path(
 	return entries_list
 
 
-def __index_parallel_helper__(
-	switch_dict,
-	entry
-	):
+def update_index(root_dir):
 
-	add_info_to_entry(entry)
-	add_id_to_entry(entry)
-	if switch_dict['hash']:
-		add_hash_to_entry(entry)
-	if switch_dict['magic']:
-		add_magic_to_entry(entry)
-	if switch_dict['type']:
-		add_type_to_entry(entry)
+	# Store current CWD
+	old_cwd = os.getcwd()
+	# Set CWD to root
+	os.chdir(root_dir)
 
-	return entry
+	# Load old index
+	old_entries_list = load_index(root_dir)
+	# Create new index, least number of parameters
+	new_entries_list = create_index_from_path(root_dir)
+
+	# Compare old list vs new list
+	uc_list, rm_list, nw_list, ch_list, mv_list = compare_entry_lists(old_entries_list, new_entries_list)
+
+	# Run index helper in parallel
+	nw_list = run_in_parallel_with_return(
+		partial(add_switched_to_entry_and_return, switch_dict = {'all': True}),
+		nw_list
+		)
+
+	# Update file information on new entries
+	updated_entries_list = run_in_parallel_with_return(
+		merge_entry_file_info_and_return,
+		ch_list + mv_list
+		)
+
+	# Restore old CWD
+	os.chdir(old_cwd)
+
+	return uc_list + nw_list + updated_entries_list

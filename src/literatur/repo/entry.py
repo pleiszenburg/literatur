@@ -72,12 +72,38 @@ def add_hash_to_entry(entry):
 		})
 
 
-def add_magic_to_entry(entry):
+def add_hash_to_entry(entry):
 
 	entry['file'].update({
-		'mime': get_mimetype((entry['file']['path'], entry['file']['name'])),
-		'magic': get_magicinfo((entry['file']['path'], entry['file']['name']))
+		'hash': get_file_hash((entry['file']['path'], entry['file']['name']))
 		})
+
+
+def add_magic_to_entry_and_return(entry):
+
+	add_hash_to_entry(entry)
+	return entry
+
+
+def add_switched_to_entry(entry, switch_dict = {}):
+
+	if 'all' not in switch_dict.keys():
+		switch_dict['all'] = False
+
+	add_info_to_entry(entry)
+	add_id_to_entry(entry)
+	if (switch_dict['hash'] or switch_dict['all']) and 'hash' not in entry['file'].keys():
+		add_hash_to_entry(entry)
+	if (switch_dict['magic'] or switch_dict['all']) and 'magic' not in entry['file'].keys():
+		add_magic_to_entry(entry)
+	if (switch_dict['type'] or switch_dict['all']) and 'type' not in entry['file'].keys():
+		add_type_to_entry(entry)
+
+
+def add_switched_to_entry_and_return(entry, switch_dict = {}):
+
+	add_switched_to_entry(entry, switch_dict)
+	return entry
 
 
 def add_type_to_entry(entry):
@@ -118,19 +144,34 @@ def compare_entry_lists(a_entry_list, b_entry_list):
 			reduce_by_id_list(b_entry_list, remove_none_from_list(b_id_list))
 			)
 
+	# Find unchanged files
 	diff_uc_list, a_entry_list, b_entry_list = diff_by_func(
 		find_entry_unchanged_in_list, a_entry_list, b_entry_list
 		)
+	# Find moved and renamed files
 	diff_mv_list, a_entry_list, b_entry_list = diff_by_func(
 		find_entry_moved_in_list, a_entry_list, b_entry_list
 		)
+
+	# Hash remaining b-list files
+	b_entry_list = run_in_parallel_with_return(
+		add_magic_to_entry_and_return, b_entry_list
+		)
+
+	# Find files, which have likely been written to a new inode
 	diff_rw_list, a_entry_list, b_entry_list = diff_by_func(
 		find_entry_rewritten_in_list, a_entry_list, b_entry_list
 		)
+
+	# Find files, where content was changed
 	diff_ch_list, a_entry_list, b_entry_list = diff_by_func(
 		find_entry_changed_in_list, a_entry_list, b_entry_list
 		)
+
+	# Remaining a-list was likely removed
 	diff_rm_list = a_entry_list
+
+	# Remaining b-list was likely added as new
 	diff_nw_list = b_entry_list
 
 	return diff_uc_list, diff_rm_list, diff_nw_list, diff_ch_list, (diff_mv_list + diff_rw_list)
@@ -233,9 +274,6 @@ def find_entry_rewritten_in_list(entry_list, in_entry):
 
 	in_entry_id = get_entry_id(in_entry)
 
-	# Hash new file
-	add_hash_to_entry(in_entry)
-
 	# Let's look for the hash
 	for entry in entry_list:
 		if entry['file']['hash'] == in_entry_hash:
@@ -277,3 +315,20 @@ def get_entry_id(entry):
 	hash_object = hashlib.sha256(field_value_str.encode())
 
 	return hash_object.hexdigest()
+
+
+def merge_entry_file_info(entry):
+
+	new_file = entry['_file']
+	old_file = entry['file']
+
+	for key in new_file.keys():
+		old_file[key] = new_file[key]
+
+	entry.pop('_file')
+
+
+def merge_entry_file_info_and_return(entry):
+
+	merge_entry_file_info(entry)
+	return entry
