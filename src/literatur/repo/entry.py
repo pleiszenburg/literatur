@@ -147,7 +147,10 @@ def compare_entry_lists(a_entry_list, b_entry_list):
 			b_entry_list
 			)
 		# Split the return tuples
-		a_id_list, b_id_list, diff_list = map(list, zip(*diff_list))
+		if len(diff_list) > 0:
+			a_id_list, b_id_list, diff_list = map(list, zip(*diff_list))
+		else:
+			a_id_list, b_id_list, diff_list = [], [], []
 		# Return result
 		return (
 			remove_none_from_list(diff_list),
