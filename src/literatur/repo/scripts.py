@@ -36,7 +36,6 @@ import os
 from pprint import pprint as pp
 import sys
 
-from .args import get_arg_file_list
 from .entry import (
 	add_switched_to_entry,
 	compare_entry_lists,
@@ -52,6 +51,7 @@ from .storage import (
 	load_index,
 	store_index
 	)
+from ..args import get_arg_file_list
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
