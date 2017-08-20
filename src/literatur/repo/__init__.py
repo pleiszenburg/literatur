@@ -151,13 +151,14 @@ def script_diff():
 	new_entries_list = __add_id_field_on_list__(new_entries_list)
 
 	# Compare old list vs new list
-	uc_list, rm_list, nw_list, ch_list = __compare_entry_lists__(old_entries_list, new_entries_list)
+	uc_list, rm_list, nw_list, ch_list, mv_list = __compare_entry_lists__(old_entries_list, new_entries_list)
 
 	pp({
 		'rm': rm_list,
 		'nw': nw_list,
 		'ch': ch_list,
-		'uc': uc_list
+		'uc': uc_list,
+		'mv': mv_list
 		})
 
 
@@ -183,75 +184,41 @@ def __add_id_field_on_list__(in_entry_list):
 
 def __compare_entry_lists__(a_entry_list, b_entry_list):
 
-	# Find unchanged entries
-	b_entry_count = len(b_entry_list)
-	find_entry_unchanged_in_list_partial = partial(__find_entry_unchanged_in_list__, a_entry_list)
-	with multiprocessing.Pool(processes = NUM_CORES) as p:
-		diff_uc_list = list(tqdm.tqdm(p.imap_unordered(
-			find_entry_unchanged_in_list_partial,
-			__entry_iterator__(b_entry_list),
-			__get_optimal_chunksize__(b_entry_count)
-			), total = b_entry_count))
-	# Split the return tuples
-	id_list, diff_uc_list = map(list, zip(*diff_uc_list))
-	# Remove None entries from lists
-	id_list = [entry_id for entry_id in id_list if entry_id is not None]
-	diff_uc_list = [entry for entry in diff_uc_list if entry is not None]
+	def reduce_by_id_list(entry_list, id_list):
+		entry_dict = {entry['file']['id']: entry for entry in entry_list}
+		for entry_id in id_list:
+			entry_dict.pop(entry_id)
+		return [item[key] for key in entry_dict.keys()]
 
-	# Reduce a_entry_list and b_entry_list by removing unchanged entries
-	a_entry_dict = {entry['file']['id']: entry for entry in a_entry_list}
-	b_entry_dict = {entry['file']['id']: entry for entry in b_entry_list}
-	for entry_id in id_list:
-		a_entry_dict.pop(entry_id)
-		b_entry_dict.pop(entry_id)
-	a_entry_list = [item[key] for key in a_entry_dict.keys()]
-	b_entry_list = [item[key] for key in b_entry_dict.keys()]
+	def remove_none_from_list(in_list):
+		return [value for value in in_list if value is not None]
 
-	# Find moved entries (1)
-	b_entry_count = len(b_entry_list)
-	find_entry_moved_in_list_partial = partial(__find_entry_moved_in_list__, a_entry_list)
-	with multiprocessing.Pool(processes = NUM_CORES) as p:
-		diff_mv_list = list(tqdm.tqdm(p.imap_unordered(
-			find_entry_unchanged_in_list_partial,
-			__entry_iterator__(b_entry_list),
-			__get_optimal_chunksize__(b_entry_count)
-			), total = b_entry_count))
-	# Split the return tuples
-	a_id_list, b_id_list, diff_mv_list = map(list, zip(*diff_mv_list))
-	# Remove None entries from lists
-	a_id_list = [entry_id for entry_id in a_id_list if entry_id is not None]
-	b_id_list = [entry_id for entry_id in b_id_list if entry_id is not None]
-	diff_mv_list = [entry for entry in diff_mv_list if entry is not None]
+	def diff_by_func(func_handle):
+		# Find relevant entries
+		b_entry_count = len(b_entry_list)
+		func_handle_partial = partial(func_handle, a_entry_list)
+		with multiprocessing.Pool(processes = NUM_CORES) as p:
+			diff_list = list(tqdm.tqdm(p.imap_unordered(
+				func_handle_partial,
+				__entry_iterator__(b_entry_list),
+				__get_optimal_chunksize__(b_entry_count)
+				), total = b_entry_count))
+		# Split the return tuples
+		a_id_list, b_id_list, diff_list = map(list, zip(*diff_list))
+		# Reduce a_entry_list and b_entry_list by removing unchanged entries
+		a_entry_list = reduce_by_id_list(a_entry_list, remove_none_from_list(a_id_list))
+		b_entry_list = reduce_by_id_list(b_entry_list, remove_none_from_list(b_id_list))
+		# Return result
+		return remove_none_from_list(diff_list)
 
-	# Reduce a_entry_list and b_entry_list by removing unchanged entries
-	a_entry_dict = {entry['file']['id']: entry for entry in a_entry_list}
-	for entry_id in a_id_list:
-		a_entry_dict.pop(entry_id)
-	a_entry_list = [item[key] for key in a_entry_dict.keys()]
-	b_entry_dict = {entry['file']['id']: entry for entry in b_entry_list}
-	for entry_id in b_id_list:
-		b_entry_dict.pop(entry_id)
-	b_entry_list = [item[key] for key in b_entry_dict.keys()]
+	diff_uc_list = diff_by_func(__find_entry_unchanged_in_list__)
+	diff_mv_list = diff_by_func(__find_entry_moved_in_list__)
+	diff_rw_list = diff_by_func(__find_entry_rewritten_in_list__)
+	diff_ch_list = diff_by_func(__find_entry_changed_in_list__)
+	diff_rm_list = a_entry_list
+	diff_nw_list = b_entry_list
 
-
-
-
-
-
-
-
-
-
-	# Find changed and new entries
-	find_entry_changed_in_list_partial = partial(__find_entry_changed_in_list__, a_entry_list)
-	with multiprocessing.Pool(processes = NUM_CORES) as p:
-		compared_entries_list = list(tqdm.tqdm(p.imap_unordered(
-			find_entry_changed_in_list_partial,
-			__entry_iterator__(b_entry_list),
-			__get_optimal_chunksize__(b_entry_count)
-			), total = b_entry_count))
-
-	return diff_uc_list, diff_rm_list, diff_nw_list, diff_ch_list
+	return diff_uc_list, diff_rm_list, diff_nw_list, diff_ch_list, (diff_mv_list + diff_rw_list)
 
 
 def __convert_filepathtuple_to_entry__(filepath_tuple):
@@ -385,9 +352,9 @@ def __find_entry_unchanged_in_list__(entry_list, in_entry):
 	for entry in entry_list:
 		if entry['file']['id'] == in_entry_id:
 			entry.update({'status': STATUS_UC})
-			return (in_entry_id, entry)
+			return (in_entry_id, in_entry_id, entry)
 
-	return (None, None)
+	return (None, None, None)
 
 
 def __get_entry_change_report__(entry):
