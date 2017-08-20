@@ -90,7 +90,7 @@ def add_switched_to_entry(entry, switch_dict = {}):
 	routines_dict = {
 		'hash': add_hash_to_entry,
 		'magic': add_magic_to_entry,
-		'type': add_magic_to_entry
+		'type': add_type_to_entry
 		}
 
 	if 'all' not in switch_dict.keys():
