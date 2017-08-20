@@ -51,14 +51,14 @@ def get_optimal_chunksize(items_count):
 
 def run_in_parallel_with_return(func_handle, parameter_list):
 
-		parameter_count = len(parameter_list)
+	parameter_count = len(parameter_list)
 
-		with multiprocessing.Pool(processes = NUM_CORES) as p:
+	with multiprocessing.Pool(processes = NUM_CORES) as p:
 
-			return_list = list(tqdm.tqdm(p.imap_unordered(
-				func_handle,
-				(parameter for parameter in parameter_list),
-				get_optimal_chunksize(parameter_count)
-				), total = parameter_count))
+		return_list = list(tqdm.tqdm(p.imap_unordered(
+			func_handle,
+			(parameter for parameter in parameter_list),
+			get_optimal_chunksize(parameter_count)
+			), total = parameter_count))
 
-		return return_list
+	return return_list
