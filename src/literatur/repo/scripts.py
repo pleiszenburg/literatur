@@ -107,7 +107,7 @@ def script_diff():
 		]:
 		if len(rp_list) <= REPORT_MAX_LINES:
 			for entry in rp_list:
-				print('%s: %s' % (rp_message, os.path.join(entry['file']['path'], entry['file']['name'])))
+				print('%s: "%s"' % (rp_message, os.path.join(entry['file']['path'], entry['file']['name'])))
 		else:
 			print('%s: [%d files]' % (rp_message, len(rp_list)))
 
