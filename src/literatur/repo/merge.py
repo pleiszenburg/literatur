@@ -6,7 +6,7 @@ LITERATUR
 Literature management with Python, Dropbox and MediaWiki
 https://github.com/pleiszenburg/literatur
 
-	src/literatur/repo/commit.py: Commit changes to repo
+	src/literatur/repo/merge.py: merge changes to repo
 
 	Copyright (C) 2017 Sebastian M. Ernst <ernst@pleiszenburg.de>
 
@@ -47,41 +47,41 @@ from ..const import (
 # ROUTINES?
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-def commit(working_path, target, mode = 'mp'):
+def merge(working_path, target, mode = 'mp'):
 
 	if target == 'journal':
-		commit_a, commit_b = FILE_DB_CURRENT + '.' + mode, FILE_DB_JOURNAL + '.' + mode
+		merge_a, merge_b = FILE_DB_CURRENT + '.' + mode, FILE_DB_JOURNAL + '.' + mode
 	elif target == 'master':
-		commit_a, commit_b = FILE_DB_JOURNAL + '.' + mode, FILE_DB_MASTER + '.' + mode
+		merge_a, merge_b = FILE_DB_JOURNAL + '.' + mode, FILE_DB_MASTER + '.' + mode
 	else:
 		raise #
 
-	__backup__(commit_b, working_path)
-	__push__(commit_a, commit_b, working_path)
+	__backup__(merge_b, working_path)
+	__copy__(merge_a, merge_b, working_path)
 
 
-def __backup__(commit_source, working_path):
+def __backup__(merge_source, working_path):
 
 	# Full path of file which is going into backup
-	commit_source_path = os.path.join(working_path, PATH_REPO, PATH_SUB_DB, commit_source)
+	merge_source_path = os.path.join(working_path, PATH_REPO, PATH_SUB_DB, merge_source)
 
 	# Run only if there is something to backup
-	if os.path.isfile(commit_source_path):
+	if os.path.isfile(merge_source_path):
 
 		# Get creation time of file
-		ctime = os.path.getmtime(commit_source_path)
+		ctime = os.path.getmtime(merge_source_path)
 
 		# Form string from creation time
 		ctime_string = __datestring__(ctime)
 
 		# Create new file name with creation time
-		commit_target = commit_source.replace('.', '_' + ctime_string + '.')
+		merge_target = merge_source.replace('.', '_' + ctime_string + '.')
 
 		# Get full path of backup target
-		commit_target_path = os.path.join(working_path, PATH_REPO, PATH_SUB_DBBACKUP, commit_target)
+		merge_target_path = os.path.join(working_path, PATH_REPO, PATH_SUB_DBBACKUP, merge_target)
 
 		# Copy file for backup
-		shutil.copyfile(commit_source_path, commit_target_path)
+		shutil.copyfile(merge_source_path, merge_target_path)
 
 
 def __datestring__(ctime):
@@ -97,18 +97,18 @@ def __datestring__(ctime):
 	return ctime_string
 
 
-def __push__(commit_source, commit_target, working_path):
+def __copy__(merge_source, merge_target, working_path):
 
 	# Get full paths
-	commit_source_path = os.path.join(working_path, PATH_REPO, PATH_SUB_DB, commit_source)
-	commit_target_path = os.path.join(working_path, PATH_REPO, PATH_SUB_DB, commit_target)
+	merge_source_path = os.path.join(working_path, PATH_REPO, PATH_SUB_DB, merge_source)
+	merge_target_path = os.path.join(working_path, PATH_REPO, PATH_SUB_DB, merge_target)
 
 	# Only push if source exists
-	if os.path.isfile(commit_source_path):
+	if os.path.isfile(merge_source_path):
 
-		# If previous commit exists, kill it
-		if os.path.isfile(commit_target_path):
-			os.remove(commit_target_path)
+		# If previous merge exists, kill it
+		if os.path.isfile(merge_target_path):
+			os.remove(merge_target_path)
 
 		# Copy original to target ('copyfile' will overwrite)
-		shutil.copyfile(commit_source_path, commit_target_path)
+		shutil.copyfile(merge_source_path, merge_target_path)

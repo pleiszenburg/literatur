@@ -41,11 +41,11 @@ from .entry import (
 	compare_entry_lists,
 	convert_filepathtuple_to_entry
 	)
-from .commit import commit
 from .index import (
 	create_index_from_path,
 	update_index
 	)
+from .merge import merge
 from .storage import (
 	init_repo_folders,
 	find_root_dir_with_message,
@@ -77,14 +77,14 @@ def script_init():
 	store_index([], current_path)
 
 
-def script_commit(target = 'journal'):
+def script_merge(target = 'journal'):
 
 	try:
 		root_dir = find_root_dir_with_message(need_to_find = True)
 	except:
 		sys.exit()
 
-	commit(root_dir, target)
+	merge(root_dir, target)
 
 
 def script_diff():
