@@ -353,7 +353,7 @@ def find_entry_unchanged_in_list(a_entry_list, b_entry_list):
 	b_entry_remaining_set = b_entry_dict.keys() - unchange_id_set
 	diff_uc_list = [a_entry_dict[key] for key in unchange_id_set]
 	a_entry_list = [a_entry_dict[key] for key in a_entry_remaining_set]
-	b_entry_list = [a_entry_dict[key] for key in b_entry_remaining_set]
+	b_entry_list = [b_entry_dict[key] for key in b_entry_remaining_set]
 
 	return diff_uc_list, a_entry_list, b_entry_list
 
