@@ -53,6 +53,7 @@ from .storage import (
 	store_index
 	)
 from ..args import get_arg_file_list
+from ..const import REPORT_MAX_LINES
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -99,13 +100,27 @@ def script_diff():
 	# Compare old list vs new list
 	uc_list, rm_list, nw_list, ch_list, mv_list = compare_entry_lists(old_entries_list, new_entries_list)
 
-	pp({
-		'rm': rm_list,
-		'nw': nw_list,
-		'ch': ch_list,
-		'uc': uc_list,
-		'mv': mv_list
-		})
+	for rp_message, rp_list in [
+		('Unchanged', uc_list),
+		('New', nw_list),
+		('Removed', rm_list)
+		]:
+		if len(rp_list) <= REPORT_MAX_LINES:
+			for entry in rp_list:
+				print('%s: %s' % (rp_message, os.path.join(entry['file']['path'], entry['file']['name'])))
+		else:
+			print('%s: [%d files]' % (rp_message, len(rp_list)))
+
+	for rp_message, rp_list in [
+		('Moved/rewritten', mv_list),
+		('Changed', ch_list)
+		]:
+		if len(rp_list) <= REPORT_MAX_LINES:
+			for entry in rp_list:
+				for rp_line in entry['report']:
+					print(rp_line)
+		else:
+			print('%s: [%d files]' % (rp_message, len(rp_list)))
 
 
 def script_dump():

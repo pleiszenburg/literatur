@@ -28,8 +28,11 @@ specific language governing rights and limitations under the License.
 # IMPORT
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+import datetime
 from functools import partial
 import hashlib
+
+import humanize
 
 from ..file import (
 	get_file_info,
@@ -57,10 +60,45 @@ from ..parallel import run_in_parallel_with_return
 
 def add_change_report_to_entry(entry):
 
-	# STATUS_MV
-	# STATUS_RW
-	# STATUS_CH
-	pass
+	entry_status = entry['status']
+	entry_report = []
+
+	if entry_status == STATUS_MV:
+
+		entry_report.append('Moved: %s to %s' % (
+			os.path.join(entry['file']['path'], entry['file']['name']),
+			os.path.join(entry['_file']['path'], entry['_file']['name'])
+			))
+
+	elif entry_status == STATUS_RW:
+
+		entry_report.append('Rewritten: %s' % (
+			os.path.join(entry['_file']['path'], entry['_file']['name'])
+			))
+
+	elif entry_status == STATUS_CH:
+
+		size_diff = entry['_file']['size'] - entry['file']['size']
+		if size_diff >= 0:
+			size_prefix = '+'
+		else:
+			size_prefix = '-'
+		entry_report.append('Changed: %s [%s] %s' % (
+			os.path.join(entry['file']['path'], entry['file']['name']),
+			size_prefix + humanize.naturalsize(abs(size_diff), gnu = True),
+			humanize(
+				datetime.datetime.now()
+				- datetime.datetime.fromtimestamp(entry['_file']['mtime'] / 1e6)
+				)
+			))
+
+	elif entry_status in [STATUS_UC, STATUS_RM, STATUS_NW]:
+		pass
+	else:
+		raise # TODO
+
+	entry['report'] = entry_report
+	entry.pop('status')
 
 
 def add_id_to_entry(entry):

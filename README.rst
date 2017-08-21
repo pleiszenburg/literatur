@@ -30,6 +30,7 @@ The following Python packages are required:
 - ``pdfminer.six``
 - ``xmltodict``
 - ``tqdm``
+- ``humanize``
 
 Installation
 ============
