@@ -40,10 +40,7 @@ from .entry import (
 	)
 from .fs import get_recursive_filepathtuple_list
 from .storage import load_index
-from ..parallel import (
-	add_return_to_func,
-	run_in_parallel_with_return
-	)
+from ..parallel import run_in_parallel_with_return
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
