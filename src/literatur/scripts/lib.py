@@ -6,7 +6,7 @@ LITERATUR
 Literature management with Python, Dropbox and MediaWiki
 https://github.com/pleiszenburg/literatur
 
-	src/literatur/repo/scripts.py: Repository management script entry points
+	src/literatur/scripts/lib.py: Repository management script entry points
 
 	Copyright (C) 2017 Sebastian M. Ernst <ernst@pleiszenburg.de>
 
@@ -36,17 +36,17 @@ import os
 from pprint import pprint as pp
 import sys
 
-from .entry import (
+from ..repo.entry import (
 	add_switched_to_entry,
 	compare_entry_lists,
 	convert_filepathtuple_to_entry
 	)
-from .index import (
+from ..repo.index import (
 	create_index_from_path,
 	update_index
 	)
-from .merge import merge
-from .storage import (
+from ..repo.merge import merge
+from ..repo.storage import (
 	init_repo_folders,
 	find_root_dir_with_message,
 	load_index,
@@ -77,14 +77,16 @@ def script_init():
 	store_index([], current_path)
 
 
-def script_merge(target = 'journal'):
+def script_commit():
 
 	try:
 		root_dir = find_root_dir_with_message(need_to_find = True)
 	except:
 		sys.exit()
 
-	merge(root_dir, target)
+	updated_entries_list = update_index(root_dir)
+
+	store_index(updated_entries_list, root_dir)
 
 
 def script_diff():
@@ -135,6 +137,16 @@ def script_dump():
 	store_index(entries_list, root_dir, mode = 'json')
 
 
+def script_merge(target = 'journal'):
+
+	try:
+		root_dir = find_root_dir_with_message(need_to_find = True)
+	except:
+		sys.exit()
+
+	merge(root_dir, target)
+
+
 def script_metainfo():
 
 	files, nofiles = get_arg_file_list()
@@ -171,15 +183,3 @@ def script_stats():
 
 	pp(OrderedDict(sorted(magic_dict.items(), key = lambda t: t[1])))
 	pp(OrderedDict(sorted(mime_dict.items(), key = lambda t: t[1])))
-
-
-def script_update():
-
-	try:
-		root_dir = find_root_dir_with_message(need_to_find = True)
-	except:
-		sys.exit()
-
-	updated_entries_list = update_index(root_dir)
-
-	store_index(updated_entries_list, root_dir)

@@ -28,6 +28,17 @@ specific language governing rights and limitations under the License.
 # IMPORT
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+import argparse
+
+from .lib import (
+	script_init,
+	script_commit,
+	script_merge,
+	script_diff,
+	script_dump,
+	script_metainfo,
+	script_stats
+	)
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -36,4 +47,29 @@ specific language governing rights and limitations under the License.
 
 def entry():
 
-	print('entry')
+	commands_dict = {
+		'init': (script_init, tuple()),
+		'commit': (script_commit, tuple()),
+		'merge_journal': (script_merge, ('journal',)),
+		'merge_master': (script_merge, ('master',)),
+		'diff': (script_diff, tuple()),
+		'dump': (script_dump, tuple()),
+		'meta': (script_metainfo, tuple()),
+		'stats': (script_stats, tuple())
+		}
+
+	parser = argparse.ArgumentParser(
+		prog = 'LITERATUR',
+		description = 'Literature management with Python, Dropbox and MediaWiki'
+		)
+	parser.add_argument(
+		dest = 'command',
+		nargs = 1,
+		action = 'store',
+		type = str,
+		choices = list(commands_dict.keys())
+		)
+	args = parser.parse_args()
+
+	cmd_routine, cmd_arguments = commands_dict[args.command[0]]
+	cmd_routine(*cmd_arguments)

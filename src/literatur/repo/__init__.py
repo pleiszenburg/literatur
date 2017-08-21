@@ -23,17 +23,3 @@ specific language governing rights and limitations under the License.
 </LICENSE_BLOCK>
 
 """
-
-# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-# IMPORT
-# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-from .scripts import (
-	script_init,
-	script_commit,
-	script_diff,
-	script_dump,
-	script_metainfo,
-	script_stats,
-	script_update
-	)
