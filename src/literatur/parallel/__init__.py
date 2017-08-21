@@ -29,6 +29,7 @@ specific language governing rights and limitations under the License.
 # IMPORT
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+from functools import partial
 import multiprocessing
 
 import tqdm
@@ -40,6 +41,11 @@ NUM_CORES = multiprocessing.cpu_count()
 # ROUTINES
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+def add_return_to_func(func_handle):
+
+	return partial(__wrapper_with_return__, func_handle)
+
+
 def get_optimal_chunksize(items_count):
 
 	chunksize = int(float(items_count) / (float(NUM_CORES) * 100.0))
@@ -49,7 +55,7 @@ def get_optimal_chunksize(items_count):
 	return chunksize
 
 
-def run_in_parallel_with_return(func_handle, parameter_list):
+def run_in_parallel_with_return(func_handle, parameter_list, add_return = False):
 
 	parameter_count = len(parameter_list)
 
@@ -59,12 +65,22 @@ def run_in_parallel_with_return(func_handle, parameter_list):
 		func_name = 'partial(%s)' % func_handle.func.__name__
 	print('Running: %s' % func_name)
 
+	if add_return:
+		func_call = add_return_to_func(func_handle)
+	else:
+		func_call = func_handle
+
 	with multiprocessing.Pool(processes = NUM_CORES) as p:
 
 		return_list = list(tqdm.tqdm(p.imap_unordered(
-			func_handle,
+			func_call,
 			(parameter for parameter in parameter_list),
 			get_optimal_chunksize(parameter_count)
 			), total = parameter_count))
 
 	return return_list
+
+
+def __wrapper_with_return__(func_handle, mutable_object, **kw):
+	func_handle(mutable_object, **kw)
+	return mutable_object

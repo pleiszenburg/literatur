@@ -33,14 +33,17 @@ import os
 from pprint import pprint as pp
 
 from .entry import (
-	add_switched_to_entry_and_return,
+	add_switched_to_entry,
 	compare_entry_lists,
 	convert_filepathtuple_to_entry,
-	merge_entry_file_info_and_return
+	merge_entry_file_info
 	)
 from .fs import get_recursive_filepathtuple_list
 from .storage import load_index
-from ..parallel import run_in_parallel_with_return
+from ..parallel import (
+	add_return_to_func,
+	run_in_parallel_with_return
+	)
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -64,8 +67,9 @@ def create_index_from_path(
 
 	# Run index helper in parallel
 	entries_list = run_in_parallel_with_return(
-		add_switched_to_entry_and_return,
-		entries_list
+		add_switched_to_entry,
+		entries_list,
+		add_return = True
 		)
 
 	# Restore old CWD
@@ -91,14 +95,16 @@ def update_index(root_dir):
 
 	# Run index helper in parallel
 	nw_list = run_in_parallel_with_return(
-		partial(add_switched_to_entry_and_return, switch_list = ['all']),
-		nw_list
+		partial(add_switched_to_entry, switch_list = ['all']),
+		nw_list,
+		add_return = True
 		)
 
 	# Update file information on new entries
 	updated_entries_list = run_in_parallel_with_return(
-		merge_entry_file_info_and_return,
-		ch_list + mv_list
+		merge_entry_file_info,
+		ch_list + mv_list,
+		add_return = True
 		)
 
 	# Restore old CWD

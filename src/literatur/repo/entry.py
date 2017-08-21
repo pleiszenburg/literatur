@@ -80,12 +80,6 @@ def add_hash_to_entry(entry):
 		})
 
 
-def add_hash_to_entry_and_return(entry):
-
-	add_hash_to_entry(entry)
-	return entry
-
-
 def add_magic_to_entry(entry):
 
 	entry['file'].update({
@@ -115,12 +109,6 @@ def add_switched_to_entry(entry, switch_list = []):
 	for key in keys:
 		if key not in entry['file'].keys():
 			routines_dict[key](entry)
-
-
-def add_switched_to_entry_and_return(entry, switch_list = []):
-
-	add_switched_to_entry(entry, switch_list)
-	return entry
 
 
 def add_type_to_entry(entry):
@@ -181,8 +169,9 @@ def compare_entry_lists(a_entry_list, b_entry_list):
 
 	# Fetch missing information on b-list entries (hash, magic, mime, type)
 	b_entry_list = run_in_parallel_with_return(
-		partial(add_switched_to_entry_and_return, switch_list = ['all']),
-		b_entry_list
+		partial(add_switched_to_entry, switch_list = ['all']),
+		b_entry_list,
+		add_return = True
 		)
 
 	# Find files, which have likely been written to a new inode
@@ -353,9 +342,3 @@ def merge_entry_file_info(entry):
 		old_file[key] = new_file[key]
 
 	entry.pop('_file')
-
-
-def merge_entry_file_info_and_return(entry):
-
-	merge_entry_file_info(entry)
-	return entry
