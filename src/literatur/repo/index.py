@@ -62,14 +62,9 @@ def create_index_from_path(
 	# Convert index into list of entries
 	entries_list = [convert_filepathtuple_to_entry(item) for item in filepathtuple_list]
 
-	# Fill switch_dict with defaults
-	for switch in ['hash', 'magic', 'type']:
-		if switch not in switch_dict.keys():
-			switch_dict[switch] = False
-
 	# Run index helper in parallel
 	entries_list = run_in_parallel_with_return(
-		partial(add_switched_to_entry_and_return, switch_dict = switch_dict),
+		add_switched_to_entry_and_return,
 		entries_list
 		)
 
@@ -96,7 +91,7 @@ def update_index(root_dir):
 
 	# Run index helper in parallel
 	nw_list = run_in_parallel_with_return(
-		partial(add_switched_to_entry_and_return, switch_dict = {'all': True}),
+		partial(add_switched_to_entry_and_return, switch_list = ['all']),
 		nw_list
 		)
 

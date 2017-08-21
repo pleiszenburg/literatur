@@ -85,7 +85,7 @@ def add_magic_to_entry(entry):
 		})
 
 
-def add_switched_to_entry(entry, switch_dict = {}):
+def add_switched_to_entry(entry, switch_list = []):
 
 	routines_dict = {
 		'hash': add_hash_to_entry,
@@ -93,14 +93,10 @@ def add_switched_to_entry(entry, switch_dict = {}):
 		'type': add_type_to_entry
 		}
 
-	if 'all' not in switch_dict.keys():
-		keys = switch_dict.keys()
+	if 'all' not in switch_list:
+		keys = switch_list
 	else:
-		if switch_dict['all']:
-			keys = routines_dict.keys()
-		else:
-			switch_dict.pop('all')
-			keys = switch_dict.keys()
+		keys = list(routines_dict.keys())
 
 	add_info_to_entry(entry)
 	add_id_to_entry(entry)
@@ -110,9 +106,9 @@ def add_switched_to_entry(entry, switch_dict = {}):
 			routines_dict[key](entry)
 
 
-def add_switched_to_entry_and_return(entry, switch_dict = {}):
+def add_switched_to_entry_and_return(entry, switch_list = []):
 
-	add_switched_to_entry(entry, switch_dict)
+	add_switched_to_entry(entry, switch_list)
 	return entry
 
 
