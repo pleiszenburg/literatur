@@ -42,7 +42,7 @@ NUM_CORES = multiprocessing.cpu_count()
 
 def get_optimal_chunksize(items_count):
 
-	chunksize = int(float(items_count) / (float(NUM_CORES) * 3.0))
+	chunksize = int(float(items_count) / (float(NUM_CORES) * 100.0))
 	if chunksize < 1:
 		chunksize = 1
 
