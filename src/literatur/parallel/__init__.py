@@ -53,6 +53,8 @@ def run_in_parallel_with_return(func_handle, parameter_list):
 
 	parameter_count = len(parameter_list)
 
+	print('Running: %s' % str(func_handle))
+
 	with multiprocessing.Pool(processes = NUM_CORES) as p:
 
 		return_list = list(tqdm.tqdm(p.imap_unordered(

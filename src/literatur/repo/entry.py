@@ -98,8 +98,10 @@ def add_switched_to_entry(entry, switch_list = []):
 	else:
 		keys = list(routines_dict.keys())
 
-	add_info_to_entry(entry)
-	add_id_to_entry(entry)
+	if 'info' not in entry['file'].keys():
+		add_info_to_entry(entry)
+	if 'id' not in entry['file'].keys():
+		add_id_to_entry(entry)
 
 	for key in keys:
 		if key not in entry['file'].keys():
@@ -168,9 +170,10 @@ def compare_entry_lists(a_entry_list, b_entry_list):
 		find_entry_moved_in_list, a_entry_list, b_entry_list
 		)
 
-	# Hash remaining b-list files
+	# Fetch missing information on b-list entries (hash, magic, mime, type)
 	b_entry_list = run_in_parallel_with_return(
-		add_hash_to_entry_and_return, b_entry_list
+		partial(add_switched_to_entry_and_return, switch_list = ['all']),
+		b_entry_list
 		)
 
 	# Find files, which have likely been written to a new inode
