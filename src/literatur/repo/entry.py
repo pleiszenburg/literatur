@@ -139,10 +139,14 @@ def compare_entry_lists(a_entry_list, b_entry_list):
 	def remove_none_from_list(in_list):
 		return [value for value in in_list if value is not None]
 
-	def diff_by_func(func_handle, a_entry_list, b_entry_list):
+	def diff_by_func(func_handle, a_entry_list, b_entry_list, a_entry_obj = None):
 		# Find relevant entries
+		if a_entry_obj is None:
+			a_in = a_entry_list
+		else:
+			a_in = a_entry_obj
 		diff_list = run_in_parallel_with_return(
-			partial(func_handle, a_entry_list),
+			partial(func_handle, a_in),
 			b_entry_list
 			)
 		# Split the return tuples
@@ -158,9 +162,11 @@ def compare_entry_lists(a_entry_list, b_entry_list):
 			)
 
 	# Find unchanged files
+	a_entry_dict = {entry['file']['id']: entry for entry in a_entry_list}
 	diff_uc_list, a_entry_list, b_entry_list = diff_by_func(
-		find_entry_unchanged_in_list, a_entry_list, b_entry_list
+		find_entry_unchanged_in_list, a_entry_list, b_entry_list, a_entry_obj = a_entry_dict
 		)
+
 	# Find moved and renamed files
 	diff_mv_list, a_entry_list, b_entry_list = diff_by_func(
 		find_entry_moved_in_list, a_entry_list, b_entry_list
@@ -298,21 +304,19 @@ def find_entry_rewritten_in_list(entry_list, in_entry):
 	return (None, None, None)
 
 
-def find_entry_unchanged_in_list(entry_list, in_entry):
+def find_entry_unchanged_in_list(entry_dict, in_entry):
 	"""
-	`entry_list` is expected to be hashed!
+	`entry_dict`: id is key.
 	`in_entry` is expected to be missing hashes!
 	Returns tuple: id of old entry, old entry dict
 	"""
 
 	in_entry_id = in_entry['file']['id']
 
-	for entry in entry_list:
-		if entry['file']['id'] == in_entry_id:
-			entry.update({'status': STATUS_UC})
-			return (in_entry_id, in_entry_id, entry)
-
-	return (None, None, None)
+	try:
+		return (in_entry_id, in_entry_id, entry_dict[in_entry_id])
+	except:
+		return (None, None, None)
 
 
 def get_entry_change_report(entry):
