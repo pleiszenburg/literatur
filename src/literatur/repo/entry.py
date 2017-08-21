@@ -67,14 +67,14 @@ def add_change_report_to_entry(entry):
 
 	if entry_status == STATUS_MV:
 
-		entry_report.append('Moved: %s to %s' % (
+		entry_report.append('Moved: "%s" -> "%s"' % (
 			os.path.join(entry['file']['path'], entry['file']['name']),
 			os.path.join(entry['_file']['path'], entry['_file']['name'])
 			))
 
 	elif entry_status == STATUS_RW:
 
-		entry_report.append('Rewritten: %s' % (
+		entry_report.append('Rewritten: "%s"' % (
 			os.path.join(entry['_file']['path'], entry['_file']['name'])
 			))
 
@@ -85,12 +85,11 @@ def add_change_report_to_entry(entry):
 			size_prefix = '+'
 		else:
 			size_prefix = '-'
-		entry_report.append('Changed: %s [%s] %s' % (
+		entry_report.append('Changed: "%s" [%s] %s ago' % (
 			os.path.join(entry['file']['path'], entry['file']['name']),
 			size_prefix + humanize.naturalsize(abs(size_diff), gnu = True),
-			humanize(
-				datetime.datetime.now()
-				- datetime.datetime.fromtimestamp(entry['_file']['mtime'] / 1e6)
+			humanize.naturaldelta(
+				datetime.datetime.now() - datetime.datetime.fromtimestamp(entry['_file']['mtime'] / 1e9)
 				)
 			))
 
