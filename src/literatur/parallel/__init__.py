@@ -53,7 +53,11 @@ def run_in_parallel_with_return(func_handle, parameter_list):
 
 	parameter_count = len(parameter_list)
 
-	print('Running: %s' % str(func_handle))
+	try:
+		func_name = func_handle.__name__
+	except:
+		func_name = 'partial(%s)' % func_handle.func.__name__
+	print('Running: %s' % func_name)
 
 	with multiprocessing.Pool(processes = NUM_CORES) as p:
 
