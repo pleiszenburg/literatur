@@ -195,9 +195,8 @@ def compare_entry_lists(a_entry_list, b_entry_list):
 			)
 
 	# Find unchanged files
-	a_entry_dict = {entry['file']['id']: entry for entry in a_entry_list}
-	diff_uc_list, a_entry_list, b_entry_list = diff_by_func(
-		find_entry_unchanged_in_list, a_entry_list, b_entry_list, a_entry_obj = a_entry_dict
+	diff_uc_list, a_entry_list, b_entry_list = find_entry_unchanged_in_list(
+		a_entry_list, b_entry_list
 		)
 
 	# Find moved and renamed files
@@ -345,19 +344,18 @@ def find_entry_rewritten_in_list(entry_list, in_entry):
 	return (None, None, None)
 
 
-def find_entry_unchanged_in_list(entry_dict, in_entry):
-	"""
-	`entry_dict`: id is key.
-	`in_entry` is expected to be missing hashes!
-	Returns tuple: id of old entry, old entry dict
-	"""
+def find_entry_unchanged_in_list(a_entry_list, b_entry_list):
 
-	in_entry_id = in_entry['file']['id']
+	a_entry_dict = {entry['file']['id']: entry for entry in a_entry_list}
+	b_entry_dict = {entry['file']['id']: entry for entry in b_entry_list}
+	unchange_id_set = a_entry_dict.keys() & b_entry_dict.keys()
+	a_entry_remaining_set = a_entry_dict.keys() - unchange_id_set
+	b_entry_remaining_set = b_entry_dict.keys() - unchange_id_set
+	diff_uc_list = [a_entry_dict[key] for key in unchange_id_set]
+	a_entry_list = [a_entry_dict[key] for key in a_entry_remaining_set]
+	b_entry_list = [a_entry_dict[key] for key in b_entry_remaining_set]
 
-	try:
-		return (in_entry_id, in_entry_id, entry_dict[in_entry_id])
-	except:
-		return (None, None, None)
+	return diff_uc_list, a_entry_list, b_entry_list
 
 
 def get_entry_id(entry):
