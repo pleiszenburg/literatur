@@ -48,7 +48,7 @@ def add_return_to_func(func_handle):
 
 def get_optimal_chunksize(items_count):
 
-	chunksize = int(float(items_count) / (float(NUM_CORES) * 100.0))
+	chunksize = int(float(items_count) / (float(NUM_CORES) * 50.0))
 	if chunksize < 1:
 		chunksize = 1
 
