@@ -13,3 +13,4 @@ python-magic
 xmltodict
 tqdm
 humanize
+msgpack-python

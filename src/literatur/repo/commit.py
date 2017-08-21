@@ -47,12 +47,12 @@ from ..const import (
 # ROUTINES?
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-def commit(working_path, target):
+def commit(working_path, target, mode = 'mp'):
 
 	if target == 'journal':
-		commit_a, commit_b = FILE_DB_CURRENT, FILE_DB_JOURNAL
+		commit_a, commit_b = FILE_DB_CURRENT + '.' + mode, FILE_DB_JOURNAL + '.' + mode
 	elif target == 'master':
-		commit_a, commit_b = FILE_DB_JOURNAL, FILE_DB_MASTER
+		commit_a, commit_b = FILE_DB_JOURNAL + '.' + mode, FILE_DB_MASTER + '.' + mode
 	else:
 		raise #
 

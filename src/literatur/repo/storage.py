@@ -32,6 +32,8 @@ import os
 import pickle
 from pprint import pprint as pp
 
+import msgpack
+
 from ..const import (
 	FILE_DB_CURRENT,
 	PATH_REPO,
@@ -99,23 +101,39 @@ def find_root_dir_with_message(need_to_find = True):
 			pass
 
 
-def load_index(root_dir):
+def load_index(root_dir, mode = 'mp'):
 
-	f = open(os.path.join(root_dir, PATH_REPO, PATH_SUB_DB, FILE_DB_CURRENT), 'rb')
-	indexdict_list = pickle.load(f)
-	f.close()
+	if mode == 'pkl':
+		f = open(os.path.join(root_dir, PATH_REPO, PATH_SUB_DB, FILE_DB_CURRENT + '.' + mode), 'rb')
+		indexdict_list = pickle.load(f)
+		f.close()
+	elif mode == 'mp':
+		f = open(os.path.join(root_dir, PATH_REPO, PATH_SUB_DB, FILE_DB_CURRENT + '.' + mode), 'rb')
+		msg_pack = f.read()
+		f.close()
+		indexdict_list = msgpack.unpackb(msg_pack, encoding='utf-8')
+	elif mode == 'json':
+		print('load_index from JSON not supported')
+		raise # TODO
+	else:
+		raise # TODO
 
 	return indexdict_list
 
 
-def store_index(indexdict_list, root_dir, mode = 'pickle.bin'):
+def store_index(indexdict_list, root_dir, mode = 'mp'):
 
-	if mode == 'pickle.bin':
-		f = open(os.path.join(root_dir, PATH_REPO, PATH_SUB_DB, FILE_DB_CURRENT), 'wb+')
+	if mode == 'pkl':
+		f = open(os.path.join(root_dir, PATH_REPO, PATH_SUB_DB, FILE_DB_CURRENT + '.' + mode), 'wb+')
 		pickle.dump(indexdict_list, f, -1)
 		f.close()
-	elif mode == 'json.txt':
-		f = open(os.path.join(root_dir, PATH_REPO, PATH_SUB_REPORTS, FILE_DB_CURRENT + '.txt'), 'w+')
+	elif mode == 'mp':
+		msg_pack = msgpack.packb(indexdict_list, use_bin_type = True)
+		f = open(os.path.join(root_dir, PATH_REPO, PATH_SUB_DB, FILE_DB_CURRENT + '.' + mode), 'wb+')
+		f.write(msg_pack)
+		f.close()
+	elif mode == 'json':
+		f = open(os.path.join(root_dir, PATH_REPO, PATH_SUB_REPORTS, FILE_DB_CURRENT + '.' + mode), 'w+')
 		pp(indexdict_list, stream = f)
 		f.close()
 	else:

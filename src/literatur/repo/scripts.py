@@ -132,7 +132,7 @@ def script_dump():
 
 	entries_list = load_index(root_dir)
 
-	store_index(entries_list, root_dir, mode = 'json.txt')
+	store_index(entries_list, root_dir, mode = 'json')
 
 
 def script_metainfo():

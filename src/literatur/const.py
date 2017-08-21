@@ -48,9 +48,9 @@ KEY_CURRENT = 'current'
 KEY_JOURNAL = 'journal'
 KEY_MASTER = 'master'
 
-FILE_DB_CURRENT = 'index_%s.pkl' % KEY_CURRENT # stage 1
-FILE_DB_JOURNAL = 'index_%s.pkl' % KEY_JOURNAL # stage 2
-FILE_DB_MASTER = 'index_%s.pkl' % KEY_MASTER # stage 3
+FILE_DB_CURRENT = 'index_%s' % KEY_CURRENT # stage 1
+FILE_DB_JOURNAL = 'index_%s' % KEY_JOURNAL # stage 2
+FILE_DB_MASTER = 'index_%s' % KEY_MASTER # stage 3
 
 STATUS_UC = 0
 STATUS_RM = 1

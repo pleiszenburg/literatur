@@ -31,6 +31,7 @@ The following Python packages are required:
 - ``xmltodict``
 - ``tqdm``
 - ``humanize``
+- ``msgpack-python``
 
 Installation
 ============
