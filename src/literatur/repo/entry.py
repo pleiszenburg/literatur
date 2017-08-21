@@ -207,7 +207,7 @@ def find_entry_changed_in_list(entry_list, in_entry):
 	Returns tuple: id of old entry, id of new entry, entry dict with report
 	"""
 
-	in_entry_id = get_entry_id(in_entry)
+	in_entry_id = in_entry['file']['id']
 
 	# Match all except path and hash
 	match = {
@@ -245,7 +245,7 @@ def find_entry_moved_in_list(entry_list, in_entry):
 	Returns tuple: id of old entry, id of new entry, entry dict with report
 	"""
 
-	in_entry_id = get_entry_id(in_entry)
+	in_entry_id = in_entry['file']['id']
 
 	# Match all except path and hash
 	match = {
@@ -285,7 +285,7 @@ def find_entry_rewritten_in_list(entry_list, in_entry):
 	Returns tuple: id of old entry, id of new entry, entry dict with report
 	"""
 
-	in_entry_id = get_entry_id(in_entry)
+	in_entry_id = in_entry['file']['id']
 
 	# Let's look for the hash
 	for entry in entry_list:
@@ -305,7 +305,8 @@ def find_entry_unchanged_in_list(entry_list, in_entry):
 	Returns tuple: id of old entry, old entry dict
 	"""
 
-	in_entry_id = get_entry_id(in_entry)
+	in_entry_id = in_entry['file']['id']
+
 	for entry in entry_list:
 		if entry['file']['id'] == in_entry_id:
 			entry.update({'status': STATUS_UC})
