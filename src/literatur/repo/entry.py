@@ -31,6 +31,8 @@ specific language governing rights and limitations under the License.
 import datetime
 from functools import partial
 import hashlib
+import os
+from pprint import pprint as pp
 
 import humanize
 
@@ -172,15 +174,11 @@ def compare_entry_lists(a_entry_list, b_entry_list):
 	def remove_none_from_list(in_list):
 		return [value for value in in_list if value is not None]
 
-	def diff_by_func(func_handle, a_entry_list, b_entry_list, a_entry_obj = None):
+	def diff_by_func(func_handle, tmp_a_entry_list, tmp_b_entry_list):
 		# Find relevant entries
-		if a_entry_obj is None:
-			a_in = a_entry_list
-		else:
-			a_in = a_entry_obj
 		diff_list = run_in_parallel_with_return(
-			partial(func_handle, a_in),
-			b_entry_list
+			partial(func_handle, tmp_a_entry_list),
+			tmp_b_entry_list
 			)
 		# Split the return tuples
 		if len(diff_list) > 0:
@@ -190,8 +188,8 @@ def compare_entry_lists(a_entry_list, b_entry_list):
 		# Return result
 		return (
 			remove_none_from_list(diff_list),
-			reduce_by_id_list(a_entry_list, remove_none_from_list(a_id_list)),
-			reduce_by_id_list(b_entry_list, remove_none_from_list(b_id_list))
+			reduce_by_id_list(tmp_a_entry_list, remove_none_from_list(a_id_list)),
+			reduce_by_id_list(tmp_b_entry_list, remove_none_from_list(b_id_list))
 			)
 
 	# Find unchanged files
@@ -263,7 +261,7 @@ def find_entry_changed_in_list(entry_list, in_entry):
 		for match_key in match_key_list:
 			if match_key in in_entry_file_key_list:
 				if in_entry_file[match_key] == entry['file'][match_key]:
-					match[match_key].append(in_entry)
+					match[match_key].append(entry)
 
 	# Old name, old path, file changed
 	for name_entry in match['name']:
@@ -304,7 +302,7 @@ def find_entry_moved_in_list(entry_list, in_entry):
 		for match_key in match_key_list:
 			if match_key in in_entry_file_key_list:
 				if in_entry_file[match_key] == entry['file'][match_key]:
-					match[match_key].append(in_entry)
+					match[match_key].append(entry)
 
 	# Size, mtime and inode match, likely moved to new path or renamed
 	for size_entry in match['size']:
@@ -330,6 +328,7 @@ def find_entry_rewritten_in_list(entry_list, in_entry):
 	"""
 
 	in_entry_id = in_entry['file']['id']
+	in_entry_hash = in_entry['file']['hash']
 
 	# Let's look for the hash
 	for entry in entry_list:
