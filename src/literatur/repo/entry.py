@@ -45,7 +45,8 @@ from ..const import (
 	STATUS_RM,
 	STATUS_NW,
 	STATUS_CH,
-	STATUS_MV
+	STATUS_MV,
+	STATUS_RW
 	)
 from ..parallel import run_in_parallel_with_return
 
@@ -53,6 +54,14 @@ from ..parallel import run_in_parallel_with_return
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # ROUTINES
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+def add_change_report_to_entry(entry):
+
+	# STATUS_MV
+	# STATUS_RW
+	# STATUS_CH
+	pass
+
 
 def add_id_to_entry(entry):
 
@@ -235,9 +244,11 @@ def find_entry_changed_in_list(entry_list, in_entry):
 		for path_entry in match['path']:
 			if name_entry['file']['id'] == path_entry['file']['id']:
 				entry = name_entry
-				entry.update({'status': STATUS_CH})
-				entry.update({'_file': in_entry['file']})
-				entry.update({'report': get_entry_change_report(entry)})
+				entry.update({
+					'status': STATUS_CH,
+					'_file': in_entry['file']
+					})
+				add_change_report_to_entry(entry)
 				return (entry['file']['id'], in_entry_id, entry)
 
 	return (None, None, None)
@@ -275,9 +286,11 @@ def find_entry_moved_in_list(entry_list, in_entry):
 			for inode_entry in match['inode']:
 				if size_entry['file']['id'] == mtime_entry['file']['id'] == inode_entry['file']['id']:
 					entry = inode_entry
-					entry.update({'status': STATUS_MV})
-					entry.update({'_file': in_entry['file']})
-					entry.update({'report': get_entry_change_report(entry)})
+					entry.update({
+						'status': STATUS_MV,
+						'_file': in_entry['file']
+						})
+					add_change_report_to_entry(entry)
 					return (entry['file']['id'], in_entry_id, entry)
 
 	return (None, None, None)
@@ -286,7 +299,7 @@ def find_entry_moved_in_list(entry_list, in_entry):
 def find_entry_rewritten_in_list(entry_list, in_entry):
 	"""
 	`entry_list` is expected to be hashed!
-	`in_entry` is expected to be missing hashes!
+	`in_entry` is expected to be hashed!
 	Returns tuple: id of old entry, id of new entry, entry dict with report
 	"""
 
@@ -295,9 +308,11 @@ def find_entry_rewritten_in_list(entry_list, in_entry):
 	# Let's look for the hash
 	for entry in entry_list:
 		if entry['file']['hash'] == in_entry_hash:
-			entry.update({'status': STATUS_MV})
-			entry.update({'_file': in_entry['file']})
-			entry.update({'report': get_entry_change_report(entry)})
+			entry.update({
+				'status': STATUS_RW,
+				'_file': in_entry['file']
+				})
+			add_change_report_to_entry(entry)
 			return (entry['file']['id'], in_entry_id, entry)
 
 	return (None, None, None)
@@ -316,11 +331,6 @@ def find_entry_unchanged_in_list(entry_dict, in_entry):
 		return (in_entry_id, in_entry_id, entry_dict[in_entry_id])
 	except:
 		return (None, None, None)
-
-
-def get_entry_change_report(entry):
-
-	return [] # TODO
 
 
 def get_entry_id(entry):
