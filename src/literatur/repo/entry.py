@@ -197,8 +197,8 @@ def compare_entry_lists(a_entry_list, b_entry_list):
 		)
 
 	# Find moved and renamed files
-	diff_mv_list, a_entry_list, b_entry_list = diff_by_func(
-		find_entry_moved_in_list, a_entry_list, b_entry_list
+	diff_mv_list, a_entry_list, b_entry_list = find_entry_moved_in_list(
+		a_entry_list, b_entry_list
 		)
 
 	# Fetch missing information on b-list entries (hash, magic, mime, type)
@@ -277,46 +277,35 @@ def find_entry_changed_in_list(entry_list, in_entry):
 	return (None, None, None)
 
 
-def find_entry_moved_in_list(entry_list, in_entry):
-	"""
-	`entry_list` is expected to be hashed!
-	`in_entry` is expected to be missing hashes!
-	Returns tuple: id of old entry, id of new entry, entry dict with report
-	"""
+def find_entry_moved_in_list(a_entry_list, b_entry_list):
 
-	in_entry_id = in_entry['file']['id']
+	def list_to_mv_dict(in_dict):
+		return {(
+			entry['file']['inode'], entry['file']['size'], entry['file']['mtime']
+			): entry for entry in in_dict}
 
-	# Match all except path and hash
-	match = {
-		'inode': [],
-		'size': [],
-		'mtime': [],
-		}
-	match_key_list = list(match.keys())
-	in_entry_file_key_list = list(in_entry['file'].keys())
-	in_entry_file = in_entry['file']
+	def update_mv_entry(a_entry, b_entry):
+		a_entry.update({
+			'status': STATUS_MV,
+			'_file': b_entry['file']
+			})
+		add_change_report_to_entry(a_entry)
+		return a_entry
 
-	# Iterate and find the matches
-	for entry in entry_list:
-		for match_key in match_key_list:
-			if match_key in in_entry_file_key_list:
-				if in_entry_file[match_key] == entry['file'][match_key]:
-					match[match_key].append(entry)
+	a_entry_dict = list_to_mv_dict(a_entry_list)
+	b_entry_dict = list_to_mv_dict(b_entry_list)
 
-	# Size, mtime and inode match, likely moved to new path or renamed
-	for size_entry in match['size']:
-		for mtime_entry in match['mtime']:
-			for inode_entry in match['inode']:
-				if size_entry['file']['id'] == mtime_entry['file']['id'] == inode_entry['file']['id']:
-					entry = inode_entry
-					entry.update({
-						'status': STATUS_MV,
-						'_file': in_entry['file']
-						})
-					add_change_report_to_entry(entry)
-					return (entry['file']['id'], in_entry_id, entry)
+	moved_id_set = a_entry_dict.keys() & b_entry_dict.keys()
 
-	return (None, None, None)
+	a_entry_remaining_set = a_entry_dict.keys() - moved_id_set
+	b_entry_remaining_set = b_entry_dict.keys() - moved_id_set
+
+	diff_mv_list = [update_mv_entry(a_entry_dict[key], b_entry_dict[key]) for key in moved_id_set]
+
+	a_entry_list = [a_entry_dict[key] for key in a_entry_remaining_set]
+	b_entry_list = [b_entry_dict[key] for key in b_entry_remaining_set]
+
+	return diff_mv_list, a_entry_list, b_entry_list
 
 
 def find_entry_rewritten_in_list(entry_list, in_entry):
