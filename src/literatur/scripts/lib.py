@@ -97,8 +97,10 @@ def script_diff():
 	# Compare old list vs new list
 	uc_list, rm_list, nw_list, ch_list, mv_list = compare_entry_lists(old_entries_list, new_entries_list)
 
+	if len(uc_list) > 0:
+		print('%s: [%d files]' % ('Unchanged', len(uc_list)))
+
 	for rp_message, rp_list in [
-		('Unchanged', uc_list),
 		('New', nw_list),
 		('Removed', rm_list)
 		]:
