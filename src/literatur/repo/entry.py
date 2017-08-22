@@ -209,8 +209,8 @@ def compare_entry_lists(a_entry_list, b_entry_list):
 		)
 
 	# Find files, which have likely been written to a new inode
-	diff_rw_list, a_entry_list, b_entry_list = diff_by_func(
-		find_entry_rewritten_in_list, a_entry_list, b_entry_list
+	diff_rw_list, a_entry_list, b_entry_list = find_entry_rewritten_in_list(
+		a_entry_list, b_entry_list
 		)
 
 	# Find files, where content was changed
@@ -308,27 +308,18 @@ def find_entry_moved_in_list(a_entry_list, b_entry_list):
 	return diff_mv_list, a_entry_list, b_entry_list
 
 
-def find_entry_rewritten_in_list(entry_list, in_entry):
-	"""
-	`entry_list` is expected to be hashed!
-	`in_entry` is expected to be hashed!
-	Returns tuple: id of old entry, id of new entry, entry dict with report
-	"""
+def find_entry_rewritten_in_list(a_entry_list, b_entry_list):
 
-	in_entry_id = in_entry['file']['id']
-	in_entry_hash = in_entry['file']['hash']
+	a_entry_dict = {entry['file']['hash']: entry for entry in a_entry_list}
+	b_entry_dict = {entry['file']['hash']: entry for entry in b_entry_list}
+	rewritten_id_set = a_entry_dict.keys() & b_entry_dict.keys()
+	a_entry_remaining_set = a_entry_dict.keys() - rewritten_id_set
+	b_entry_remaining_set = b_entry_dict.keys() - rewritten_id_set
+	diff_rw_list = [a_entry_dict[key] for key in rewritten_id_set]
+	a_entry_list = [a_entry_dict[key] for key in a_entry_remaining_set]
+	b_entry_list = [b_entry_dict[key] for key in b_entry_remaining_set]
 
-	# Let's look for the hash
-	for entry in entry_list:
-		if entry['file']['hash'] == in_entry_hash:
-			entry.update({
-				'status': STATUS_RW,
-				'_file': in_entry['file']
-				})
-			add_change_report_to_entry(entry)
-			return (entry['file']['id'], in_entry_id, entry)
-
-	return (None, None, None)
+	return diff_rw_list, a_entry_list, b_entry_list
 
 
 def find_entry_unchanged_in_list(a_entry_list, b_entry_list):
