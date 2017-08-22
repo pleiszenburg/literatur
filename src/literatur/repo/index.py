@@ -39,7 +39,7 @@ from .entry import (
 	merge_entry_file_info
 	)
 from .fs import get_recursive_filepathtuple_list
-from .storage import load_index
+from .storage import load_index_from_root_path
 from ..parallel import run_in_parallel_with_return
 
 
@@ -75,7 +75,7 @@ def create_index_from_path(
 	return entries_list
 
 
-def update_index(root_dir):
+def update_index_at_root_path(root_dir):
 
 	# Store current CWD
 	old_cwd = os.getcwd()
@@ -83,7 +83,7 @@ def update_index(root_dir):
 	os.chdir(root_dir)
 
 	# Load old index
-	old_entries_list = load_index(root_dir)
+	old_entries_list = load_index_from_root_path(root_dir)
 	# Create new index, least number of parameters
 	new_entries_list = create_index_from_path(root_dir)
 

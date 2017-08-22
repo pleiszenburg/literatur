@@ -47,7 +47,7 @@ from ..const import (
 # ROUTINES
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-def init_repo_folders(root_dir):
+def init_repo_folders_at_root_path(root_dir):
 
 	current_repository = os.path.join(root_dir, PATH_REPO)
 	os.makedirs(current_repository)
@@ -55,7 +55,7 @@ def init_repo_folders(root_dir):
 		os.makedirs(os.path.join(current_repository, fld))
 
 
-def find_root_dir():
+def find_root_path():
 
 	current_path = os.getcwd()
 
@@ -81,12 +81,12 @@ def find_root_dir():
 	raise # TODO
 
 
-def find_root_dir_with_message(need_to_find = True):
+def find_root_path_with_message(need_to_find = True):
 
 	if need_to_find:
 
 		try:
-			return find_root_dir()
+			return find_root_path()
 		except:
 			print('You are no in a literature repository.')
 			raise # TODO
@@ -94,14 +94,15 @@ def find_root_dir_with_message(need_to_find = True):
 	else:
 
 		try:
-			root_dir = find_root_dir()
-			print('You already are in an existing literature repository at "%s".' % root_dir)
-			raise # TODO
+			root_dir = find_root_path()
 		except:
 			pass
+		else:
+			print('You already are in an existing literature repository at "%s".' % root_dir)
+			raise # TODO
 
 
-def load_index(root_dir, mode = 'mp'):
+def load_index_from_root_path(root_dir, mode = 'mp'):
 
 	if mode == 'pkl':
 		f = open(os.path.join(root_dir, PATH_REPO, PATH_SUB_DB, FILE_DB_CURRENT + '.' + mode), 'rb')
@@ -121,7 +122,7 @@ def load_index(root_dir, mode = 'mp'):
 	return indexdict_list
 
 
-def store_index(indexdict_list, root_dir, mode = 'mp'):
+def store_index_at_root_path(indexdict_list, root_dir, mode = 'mp'):
 
 	if mode == 'pkl':
 		f = open(os.path.join(root_dir, PATH_REPO, PATH_SUB_DB, FILE_DB_CURRENT + '.' + mode), 'wb+')

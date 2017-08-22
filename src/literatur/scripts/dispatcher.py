@@ -29,6 +29,8 @@ specific language governing rights and limitations under the License.
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 import argparse
+import os # TODO remove?
+import sys # TODO remove?
 
 from .lib import (
 	script_init,
@@ -73,3 +75,18 @@ def entry():
 
 	cmd_routine, cmd_arguments = commands_dict[args.command[0]]
 	cmd_routine(*cmd_arguments)
+	# TODO fix input for meta
+
+
+def __get_arg_file_list__():
+
+	ret_files = []
+	ret_else = []
+
+	for argument in sys.argv[1:]:
+		if os.path.isfile(argument):
+			ret_files.append(argument)
+		else:
+			ret_else.append(argument)
+
+	return ret_files, ret_else

@@ -36,24 +36,19 @@ import os
 from pprint import pprint as pp
 import sys
 
-from ..repo.entry import (
-	add_switched_to_entry,
-	compare_entry_lists,
-	convert_filepathtuple_to_entry
-	)
-from ..repo.index import (
-	create_index_from_path,
-	update_index
-	)
-from ..repo.merge import merge
-from ..repo.storage import (
-	init_repo_folders,
-	find_root_dir_with_message,
-	load_index,
-	store_index
-	)
-from ..args import get_arg_file_list
 from ..const import REPORT_MAX_LINES
+from ..repo import (
+	add_switched_to_entry,
+	init_repo_folders_at_root_path,
+	compare_entry_lists,
+	convert_filepathtuple_to_entry,
+	create_index_from_path,
+	find_root_path_with_message,
+	load_index_from_root_path,
+	merge_at_root_path,
+	store_index_at_root_path,
+	update_index_at_root_path
+	)
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -63,7 +58,7 @@ from ..const import REPORT_MAX_LINES
 def script_init():
 
 	try:
-		find_root_dir_with_message(need_to_find = False)
+		find_root_path_with_message(need_to_find = False)
 	except:
 		sys.exit()
 
@@ -71,32 +66,32 @@ def script_init():
 	current_path = os.getcwd()
 
 	# Init folders
-	init_repo_folders(current_path)
+	init_repo_folders_at_root_path(current_path)
 
 	# Init empty database
-	store_index([], current_path)
+	store_index_at_root_path([], current_path)
 
 
 def script_commit():
 
 	try:
-		root_dir = find_root_dir_with_message(need_to_find = True)
+		root_dir = find_root_path_with_message(need_to_find = True)
 	except:
 		sys.exit()
 
-	updated_entries_list = update_index(root_dir)
+	updated_entries_list = update_index_at_root_path(root_dir)
 
-	store_index(updated_entries_list, root_dir)
+	store_index_at_root_path(updated_entries_list, root_dir)
 
 
 def script_diff():
 
 	try:
-		root_dir = find_root_dir_with_message(need_to_find = True)
+		root_dir = find_root_path_with_message(need_to_find = True)
 	except:
 		sys.exit()
 
-	old_entries_list = load_index(root_dir)
+	old_entries_list = load_index_from_root_path(root_dir)
 	new_entries_list = create_index_from_path(root_dir)
 
 	# Compare old list vs new list
@@ -128,37 +123,29 @@ def script_diff():
 def script_dump():
 
 	try:
-		root_dir = find_root_dir_with_message(need_to_find = True)
+		root_dir = find_root_path_with_message(need_to_find = True)
 	except:
 		sys.exit()
 
-	entries_list = load_index(root_dir)
+	entries_list = load_index_from_root_path(root_dir)
 
-	store_index(entries_list, root_dir, mode = 'json')
+	store_index_at_root_path(entries_list, root_dir, mode = 'json')
 
 
 def script_merge(target = 'journal'):
 
 	try:
-		root_dir = find_root_dir_with_message(need_to_find = True)
+		root_dir = find_root_path_with_message(need_to_find = True)
 	except:
 		sys.exit()
 
-	merge(root_dir, target)
+	merge_at_root_path(root_dir, target)
 
 
-def script_metainfo():
-
-	files, nofiles = get_arg_file_list()
-	current_path = os.getcwd()
-
-	for nofile in nofiles:
-		err_file = convert_filepathtuple_to_entry((current_path, nofile))
-		err_file['ERROR'] = 'Not a file.'
-		pp(err_file)
+def script_metainfo(current_path, file_list):
 
 	meta = []
-	for filename in files:
+	for filename in file_list:
 		entry = convert_filepathtuple_to_entry((current_path, filename))
 		add_switched_to_entry(entry, {'all': True})
 		meta.append(entry)
@@ -169,11 +156,11 @@ def script_metainfo():
 def script_stats():
 
 	try:
-		root_dir = find_root_dir_with_message(need_to_find = True)
+		root_dir = find_root_path_with_message(need_to_find = True)
 	except:
 		sys.exit()
 
-	entries_list = load_index(root_dir)
+	entries_list = load_index_from_root_path(root_dir)
 
 	magic_list = [entry['file']['magic'] for entry in entries_list]
 	mime_list = [entry['file']['mime'] for entry in entries_list]

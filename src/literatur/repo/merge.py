@@ -47,7 +47,7 @@ from ..const import (
 # ROUTINES?
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-def merge(working_path, target, mode = 'mp'):
+def merge_at_root_path(root_path, target, mode = 'mp'):
 
 	if target == 'journal':
 		merge_a, merge_b = FILE_DB_CURRENT + '.' + mode, FILE_DB_JOURNAL + '.' + mode
@@ -56,8 +56,8 @@ def merge(working_path, target, mode = 'mp'):
 	else:
 		raise #
 
-	__backup__(merge_b, working_path)
-	__copy__(merge_a, merge_b, working_path)
+	__backup__(merge_b, root_path)
+	__copy__(merge_a, merge_b, root_path)
 
 
 def __backup__(merge_source, working_path):

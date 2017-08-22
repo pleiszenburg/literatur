@@ -23,3 +23,27 @@ specific language governing rights and limitations under the License.
 </LICENSE_BLOCK>
 
 """
+
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# IMPORT
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+from .entry import (
+	add_switched_to_entry,
+	compare_entry_lists,
+	convert_filepathtuple_to_entry
+	)
+from .index import (
+	create_index_from_path,
+	update_index_at_root_path
+	)
+from .merge import (
+	merge_at_root_path
+	)
+from .storage import (
+	init_repo_folders_at_root_path,
+	find_root_path,
+	find_root_path_with_message,
+	load_index_from_root_path,
+	store_index_at_root_path
+	)
