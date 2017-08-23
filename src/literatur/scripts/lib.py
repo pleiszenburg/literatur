@@ -95,10 +95,14 @@ def script_diff():
 	new_entries_list = create_index_from_path(root_dir)
 
 	# Compare old list vs new list
-	uc_list, rm_list, nw_list, ch_list, mv_list = compare_entry_lists(old_entries_list, new_entries_list)
+	uc_list, rw_list, rm_list, nw_list, ch_list, mv_list = compare_entry_lists(old_entries_list, new_entries_list)
 
-	if len(uc_list) > 0:
-		print('%s: [%d files]' % ('Unchanged', len(uc_list)))
+	for rp_message, rp_list in [
+		('Unchanged', uc_list),
+		('Rewritten', rw_list)
+		]:
+		if len(rp_list) > 0:
+			print('%s: [%d files]' % (rp_message, len(rp_list)))
 
 	for rp_message, rp_list in [
 		('New', nw_list),
@@ -111,7 +115,7 @@ def script_diff():
 			print('%s: [%d files]' % (rp_message, len(rp_list)))
 
 	for rp_message, rp_list in [
-		('Moved/rewritten', mv_list),
+		('Moved', mv_list),
 		('Changed', ch_list)
 		]:
 		if len(rp_list) <= REPORT_MAX_LINES:

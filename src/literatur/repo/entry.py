@@ -60,9 +60,8 @@ from ..parallel import run_in_parallel_with_return
 # ROUTINES
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-def add_change_report_to_entry(entry):
+def add_change_report_to_entry(entry, entry_status):
 
-	entry_status = entry['status']
 	entry_report = []
 
 	if entry_status == STATUS_MV:
@@ -98,8 +97,10 @@ def add_change_report_to_entry(entry):
 	else:
 		raise # TODO
 
-	entry['report'] = entry_report
-	entry.pop('status')
+	entry.update({
+		'status': entry_status,
+		'report': entry_report
+		})
 
 
 def add_id_to_entry(entry):
@@ -164,41 +165,14 @@ def add_type_to_entry(entry):
 
 def compare_entry_lists(a_entry_list, b_entry_list):
 
-	def reduce_by_id_list(entry_list, id_list):
-		entry_dict = {entry['file']['id']: entry for entry in entry_list}
-		for entry_id in id_list:
-			entry_dict.pop(entry_id)
-		return [entry_dict[key] for key in entry_dict.keys()]
-
-	def remove_none_from_list(in_list):
-		return [value for value in in_list if value is not None]
-
-	def diff_by_func(func_handle, tmp_a_entry_list, tmp_b_entry_list):
-		# Find relevant entries
-		diff_list = run_in_parallel_with_return(
-			partial(func_handle, tmp_a_entry_list),
-			tmp_b_entry_list
-			)
-		# Split the return tuples
-		if len(diff_list) > 0:
-			a_id_list, b_id_list, diff_list = map(list, zip(*diff_list))
-		else:
-			a_id_list, b_id_list, diff_list = [], [], []
-		# Return result
-		return (
-			remove_none_from_list(diff_list),
-			reduce_by_id_list(tmp_a_entry_list, remove_none_from_list(a_id_list)),
-			reduce_by_id_list(tmp_b_entry_list, remove_none_from_list(b_id_list))
-			)
-
 	# Find unchanged files
-	diff_uc_list, a_entry_list, b_entry_list = find_entry_unchanged_in_list(
-		a_entry_list, b_entry_list
+	diff_uc_list, a_entry_list, b_entry_list = __find_process_diff__(
+		a_entry_dict, b_entry_dict, ('id',), STATUS_UC
 		)
 
 	# Find moved and renamed files
-	diff_mv_list, a_entry_list, b_entry_list = find_entry_moved_in_list(
-		a_entry_list, b_entry_list
+	diff_mv_list, a_entry_list, b_entry_list = __find_process_diff__(
+		a_entry_dict, b_entry_dict, ('inode', 'mtime', 'size'), STATUS_MV
 		)
 
 	# Fetch missing information on b-list entries (hash, magic, mime, type)
@@ -209,13 +183,13 @@ def compare_entry_lists(a_entry_list, b_entry_list):
 		)
 
 	# Find files, which have likely been written to a new inode
-	diff_rw_list, a_entry_list, b_entry_list = find_entry_rewritten_in_list(
-		a_entry_list, b_entry_list
+	diff_rw_list, a_entry_list, b_entry_list = __find_process_diff__(
+		a_entry_dict, b_entry_dict, ('hash', 'name', 'path'), STATUS_RW
 		)
 
 	# Find files, where content was changed
-	diff_ch_list, a_entry_list, b_entry_list = diff_by_func(
-		find_entry_changed_in_list, a_entry_list, b_entry_list
+	diff_ch_list, a_entry_list, b_entry_list = __find_process_diff__(
+		a_entry_dict, b_entry_dict, ('name', 'path'), STATUS_CH
 		)
 
 	# Remaining a-list was likely removed
@@ -224,7 +198,7 @@ def compare_entry_lists(a_entry_list, b_entry_list):
 	# Remaining b-list was likely added as new
 	diff_nw_list = b_entry_list
 
-	return diff_uc_list, diff_rm_list, diff_nw_list, diff_ch_list, (diff_mv_list + diff_rw_list)
+	return diff_uc_list, diff_rw_list, diff_rm_list, diff_nw_list, diff_ch_list, diff_mv_list
 
 
 def convert_filepathtuple_to_entry(filepath_tuple):
@@ -237,124 +211,35 @@ def convert_filepathtuple_to_entry(filepath_tuple):
 		}
 
 
-def find_entry_changed_in_list(entry_list, in_entry):
-	"""
-	`entry_list` is expected to be hashed!
-	`in_entry` is expected to be missing hashes!
-	Returns tuple: id of old entry, id of new entry, entry dict with report
-	"""
+def __find_process_diff__(a_entry_dict, b_entry_dict, key_tuple, status_code):
 
-	in_entry_id = in_entry['file']['id']
+	def list_to_dict(entry_list, key_tuple):
+		return {tuple(entry['file'][key] for key in key_tuple): entry for entry in entry_list}
 
-	# Match all except path and hash
-	match = {
-		'name': [],
-		'path': []
-		}
-	match_key_list = list(match.keys())
-	in_entry_file_key_list = list(in_entry['file'].keys())
-	in_entry_file = in_entry['file']
-
-	# Iterate and find the matches
-	for entry in entry_list:
-		for match_key in match_key_list:
-			if match_key in in_entry_file_key_list:
-				if in_entry_file[match_key] == entry['file'][match_key]:
-					match[match_key].append(entry)
-
-	# Old name, old path, file changed
-	for name_entry in match['name']:
-		for path_entry in match['path']:
-			if name_entry['file']['id'] == path_entry['file']['id']:
-				entry = name_entry
-				entry.update({
-					'status': STATUS_CH,
-					'_file': in_entry['file']
-					})
-				add_change_report_to_entry(entry)
-				return (entry['file']['id'], in_entry_id, entry)
-
-	return (None, None, None)
-
-
-def find_entry_moved_in_list(a_entry_list, b_entry_list):
-
-	def list_to_mv_dict(in_dict):
-		return {(
-			entry['file']['inode'], entry['file']['size'], entry['file']['mtime']
-			): entry for entry in in_dict}
-
-	def update_mv_entry(a_entry, b_entry):
+	def update_entry(a_entry, b_entry, status_code):
 		a_entry.update({
-			'status': STATUS_MV,
+			'status': status_code,
 			'_file': b_entry['file']
 			})
-		add_change_report_to_entry(a_entry)
+		add_change_report_to_entry(a_entry, status_code)
 		return a_entry
 
-	a_entry_dict = list_to_mv_dict(a_entry_list)
-	b_entry_dict = list_to_mv_dict(b_entry_list)
+	a_entry_dict = list_to_dict(a_entry_list, key_tuple)
+	b_entry_dict = list_to_dict(b_entry_list, key_tuple)
 
-	moved_id_set = a_entry_dict.keys() & b_entry_dict.keys()
+	diff_id_set = a_entry_dict.keys() & b_entry_dict.keys()
 
-	a_entry_remaining_set = a_entry_dict.keys() - moved_id_set
-	b_entry_remaining_set = b_entry_dict.keys() - moved_id_set
+	a_entry_remaining_set = a_entry_dict.keys() - diff_id_set
+	b_entry_remaining_set = b_entry_dict.keys() - diff_id_set
 
-	diff_mv_list = [update_mv_entry(a_entry_dict[key], b_entry_dict[key]) for key in moved_id_set]
-
-	a_entry_list = [a_entry_dict[key] for key in a_entry_remaining_set]
-	b_entry_list = [b_entry_dict[key] for key in b_entry_remaining_set]
-
-	return diff_mv_list, a_entry_list, b_entry_list
-
-
-def find_entry_rewritten_in_list(a_entry_list, b_entry_list):
-
-	def list_to_mv_dict(in_dict):
-		return {(
-			entry['file']['hash'], entry['file']['name'], entry['file']['path']
-			): entry for entry in in_dict}
-
-	def update_rw_entry(a_entry, b_entry):
-		a_entry.update({
-			'status': STATUS_RW,
-			'_file': b_entry['file']
-			})
-		add_change_report_to_entry(a_entry)
-		return a_entry
-
-	a_entry_dict = list_to_mv_dict(a_entry_list)
-	b_entry_dict = list_to_mv_dict(b_entry_list)
-
-	rewritten_id_set = a_entry_dict.keys() & b_entry_dict.keys()
-
-	a_entry_remaining_set = a_entry_dict.keys() - rewritten_id_set
-	b_entry_remaining_set = b_entry_dict.keys() - rewritten_id_set
-
-	diff_rw_list = [update_rw_entry(a_entry_dict[key], b_entry_dict[key]) for key in rewritten_id_set]
+	diff_list = [update_entry(
+		a_entry_dict[key], b_entry_dict[key], status_code
+		) for key in diff_id_set]
 
 	a_entry_list = [a_entry_dict[key] for key in a_entry_remaining_set]
 	b_entry_list = [b_entry_dict[key] for key in b_entry_remaining_set]
 
-	return diff_rw_list, a_entry_list, b_entry_list
-
-
-def find_entry_unchanged_in_list(a_entry_list, b_entry_list):
-
-	a_entry_dict = {entry['file']['id']: entry for entry in a_entry_list}
-	b_entry_dict = {entry['file']['id']: entry for entry in b_entry_list}
-
-	unchange_id_set = a_entry_dict.keys() & b_entry_dict.keys()
-
-	a_entry_remaining_set = a_entry_dict.keys() - unchange_id_set
-	b_entry_remaining_set = b_entry_dict.keys() - unchange_id_set
-
-	diff_uc_list = [a_entry_dict[key] for key in unchange_id_set]
-
-	a_entry_list = [a_entry_dict[key] for key in a_entry_remaining_set]
-	b_entry_list = [b_entry_dict[key] for key in b_entry_remaining_set]
-
-	return diff_uc_list, a_entry_list, b_entry_list
+	return diff_list, a_entry_list, b_entry_list
 
 
 def get_entry_id(entry):
@@ -370,10 +255,6 @@ def get_entry_id(entry):
 
 def merge_entry_file_info(entry):
 
-	new_file = entry['_file']
-	old_file = entry['file']
-
-	for key in new_file.keys():
-		old_file[key] = new_file[key]
-
-	entry.pop('_file')
+	entry['file'].update(entry['_file'])
+	for key in ['_file', 'report', 'status']:
+		entry.pop('key')

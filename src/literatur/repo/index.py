@@ -88,23 +88,16 @@ def update_index_at_root_path(root_dir):
 	new_entries_list = create_index_from_path(root_dir)
 
 	# Compare old list vs new list
-	uc_list, rm_list, nw_list, ch_list, mv_list = compare_entry_lists(old_entries_list, new_entries_list)
-
-	# Run index helper in parallel
-	nw_list = run_in_parallel_with_return(
-		partial(add_switched_to_entry, switch_list = ['all']),
-		nw_list,
-		add_return = True
-		)
+	uc_list, rw_list, rm_list, nw_list, ch_list, mv_list = compare_entry_lists(old_entries_list, new_entries_list)
 
 	# Update file information on new entries
 	updated_entries_list = run_in_parallel_with_return(
 		merge_entry_file_info,
-		ch_list + mv_list,
+		uc_list, rw_list, rm_list, nw_list, ch_list, mv_list,
 		add_return = True
 		)
 
 	# Restore old CWD
 	os.chdir(old_cwd)
 
-	return uc_list + nw_list + updated_entries_list
+	return updated_entries_list
