@@ -315,7 +315,7 @@ def find_entry_rewritten_in_list(a_entry_list, b_entry_list):
 			entry['file']['hash'], entry['file']['name'], entry['file']['path']
 			): entry for entry in in_dict}
 
-	def update_mv_entry(a_entry, b_entry):
+	def update_rw_entry(a_entry, b_entry):
 		a_entry.update({
 			'status': STATUS_RW,
 			'_file': b_entry['file']
@@ -331,7 +331,7 @@ def find_entry_rewritten_in_list(a_entry_list, b_entry_list):
 	a_entry_remaining_set = a_entry_dict.keys() - rewritten_id_set
 	b_entry_remaining_set = b_entry_dict.keys() - rewritten_id_set
 
-	diff_rw_list = [a_entry_dict[key] for key in rewritten_id_set]
+	diff_rw_list = [update_rw_entry(a_entry_dict[key], b_entry_dict[key]) for key in rewritten_id_set]
 
 	a_entry_list = [a_entry_dict[key] for key in a_entry_remaining_set]
 	b_entry_list = [b_entry_dict[key] for key in b_entry_remaining_set]
