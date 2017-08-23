@@ -49,41 +49,37 @@ Think of *git* with two hard-coded branches (``journal`` and ``master``) and a s
 Think of the folder ``.l`` like you would think about ``.git``.
 Find reports and analysis data in ``.l/reports``.
 
-First, run ``l_init`` at the root of a new repository.
-Add literature and adjust the filenames with ``l_rename``.
-Check the repository state, i.e. the file names, with ``l_sanity``.
-Build an index for ``current`` with ``l_buildindex``, update it with ``l_rebuildindex``.
-Commit changes to the ``journal`` branch with ``l_commit_journal``.
-Make changes permanent by further pushing to `master` with ``l_commit_master``.
-Find duplicate entries with ``l_findduplicates``.
-Dump the database into plain text files with ``l_dumpdb``.
-Generate all sorts of useful reports with ``l_report``.
-Determine the type of a file with ``l_file``, JSON output.
-Get meta information from file with ``l_meta``, JSON output.
-Push the latest state of the repository to a MediaWiki server with ``l_pushwiki``.
-Show repository statistics with ``l_stat``.
-Analyse the network of authors with ``l_getnetwork``.
+First, run ``lit init`` at the root of a new repository.
+Show difference to ``current`` index with ``lit diff``.
+Commit to the ``current`` index with ``lit commit``.
+Merge the changes into the ``journal`` branch with ``lit merge_journal``.
+Make changes permanent by further merging them into ``master`` with ``lit merge_master``.
+Dump the database into plain text files with ``lit dump``.
+Get meta information from file with ``lit meta``, JSON output.
+Show repository statistics with ``lit stats``.
+
+.. _Add literature and adjust the filenames with ``l_rename``.
+.. _Check the repository state, i.e. the file names, with ``l_sanity``.
+.. _Build an index for ``current`` with ``l_buildindex``, update it with ``l_rebuildindex``.
+.. _Find duplicate entries with ``l_findduplicates``.
+.. _Generate all sorts of useful reports with ``l_report``.
+.. _Determine the type of a file with ``l_file``, JSON output.
+.. _Push the latest state of the repository to a MediaWiki server with ``l_pushwiki``.
+.. _Analyse the network of authors with ``l_getnetwork``.
 
 Full list of commands
 ---------------------
 
 .. code:: bash
 
-	l_init
-	l_buildindex
-	l_rebuildindex
-	l_commit_journal
-	l_commit_master
-	l_sanity
-	l_findduplicates
-	l_dumpdb
-	l_report
-	l_stat
-	l_getnetwork
-	l_pushwiki
-	l_rename
-	l_meta
-	f_file
+	lit init
+	lit diff
+	lit commit
+	lit merge_journal
+	lit merge_master
+	lit dump
+	lit stats
+	lit meta
 
 Need help?
 ==========
