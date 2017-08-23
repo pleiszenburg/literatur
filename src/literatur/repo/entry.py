@@ -310,12 +310,29 @@ def find_entry_moved_in_list(a_entry_list, b_entry_list):
 
 def find_entry_rewritten_in_list(a_entry_list, b_entry_list):
 
-	a_entry_dict = {entry['file']['hash']: entry for entry in a_entry_list}
-	b_entry_dict = {entry['file']['hash']: entry for entry in b_entry_list}
+	def list_to_mv_dict(in_dict):
+		return {(
+			entry['file']['hash'], entry['file']['name'], entry['file']['path']
+			): entry for entry in in_dict}
+
+	def update_mv_entry(a_entry, b_entry):
+		a_entry.update({
+			'status': STATUS_RW,
+			'_file': b_entry['file']
+			})
+		add_change_report_to_entry(a_entry)
+		return a_entry
+
+	a_entry_dict = list_to_mv_dict(a_entry_list)
+	b_entry_dict = list_to_mv_dict(b_entry_list)
+
 	rewritten_id_set = a_entry_dict.keys() & b_entry_dict.keys()
+
 	a_entry_remaining_set = a_entry_dict.keys() - rewritten_id_set
 	b_entry_remaining_set = b_entry_dict.keys() - rewritten_id_set
+
 	diff_rw_list = [a_entry_dict[key] for key in rewritten_id_set]
+
 	a_entry_list = [a_entry_dict[key] for key in a_entry_remaining_set]
 	b_entry_list = [b_entry_dict[key] for key in b_entry_remaining_set]
 
@@ -326,10 +343,14 @@ def find_entry_unchanged_in_list(a_entry_list, b_entry_list):
 
 	a_entry_dict = {entry['file']['id']: entry for entry in a_entry_list}
 	b_entry_dict = {entry['file']['id']: entry for entry in b_entry_list}
+
 	unchange_id_set = a_entry_dict.keys() & b_entry_dict.keys()
+
 	a_entry_remaining_set = a_entry_dict.keys() - unchange_id_set
 	b_entry_remaining_set = b_entry_dict.keys() - unchange_id_set
+
 	diff_uc_list = [a_entry_dict[key] for key in unchange_id_set]
+
 	a_entry_list = [a_entry_dict[key] for key in a_entry_remaining_set]
 	b_entry_list = [b_entry_dict[key] for key in b_entry_remaining_set]
 
