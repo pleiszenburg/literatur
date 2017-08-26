@@ -167,12 +167,12 @@ def compare_entry_lists(a_entry_list, b_entry_list):
 
 	# Find unchanged files
 	diff_uc_list, a_entry_list, b_entry_list = __find_process_diff__(
-		a_entry_dict, b_entry_dict, ('id',), STATUS_UC
+		a_entry_list, b_entry_list, ('id',), STATUS_UC
 		)
 
 	# Find moved and renamed files
 	diff_mv_list, a_entry_list, b_entry_list = __find_process_diff__(
-		a_entry_dict, b_entry_dict, ('inode', 'mtime', 'size'), STATUS_MV
+		a_entry_list, b_entry_list, ('inode', 'mtime', 'size'), STATUS_MV
 		)
 
 	# Fetch missing information on b-list entries (hash, magic, mime, type)
@@ -184,12 +184,12 @@ def compare_entry_lists(a_entry_list, b_entry_list):
 
 	# Find files, which have likely been written to a new inode
 	diff_rw_list, a_entry_list, b_entry_list = __find_process_diff__(
-		a_entry_dict, b_entry_dict, ('hash', 'name', 'path'), STATUS_RW
+		a_entry_list, b_entry_list, ('hash', 'name', 'path'), STATUS_RW
 		)
 
 	# Find files, where content was changed
 	diff_ch_list, a_entry_list, b_entry_list = __find_process_diff__(
-		a_entry_dict, b_entry_dict, ('name', 'path'), STATUS_CH
+		a_entry_list, b_entry_list, ('name', 'path'), STATUS_CH
 		)
 
 	# Remaining a-list was likely removed
@@ -211,7 +211,7 @@ def convert_filepathtuple_to_entry(filepath_tuple):
 		}
 
 
-def __find_process_diff__(a_entry_dict, b_entry_dict, key_tuple, status_code):
+def __find_process_diff__(a_entry_list, b_entry_list, key_tuple, status_code):
 
 	def list_to_dict(entry_list, key_tuple):
 		return {tuple(entry['file'][key] for key in key_tuple): entry for entry in entry_list}
@@ -255,6 +255,9 @@ def get_entry_id(entry):
 
 def merge_entry_file_info(entry):
 
-	entry['file'].update(entry['_file'])
+	if '_file' in entry.keys():
+		entry['file'].update(entry['_file'])
+		rm_keys.append('_file')
 	for key in ['_file', 'report', 'status']:
-		entry.pop('key')
+		if key in entry.keys():
+			entry.pop(key)

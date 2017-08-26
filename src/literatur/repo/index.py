@@ -93,7 +93,7 @@ def update_index_at_root_path(root_dir):
 	# Update file information on new entries
 	updated_entries_list = run_in_parallel_with_return(
 		merge_entry_file_info,
-		uc_list, rw_list, rm_list, nw_list, ch_list, mv_list,
+		uc_list + rw_list + rm_list + nw_list + ch_list + mv_list,
 		add_return = True
 		)
 
