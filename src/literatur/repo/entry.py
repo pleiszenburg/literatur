@@ -257,7 +257,6 @@ def merge_entry_file_info(entry):
 
 	if '_file' in entry.keys():
 		entry['file'].update(entry['_file'])
-		rm_keys.append('_file')
 	for key in ['_file', 'report', 'status']:
 		if key in entry.keys():
 			entry.pop(key)
