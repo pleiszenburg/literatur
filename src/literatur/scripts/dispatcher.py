@@ -38,6 +38,7 @@ from .lib import (
 	script_merge,
 	script_diff,
 	script_dump,
+	script_duplicates,
 	script_metainfo,
 	script_stats
 	)
@@ -56,6 +57,7 @@ def entry():
 		'merge_master': (script_merge, ('master',)),
 		'diff': (script_diff, tuple()),
 		'dump': (script_dump, tuple()),
+		'duplicates': (script_duplicates, tuple()),
 		'meta': (script_metainfo, tuple()),
 		'stats': (script_stats, tuple())
 		}

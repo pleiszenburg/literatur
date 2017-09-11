@@ -43,6 +43,7 @@ from ..repo import (
 	compare_entry_lists,
 	convert_filepathtuple_to_entry,
 	create_index_from_path,
+	find_duplicates_in_entry_list,
 	find_root_path_with_message,
 	load_index_from_root_path,
 	merge_at_root_path,
@@ -136,6 +137,20 @@ def script_dump():
 	entries_list = load_index_from_root_path(root_dir)
 
 	store_index_at_root_path(entries_list, root_dir, mode = 'json')
+
+
+def script_duplicates():
+
+	try:
+		root_dir = find_root_path_with_message(need_to_find = True)
+	except:
+		sys.exit()
+
+	entries_list = load_index_from_root_path(root_dir)
+
+	duplicates_dict = find_duplicates_in_entry_list(entries_list)
+
+	pp(duplicates_dict)
 
 
 def script_merge(target = 'journal'):

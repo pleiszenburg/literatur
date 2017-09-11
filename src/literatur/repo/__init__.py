@@ -31,7 +31,8 @@ specific language governing rights and limitations under the License.
 from .entry import (
 	add_switched_to_entry,
 	compare_entry_lists,
-	convert_filepathtuple_to_entry
+	convert_filepathtuple_to_entry,
+	find_duplicates_in_entry_list
 	)
 from .index import (
 	create_index_from_path,

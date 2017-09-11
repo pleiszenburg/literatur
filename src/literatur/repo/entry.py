@@ -211,6 +211,11 @@ def convert_filepathtuple_to_entry(filepath_tuple):
 		}
 
 
+def find_duplicates_in_entry_list(entry_list):
+
+	return {}
+
+
 def __find_process_diff__(a_entry_list, b_entry_list, key_tuple, status_code):
 
 	def list_to_dict(entry_list, key_tuple):
