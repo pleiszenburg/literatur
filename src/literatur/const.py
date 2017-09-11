@@ -116,8 +116,11 @@ KEY_YEAR = 'year'
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-# CLASSES
+# ENTRY META: CLASSES, AUTHORS, ...
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+AUTHORS_ETAL = 'ETAL'
+AUTHORS_EXCLUDE_LIST = [AUTHORS_ETAL, 'plate', 'frontmatter', 'backmatter', 'hires']
 
 CLASS_CHAPTER = 'CHAPTER'
 CLASS_BOOK = 'BOOK'

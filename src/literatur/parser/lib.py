@@ -30,6 +30,7 @@ specific language governing rights and limitations under the License.
 
 from collections import OrderedDict
 
+from ..const import AUTHORS_EXCLUDE_LIST
 from ..repo import get_series_dict
 
 
@@ -66,7 +67,7 @@ def string_to_authors_dict(authors):
 	authors_etal = False
 
 	for jj in temp_list:
-		if (jj not in list_authors_exclude) and (not jj.isdigit()) and (len(jj) > 0):
+		if (jj not in AUTHORS_EXCLUDE_LIST) and (not jj.isdigit()) and (len(jj) > 0):
 			if jj[0].islower():
 				temp_author += jj + ' '
 				temp_author_k += '_' + jj
