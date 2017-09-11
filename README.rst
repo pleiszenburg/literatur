@@ -61,8 +61,6 @@ Show repository statistics with ``lit stats``.
 
 .. _Add literature and adjust the filenames with ``l_rename``.
 .. _Check the repository state, i.e. the file names, with ``l_sanity``.
-.. _Build an index for ``current`` with ``l_buildindex``, update it with ``l_rebuildindex``.
-.. _Find duplicate entries with ``l_findduplicates``.
 .. _Generate all sorts of useful reports with ``l_report``.
 .. _Determine the type of a file with ``l_file``, JSON output.
 .. _Push the latest state of the repository to a MediaWiki server with ``l_pushwiki``.
