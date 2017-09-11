@@ -213,7 +213,22 @@ def convert_filepathtuple_to_entry(filepath_tuple):
 
 def find_duplicates_in_entry_list(entry_list):
 
-	return {}
+	entry_by_hash_dict = {}
+
+	for entry in entry_list:
+		hash_str = entry['file']['hash']
+		if hash_str not in entry_by_hash_dict.keys():
+			entry_by_hash_dict.update({hash_str: [entry]})
+		else:
+			entry_by_hash_dict[hash_str].append(entry)
+
+	duplicates_dict = {}
+
+	for hash_str in entry_by_hash_dict.keys():
+		if len(entry_by_hash_dict[hash_str]) > 1:
+			duplicates_dict.update({hash_str: entry_by_hash_dict[hash_str]})
+
+	return duplicates_dict
 
 
 def __find_process_diff__(a_entry_list, b_entry_list, key_tuple, status_code):
