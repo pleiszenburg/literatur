@@ -6,7 +6,7 @@ LITERATUR
 Literature management with Python, Dropbox and MediaWiki
 https://github.com/pleiszenburg/literatur
 
-	src/literatur/const.py: Constants, keys, default parameter
+	src/literatur/parser/string.py: Cleaning and converting strings
 
 	Copyright (C) 2017 Sebastian M. Ernst <ernst@pleiszenburg.de>
 
@@ -24,51 +24,35 @@ specific language governing rights and limitations under the License.
 
 """
 
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# IMPORT
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+from ..const import LETTER_SUB_DICT
+
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-# STATIC STRINGS
+# ROUTINES
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-PATH_SUB_DB = 'db'
-PATH_SUB_DBBACKUP = 'db/backup'
-PATH_SUB_REPORTS = 'reports'
+def clean_str(in_str):
 
-PATH_REPO = '.l'
+	# Remove stuff left and right
+	out_str = in_str.strip(' \n\t')
 
-IGNORE_DIR_LIST = [
-	PATH_REPO,
-	'.git'
-	]
-IGNORE_FILE_LIST = [
-	'desktop.ini',
-	'.directory'
-	]
+	# Tabs, underlines and line breaks etc become spaces
+	for ii in '\t\n\'"”/()+,:_—–;<=>[\\]{|}&`‘’':
+		out_str = out_str.replace(ii, ' ')
 
-KEY_CURRENT = 'current'
-KEY_JOURNAL = 'journal'
-KEY_MASTER = 'master'
+	# Remove multiple spaces
+	out_str = ' '.join(out_str.split())
 
-FILE_DB_CURRENT = 'index_%s' % KEY_CURRENT # stage 1
-FILE_DB_JOURNAL = 'index_%s' % KEY_JOURNAL # stage 2
-FILE_DB_MASTER = 'index_%s' % KEY_MASTER # stage 3
+	# Kill special alphabets
+	for ii in LETTER_SUB_DICT.keys():
+		out_str = out_str.replace(ii, LETTER_SUB_DICT[ii])
 
-STATUS_UC = 0
-STATUS_RM = 1
-STATUS_NW = 2
-STATUS_CH = 3
-STATUS_MV = 4
-STATUS_RW = 5
+	# Remove remaining special characters ...
+	for ii in '!$§#%&*.?@^°':
+		out_str = out_str.replace(ii, '')
 
-REPORT_MAX_LINES = 1000
-
-LETTER_SUB_DICT = {
-	"ä":"ae", "Ä":"Ae", "ö":"oe", "Ö":"Oe", "ü":"ue", "Ü":"Ue",
-	"é":"e", "É":"E", "è":"e", "È":"E",
-	"á":"a", "Á":"A", "à":"a", "À":"A", "Á":"A", "À":"A",
-	"ĉ":"c", "Ĉ":"C",
-	"ß":"ss", "š":"s",
-	"ﬀ":"ff", "ﬁ":"fi", "ﬂ":"fl",
-	"í":"i",
-	"µ":"u",
-	"ñ":"n"
-	}
+	return out_str
