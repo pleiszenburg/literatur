@@ -55,6 +55,7 @@ Commit to the ``current`` index with ``lit commit``.
 Merge the changes into the ``journal`` branch with ``lit merge_journal``.
 Make changes permanent by further merging them into ``master`` with ``lit merge_master``.
 Dump the database into plain text files with ``lit dump``.
+Find duplicates in the repository by file hash with ``lit duplicates``.
 Get meta information from file with ``lit meta``, JSON output.
 Show repository statistics with ``lit stats``.
 
