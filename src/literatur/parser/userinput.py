@@ -37,6 +37,7 @@ from .string import clean_str
 from ..filetypes import KNOWN_EXTENSIONS_LIST
 
 from ..const import (
+	AUTHORS_ETAL,
 	DEFAULT_ANNOTATION,
 	DEFAULT_AUTHOR,
 	DEFAULT_CLASS,
@@ -50,7 +51,6 @@ from ..const import (
 	KEY_ANNOTATION,
 	KEY_AUTHOR_FIRST,
 	KEY_AUTHORS_DICT,
-	KEY_AUTHORS_LIST,
 	KEY_CLASS,
 	KEY_EDITORS_DICT,
 	KEY_EDITORS_LIST,
@@ -70,14 +70,67 @@ from ..const import (
 # ROUTINES
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-def userinput_str_to_metaentry_dict(in_str):
+def metaentry_dict_to_userinput_str(metaentry_dict):
 
-	fragments_list = in_str.split(DELIMITER_USERINPUT_BLOCK)
+	cnt_n = '\n'
+
+	userinput_list.append(metaentry_dict[KEY_CLASS])
+	userinput_list.append(cnt_n)
+	userinput_list.append(DELIMITER_USERINPUT_BLOCK)
+	userinput_list.append(cnt_n)
+	userinput_list.append(metaentry_dict[KEY_YEAR])
+	if metaentry_dict[KEY_SERIES_ID] != '':
+		userinput_list.append(' ' + metaentry_dict[KEY_SERIES_ID])
+		if metaentry_dict[KEY_SERIES_SECTION] != '':
+			userinput_list.append(
+				' ' + DELIMITER_USERINPUT_SERIES + ' ' + metaentry_dict[KEY_SERIES_SECTION].replace('.', ' ')
+				)
+	userinput_list.append(cnt_n)
+	userinput_list.append(DELIMITER_USERINPUT_BLOCK)
+	userinput_list.append(cnt_n)
+	for author_key in list(metaentry_dict[KEY_AUTHORS_DICT].keys()):
+		userinput_list.append(metaentry_dict[KEY_AUTHORS_DICT][author_key] + ' ')
+	if metaentry_dict[KEY_ETAL_BOOL]:
+		userinput_list.append(AUTHORS_ETAL + ' ')
+	userinput_list.append(cnt_n)
+	userinput_list.append(DELIMITER_USERINPUT_BLOCK)
+	userinput_list.append(cnt_n)
+	userinput_list.append(metaentry_dict[KEY_TITLE])
+	userinput_list.append(cnt_n)
+	userinput_list.append(DELIMITER_USERINPUT_BLOCK)
+	userinput_list.append(cnt_n)
+	if metaentry_dict[KEY_ANNOTATION] != '':
+		userinput_list.append(metaentry_dict[KEY_ANNOTATION])
+	userinput_list.append(cnt_n)
+	userinput_list.append(DELIMITER_USERINPUT_BLOCK)
+	userinput_list.append(cnt_n)
+	userinput_list.append(metaentry_dict[KEY_EXTENSION].lower())
+	userinput_list.append(cnt_n)
+
+	userinput_str = ''.join(userinput_list)
+
+	return userinput_str
+
+	# userinput_list = []
+	#
+	# if follow_convention_guess(item_filename):
+	#
+	# 	# ...
+	#
+	# else:
+	#
+	# 	fext, fname = filename_ext(item_filename)
+	# 	userinput = cnt_n + fname + cnt_n + DELIMITER_USERINPUT_BLOCK + cnt_n + fext + cnt_n
+
+
+def userinput_str_to_metaentry_dict(userinput_str):
+
+	fragments_list = userinput_str.split(DELIMITER_USERINPUT_BLOCK)
 
 	# Step 1: Class
 	item_class = DEFAULT_CLASS
 	if len(fragments_list) > 0:
-		item_class = clean_str(in_str).upper().replace(' ', '-')
+		item_class = clean_str(fragments_list[0]).upper().replace(' ', '-')
 		if item_class not in KNOWN_CLASSES_LIST:
 			item_class = DEFAULT_CLASS
 
@@ -95,7 +148,7 @@ def userinput_str_to_metaentry_dict(in_str):
 			if item_year_f[:4].isdigit():
 				item_year = item_year_f[:4]
 				# Check for unrealistic years
-				if item_year > DEFAULT_YEAR_MAX or int(item_year) < DEFAULT_YEAR_MIN:
+				if int(item_year) > DEFAULT_YEAR_MAX or int(item_year) < DEFAULT_YEAR_MIN:
 					item_year = str(DEFAULT_YEAR)
 				# Fetch series etc
 				if len(item_year_f) > 4:
@@ -112,7 +165,7 @@ def userinput_str_to_metaentry_dict(in_str):
 		if len(item_authors_d) == 0:
 			item_authors_d = DEFAULT_AUTHOR
 	# Generate author dictionary
-	item_first, item_names, item_etal = string_to_authors_dict(item_authors_d.replace(' ', '-'))
+	item_first, item_authors_dict, item_etal = string_to_authors_dict(item_authors_d.replace(' ', '-'))
 
 	# Step 4: Title
 	item_title_d = DEFAULT_TITLE
@@ -140,16 +193,15 @@ def userinput_str_to_metaentry_dict(in_str):
 	return {
 		KEY_ANNOTATION: item_ann_d,
 		KEY_AUTHOR_FIRST: item_first,
-		KEY_AUTHORS_DICT: item_authors_d,
-		KEY_AUTHORS_LIST: item_names,
+		KEY_AUTHORS_DICT: item_authors_dict,
 		KEY_CLASS: item_class,
 		KEY_EDITORS_LIST: item_editors,
 		KEY_ETAL_BOOL: item_etal,
-		KEY_EXTENSION: item_fileformat
+		KEY_EXTENSION: item_fileformat,
 		KEY_SERIES_ID: item_bookid,
 		KEY_SERIES_NAME: item_book,
 		KEY_SERIES_TYPE: item_type,
 		KEY_SERIES_SECTION: item_section,
 		KEY_TITLE: item_title_d,
-		KEY_YEAR: item_year,
+		KEY_YEAR: item_year
 		}

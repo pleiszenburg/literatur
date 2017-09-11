@@ -58,4 +58,11 @@ def clean_str(in_str):
 	for ii in '!$§#%&*.?@^°':
 		out_str = out_str.replace(ii, '')
 
+	# Finally spaces become dashes and vice versa
+	lString = lString.replace(" ", "-")
+	lString = lString.replace("-", " ")
+
+	# Remove multiple space
+	lString = ' '.join(lString.split())
+
 	return out_str

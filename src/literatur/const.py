@@ -101,7 +101,6 @@ DEFAULT_YEAR = DEFAULT_YEAR_MIN
 KEY_ANNOTATION = 'annotation'
 KEY_AUTHOR_FIRST = 'author_first'
 KEY_AUTHORS_DICT = 'authors_dict'
-KEY_AUTHORS_LIST = 'authors_list'
 KEY_CLASS = 'class'
 KEY_EDITORS_DICT = 'editors_dict'
 KEY_EDITORS_LIST = 'editors_list'

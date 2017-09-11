@@ -59,7 +59,7 @@ def string_to_authors_dict(authors):
 
 	temp_list = authors.replace('-', ' ').split(' ')
 
-	authors_list = OrderedDict()
+	authors_dict = OrderedDict()
 	temp_author = ''
 	temp_author_k = ''
 	flag_first = False
@@ -73,10 +73,10 @@ def string_to_authors_dict(authors):
 				temp_author_k += '_' + jj
 			else:
 				id_count = 1
-				while (jj + temp_author_k + '_' + str(id_count)) in list(authors_list.keys()):
+				while (jj + temp_author_k + '_' + str(id_count)) in list(authors_dict.keys()):
 					id_count += 1
 				jj_id = jj + temp_author_k + '_' + str(id_count)
-				authors_list.update({jj_id:(temp_author + jj)})
+				authors_dict.update({jj_id:(temp_author + jj)})
 				if not flag_first:
 					first_author = jj_id
 					flag_first = True
@@ -85,4 +85,4 @@ def string_to_authors_dict(authors):
 		if jj == lit_authors_etal:
 			authors_etal = True
 
-	return first_author, authors_list, authors_etal
+	return first_author, authors_dict, authors_etal
