@@ -26,7 +26,7 @@ specific language governing rights and limitations under the License.
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-# STATIC STRINGS
+# REPO STORAGE
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 PATH_SUB_DB = 'db'
@@ -52,6 +52,11 @@ FILE_DB_CURRENT = 'index_%s' % KEY_CURRENT # stage 1
 FILE_DB_JOURNAL = 'index_%s' % KEY_JOURNAL # stage 2
 FILE_DB_MASTER = 'index_%s' % KEY_MASTER # stage 3
 
+
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# ENTRY STATUS
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
 STATUS_UC = 0
 STATUS_RM = 1
 STATUS_NW = 2
@@ -59,7 +64,38 @@ STATUS_CH = 3
 STATUS_MV = 4
 STATUS_RW = 5
 
+
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# REPORTING
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
 REPORT_MAX_LINES = 1000
+
+
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# KEYS
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+KEY_ANNOTATION = 'annotation'
+KEY_AUTHOR_FIRST = 'author_first'
+KEY_AUTHORS_DICT = 'authors_dict'
+KEY_AUTHORS_LIST = 'authors_list'
+KEY_CLASS = 'class'
+KEY_EDITORS_DICT = 'editors_dict'
+KEY_EDITORS_LIST = 'editors_list'
+KEY_ETAL_BOOL = 'etal'
+KEY_EXTENSION = 'extension'
+KEY_SERIES_ID = 'series_id'
+KEY_SERIES_NAME = 'series_name'
+KEY_SERIES_SECTION = 'series_section'
+KEY_SERIES_TYPE = 'series_type'
+KEY_TITLE = 'title'
+KEY_YEAR = 'year'
+
+
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# FILENAME HANDLING
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 LETTER_SUB_DICT = {
 	"ä":"ae", "Ä":"Ae", "ö":"oe", "Ö":"Oe", "ü":"ue", "Ü":"Ue",
