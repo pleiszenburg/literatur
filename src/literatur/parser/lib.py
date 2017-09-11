@@ -30,6 +30,8 @@ specific language governing rights and limitations under the License.
 
 from collections import OrderedDict
 
+from ..repo import get_series_dict
+
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # ROUTINES
@@ -40,8 +42,9 @@ def get_book_from_bookid(year, bookid):
 	item_book = ''
 	item_editors = OrderedDict()
 	item_type = ''
+	lit_book_ids = get_series_dict()
 
-	if bookid in lit_book_ids:
+	if bookid in lit_book_ids.keys():
 		if year in lit_book_ids[bookid]:
 			item_book = lit_book_ids[bookid][year][lit_id_title]
 			item_type = lit_book_ids[bookid][year][lit_id_type]
