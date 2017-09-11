@@ -73,6 +73,7 @@ from ..const import (
 def metaentry_dict_to_userinput_str(metaentry_dict):
 
 	cnt_n = '\n'
+	userinput_list = []
 
 	userinput_list.append(metaentry_dict[KEY_CLASS])
 	userinput_list.append(cnt_n)
