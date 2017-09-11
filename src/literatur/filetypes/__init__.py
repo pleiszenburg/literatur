@@ -35,3 +35,25 @@ from .__typeinfo__ import (
 	get_mimetype,
 	filetypes
 	)
+
+KNOWN_EXTENSIONS_LIST = [
+	'pdf',
+	'doc',
+	'docx',
+	'odt',
+	'epub',
+	'ps.gz',
+	'ps',
+	'eps',
+	'djvu',
+	'xps',
+	'ppt',
+	'pptx',
+	'txt',
+	'key',
+	'gif',
+	'png',
+	'jpg',
+	'jpeg',
+	'tiff'
+	]

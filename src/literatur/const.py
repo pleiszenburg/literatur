@@ -84,7 +84,11 @@ DELIMITER_USERINPUT_SERIES = '~'
 # DEFAULTS
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+DEFAULT_ANNOTATION = ''
+DEFAULT_AUTHOR = 'ANONYMOUS'
 DEFAULT_CLASS = 'AA'
+DEFAULT_EXTENSION = 'pdf'
+DEFAULT_TITLE = 'NOTITLE'
 DEFAULT_YEAR_MAX = 2100
 DEFAULT_YEAR_MIN = 1000
 DEFAULT_YEAR = DEFAULT_YEAR_MIN

@@ -28,10 +28,20 @@ specific language governing rights and limitations under the License.
 # IMPORT
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+from .lib import (
+	get_book_from_bookid,
+	string_to_authors_dict
+	)
 from .string import clean_str
 
+from ..filetypes import KNOWN_EXTENSIONS_LIST
+
 from ..const import (
+	DEFAULT_ANNOTATION,
+	DEFAULT_AUTHOR,
 	DEFAULT_CLASS,
+	DEFAULT_EXTENSION,
+	DEFAULT_TITLE,
 	DEFAULT_YEAR,
 	DEFAULT_YEAR_MAX,
 	DEFAULT_YEAR_MIN,
@@ -89,41 +99,41 @@ def userinput_str_to_metaentry_dict(in_str):
 				# Fetch series etc
 				if len(item_year_f) > 4:
 					item_book_s = item_year_f[4:].split(DELIMITER_USERINPUT_SERIES)
-					item_bookid = item_book_s[0].strip(' ').replace(" ", "-")
-					item_book, item_editors, item_type = lit_get_book_from_bookid(item_year, item_bookid)
+					item_bookid = item_book_s[0].strip(' ').replace(' ', '-')
+					item_book, item_editors, item_type = get_book_from_bookid(item_year, item_bookid)
 					if len(item_book_s) > 1:
 						item_section = item_book_s[1].strip(' ')
 
 	# Step 3: Authors
-	item_authors_d = lit_authors_default
+	item_authors_d = DEFAULT_AUTHOR
 	if len(fragments_list) > 2:
 		item_authors_d = clean_str(fragments_list[2])
 		if len(item_authors_d) == 0:
-			item_authors_d = lit_authors_default
+			item_authors_d = DEFAULT_AUTHOR
 	# Generate author dictionary
-	item_first, item_names, item_etal = string_to_authors_dict(item_authors_d.replace(" ", "-"))
+	item_first, item_names, item_etal = string_to_authors_dict(item_authors_d.replace(' ', '-'))
 
 	# Step 4: Title
-	item_title_d = lit_title_default
+	item_title_d = DEFAULT_TITLE
 	if len(fragments_list) > 3:
 		item_title_d = clean_str(fragments_list[3])
 		if len(item_title_d) == 0:
-			item_title_d = lit_title_default
+			item_title_d = DEFAULT_TITLE
 
 	# Step 5: Annotation
-	item_ann_d = lit_ann_default
+	item_ann_d = DEFAULT_ANNOTATION
 	if len(fragments_list) > 4:
 		item_ann_d = clean_str(fragments_list[4])
 		if len(item_ann_d) == 0:
-			item_ann_d = lit_ann_default
+			item_ann_d = DEFAULT_ANNOTATION
 
 	# Step 6: File format
-	item_fileformat = lit_fileformat_default
+	item_fileformat = DEFAULT_EXTENSION
 	if len(fragments_list) > 5:
-		item_fileformat = fragments_list[5].replace(".", " ")
-		item_fileformat = clean_str(item_fileformat).replace(" ", ".").lower()
-		if item_fileformat not in list_ext:
-			item_fileformat = lit_fileformat_default
+		item_fileformat = fragments_list[5].replace('.', ' ')
+		item_fileformat = clean_str(item_fileformat).replace(' ', '.').lower()
+		if item_fileformat not in KNOWN_EXTENSIONS_LIST:
+			item_fileformat = DEFAULT_EXTENSION
 
 	# Build and object
 	return {
