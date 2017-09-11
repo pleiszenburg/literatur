@@ -116,6 +116,28 @@ KEY_YEAR = 'year'
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# CLASSES
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+CLASS_CHAPTER = 'CHAPTER'
+CLASS_BOOK = 'BOOK'
+CLASS_PROCEEDINGS = 'PROCEEDINGS'
+CLASS_JOURNAL = 'JOURNAL'
+
+KNOWN_CLASSES_SP_LIST = [
+	CLASS_CHAPTER, CLASS_BOOK, CLASS_PROCEEDINGS, CLASS_JOURNAL
+	]
+KNOWN_CLASSES_LIST = KNOWN_CLASSES_SP_LIST + [
+	'ABSTRACT', 'ABSTRACTS', 'PAPER', 'ANNOUNCEMENT',
+	'ARTICLE', 'LETTER', 'MANUAL', 'NOTE', 'PATENT', 'POSTER',
+	'PRESENTATION', 'REPORT', 'RESOLUTION', 'SCRIPT', 'THESIS',
+	'THESIS-MSC', 'THESIS-BSC', 'THESIS-PHD', 'THESIS-DIPLOMA',
+	'WEB', 'PROPOSAL', 'DATASHEET', 'SPEECH', 'SPEC',
+	'TUTORIAL', 'STANDARD', 'REVIEW', 'DATA', 'CALL'
+	]
+
+
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # FILENAME HANDLING
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 

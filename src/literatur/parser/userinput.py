@@ -61,7 +61,8 @@ from ..const import (
 	KEY_SERIES_SECTION,
 	KEY_SERIES_TYPE,
 	KEY_TITLE,
-	KEY_YEAR
+	KEY_YEAR,
+	KNOWN_CLASSES_LIST
 	)
 
 
@@ -77,7 +78,7 @@ def userinput_str_to_metaentry_dict(in_str):
 	item_class = DEFAULT_CLASS
 	if len(fragments_list) > 0:
 		item_class = clean_str(in_str).upper().replace(' ', '-')
-		if item_class not in lit_classes:
+		if item_class not in KNOWN_CLASSES_LIST:
 			item_class = DEFAULT_CLASS
 
 	# Step 2: Year
