@@ -52,6 +52,9 @@ FILE_DB_CURRENT = 'index_%s' % KEY_CURRENT # stage 1
 FILE_DB_JOURNAL = 'index_%s' % KEY_JOURNAL # stage 2
 FILE_DB_MASTER = 'index_%s' % KEY_MASTER # stage 3
 
+FIMENAME_MAXLENGTH_INT = 255 # EXT4 & NTFS
+FILENAME_SHORTLENGTH_INT = 80 # For logging ...
+
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # ENTRY STATUS
@@ -76,6 +79,7 @@ REPORT_MAX_LINES = 1000
 # USER I/O
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+DELIMITER_FILENAME_BLOCK = '_'
 DELIMITER_USERINPUT_BLOCK = '#'
 DELIMITER_USERINPUT_SERIES = '~'
 
@@ -103,7 +107,7 @@ KEY_AUTHOR_FIRST = 'author_first'
 KEY_AUTHORS_DICT = 'authors_dict'
 KEY_CLASS = 'class'
 KEY_EDITORS_DICT = 'editors_dict'
-KEY_EDITORS_LIST = 'editors_list'
+# KEY_EDITORS_LIST = 'editors_list'
 KEY_ETAL_BOOL = 'etal'
 # KEY_EXTENSION = 'extension'
 # KEY_FILENAME = 'filename'
@@ -146,6 +150,8 @@ MATTER_LIST = ['plate', 'frontmatter', 'backmatter']
 
 ANNOTATION_LIST = ['OCR', 'WATERMARKED-DO-NOT-DISTRIBUTE', 'PREPRINT', 'SM', 'SM-PREPRINT']
 
+TITLE_LENGTH_MIN_INT = 12
+
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # MESSAGES
@@ -159,6 +165,7 @@ MSG_DEBUG_UNEXPECTEDANNOTATION = 'Unexpected annotation'
 MSG_DEBUG_UNKNOWNCLASS = 'Unknown class'
 MSG_DEBUG_UNKNOWNEXTENSION = 'Unknown extension'
 MSG_DEBUG_UNKNWNSERIES = 'Unknown series'
+MSG_DEBUG_YEARNAN = 'Year not a number'
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

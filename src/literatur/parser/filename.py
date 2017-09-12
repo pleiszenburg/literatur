@@ -32,6 +32,7 @@ from collections import OrderedDict
 
 from .lib import (
 	get_book_from_bookid,
+	get_default_metaentry_dict,
 	string_to_authors_dict,
 	string_to_keywords_list
 	)
@@ -39,12 +40,14 @@ from .string import clean_str
 
 from ..const import (
 	ANNOTATION_LIST,
-	DEFAULT_TITLE,
+	DELIMITER_FILENAME_BLOCK,
+	FIMENAME_MAXLENGTH_INT,
+	FILENAME_SHORTLENGTH_INT,
 	KEY_ANNOTATION,
 	KEY_AUTHORS_DICT,
 	KEY_AUTHOR_FIRST,
 	KEY_CLASS,
-	KEY_EDITORS_LIST,
+	KEY_EDITORS_DICT,
 	KEY_ETAL_BOOL,
 	KEY_KEYWORDS_LIST,
 	KEY_MATTER_BOOL,
@@ -63,9 +66,12 @@ from ..const import (
 	MSG_DEBUG_UNEXPECTEDANNOTATION,
 	MSG_DEBUG_UNKNOWNCLASS,
 	MSG_DEBUG_UNKNOWNEXTENSION,
-	MSG_DEBUG_UNKNWNSERIES
+	MSG_DEBUG_UNKNWNSERIES,
+	MSG_DEBUG_YEARNAN,
+	TITLE_LENGTH_MIN_INT
 	)
 from ..filetypes import KNOWN_EXTENSIONS_LIST
+from ..repo import get_series_dict
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -74,107 +80,92 @@ from ..filetypes import KNOWN_EXTENSIONS_LIST
 
 def filename_str_to_metaentry_dict(filename_str):
 
-	def debug_msg(filename_long_str, msg_list, msg_type_str, msg_str):
-		msg_list.append('%s: %s (%s)\n' % (
-			msg_type_str, msg_str, __short_filename_str_for_log__(filename_long_str)
-			))
-
-	cnt_n = '\n'
-
-	# Debug messages
+	# Short filename for debugging
+	filename_short_str = __short_filename_str_for_log__(filename_str)
+	# Debug messages list
 	item_msg = []
 
+	def debug_msg(msg_type_str, msg_str):
+		item_msg.append('%s: %s (%s)\n' % (
+			msg_type_str, msg_str, filename_short_str
+			))
+
+	# New meta entry
+	metaentry_dict = get_default_metaentry_dict()
+
 	# Check length filename
-	if len(filename_str) > lit_filename_maxlength:
-		debug_msg(item_msg, MSG_DEBUG_FILENAMETOOLONG, filename_str)
+	if len(filename_str) > FIMENAME_MAXLENGTH_INT:
+		debug_msg(MSG_DEBUG_FILENAMETOOLONG, filename_str)
+	# Split filename and extention if possible
+	extention_str, filename_clean_str = __extract_extension_from_filename_str__(filename_str)
+	# Check extention
+	if extention_str == '':
+		debug_msg(MSG_DEBUG_UNKNOWNEXTENSION, '?')
 
-	# Split filename and extention
-	item_fileformat, filename_str_clean = __extract_extension_from_filename_str__(filename_str)
-	if item_fileformat == '':
-		debug_msg(filename_str, item_msg, MSG_DEBUG_UNKNOWNEXTENSION, '?')
-
-	# Breake file name into items
-	items = filename_str_clean.split('_')
+	# Break file name into items
+	items = filename_clean_str.split(DELIMITER_FILENAME_BLOCK)
 
 	# 1st item: Class
-	item_class = items[0]
-	if item_class not in KNOWN_CLASSES_LIST:
-		debug_msg(filename_str, item_msg, MSG_DEBUG_UNKNOWNCLASS, item_class)
+	metaentry_dict[KEY_CLASS] = items[0]
+	if metaentry_dict[KEY_CLASS] not in KNOWN_CLASSES_LIST:
+		debug_msg(MSG_DEBUG_UNKNOWNCLASS, metaentry_dict[KEY_CLASS])
 
 	# 2nd item: Year, series, section
 	items_block = items[1].split('.')
-	item_year = items_block[0]
+	if items_block[0].isdigit():
+		metaentry_dict[KEY_YEAR] = int(items_block[0])
+	else:
+		debug_msg(MSG_DEBUG_YEARNAN, items_block[0])
 	if len(items_block) > 1:
-		item_bookid = items_block[1]
-		item_book, item_editors, item_type = get_book_from_bookid(item_year, item_bookid)
-		if item_bookid not in list(lit_book_ids.keys()):
-			debug_msg(filename_str, item_msg, MSG_DEBUG_UNKNWNSERIES, item_bookid)
-	else:
-		item_bookid = ''
-		item_book = ''
-		item_type = ''
-		item_editors = OrderedDict()
+		metaentry_dict[KEY_SERIES_ID] = items_block[1]
+		(
+			metaentry_dict[KEY_SERIES_NAME],
+			metaentry_dict[KEY_EDITORS_DICT],
+			metaentry_dict[KEY_SERIES_TYPE]
+			) = get_book_from_bookid(metaentry_dict[KEY_YEAR], metaentry_dict[KEY_SERIES_ID])
+		if metaentry_dict[KEY_SERIES_ID] not in list(get_series_dict().keys()):
+			debug_msg(MSG_DEBUG_UNKNWNSERIES, metaentry_dict[KEY_SERIES_ID])
 	if len(items_block) > 2:
-		item_section = items_block[2].replace('-', '.')
-	else:
-		item_section = ''
+		metaentry_dict[KEY_SERIES_SECTION] = items_block[2].replace('-', '.')
 
 	# 3rd item: Authors
-	item_first, item_names, item_etal = string_to_authors_dict(items[2])
+	(
+		metaentry_dict[KEY_AUTHOR_FIRST],
+		metaentry_dict[KEY_AUTHORS_DICT],
+		metaentry_dict[KEY_ETAL_BOOL]
+		) = string_to_authors_dict(items[2])
 
 	# 4th item: Title
 	if len(items) > 3:
-		item_title = items[3].replace('-', ' ')
-		item_keywords = string_to_keywords_list(item_title)
-		if len(item_title) < 12 and item_title.split(' ')[0] not in MATTER_LIST:
-			debug_msg(filename_str, item_msg, MSG_DEBUG_SHORTTITLE, item_title)
-	else:
-		debug_msg(filename_str, item_msg, MSG_DEBUG_NOTITLE, '?')
-		item_title = DEFAULT_TITLE
-		item_keywords = []
+		metaentry_dict[KEY_TITLE] = items[3].replace('-', ' ')
+		metaentry_dict[KEY_KEYWORDS_LIST] = string_to_keywords_list(metaentry_dict[KEY_TITLE])
+		if (
+			len(metaentry_dict[KEY_TITLE]) < TITLE_LENGTH_MIN_INT
+			) and (
+			metaentry_dict[KEY_TITLE].split(' ')[0] not in MATTER_LIST
+			):
+			debug_msg(MSG_DEBUG_SHORTTITLE, metaentry_dict[KEY_TITLE])
 	# Handle special titles, frontmatters etc
-	if item_title.split(' ')[0] in MATTER_LIST:
-		item_flag_sp = True
-	else:
-		item_flag_sp = False
+	metaentry_dict[KEY_MATTER_BOOL] = metaentry_dict[KEY_TITLE].split(' ')[0] in MATTER_LIST
+	if metaentry_dict[KEY_MATTER_BOOL]:
+		debug_msg(MSG_DEBUG_RESERVEDTITLE, metaentry_dict[KEY_TITLE])
 
-	# Deal with special files, frontmatters etc - TODO remove this section eventually
-	if items[2].split('-')[0] in MATTER_LIST:
-		item_title = '[' + items[2].replace('-', ' ') + ']'
-		debug_msg(filename_str, item_msg, MSG_DEBUG_RESERVEDTITLE, item_title)
-		# item_flag_sp = True
-	# else:
-		# item_flag_sp = False
+	# # Deal with special files, frontmatters etc - TODO remove this section eventually
+	# if items[2].split('-')[0] in MATTER_LIST:
+	# 	item_title = '[' + items[2].replace('-', ' ') + ']'
+	# 	debug_msg(filename_str, item_msg, MSG_DEBUG_RESERVEDTITLE, item_title)
+	# 	# item_flag_sp = True
+	# # else:
+	# 	# item_flag_sp = False
 
 	# 5th item: Annotations (optional)
 	if len(items) > 4:
-		item_ann = items[4]
-		if len(items) > 5:
-			item_ann_d = items[5:]
-			for zz in item_ann_d:
-				item_ann += ' ' + zz
-		if item_ann not in ANNOTATION_LIST:
-			debug_msg(filename_str, item_msg, MSG_DEBUG_UNEXPECTEDANNOTATION, item_ann)
-	else:
-		item_ann = ''
+		metaentry_dict[KEY_ANNOTATION] = ' '.join(items[4:])
+		if metaentry_dict[KEY_ANNOTATION] not in ANNOTATION_LIST:
+			debug_msg(MSG_DEBUG_UNEXPECTEDANNOTATION, metaentry_dict[KEY_ANNOTATION])
 
 	# Build object
-	return {
-		KEY_ANNOTATION: item_ann,
-		KEY_AUTHOR_FIRST: item_first,
-		KEY_AUTHORS_DICT: item_names,
-		KEY_CLASS: item_class,
-		KEY_EDITORS_LIST: item_editors,
-		KEY_ETAL_BOOL: item_etal,
-		KEY_KEYWORDS_LIST: item_keywords,
-		KEY_MATTER_BOOL: item_flag_sp,
-		KEY_SERIES_ID: item_bookid,
-		KEY_SERIES_NAME: item_book,
-		KEY_SERIES_SECTION: item_section,
-		KEY_SERIES_TYPE: item_type,
-		KEY_TITLE: item_title,
-		KEY_YEAR: item_year
-		}, ''.join(item_msg).strip(' \n\t')
+	return metaentry_dict, ''.join(item_msg).strip(' \n\t')
 
 
 def metaentry_dict_to_filename_str(lwObject):
@@ -237,11 +228,9 @@ def __extract_extension_from_filename_str__(filename_str):
 
 def __short_filename_str_for_log__(filename_str):
 
-	len_cut = 80
-
-	if len(filename_str) > len_cut:
+	if len(filename_str) > FILENAME_SHORTLENGTH_INT:
 		ext, name = __extract_extension_from_filename_str__(filename_str)
-		short_name = name[:(len_cut - 10)] + '...' + name[-6:]
+		short_name = name[:(FILENAME_SHORTLENGTH_INT - 10)] + '...' + name[-6:]
 		if ext != '':
 			short_name += '.' + ext
 		return short_name

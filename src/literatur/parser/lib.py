@@ -31,7 +31,28 @@ specific language governing rights and limitations under the License.
 from collections import OrderedDict
 import string
 
-from ..const import AUTHORS_EXCLUDE_LIST
+from ..const import (
+	AUTHORS_EXCLUDE_LIST,
+	DEFAULT_ANNOTATION,
+	DEFAULT_AUTHOR,
+	DEFAULT_CLASS,
+	DEFAULT_TITLE,
+	DEFAULT_YEAR,
+	KEY_ANNOTATION,
+	KEY_AUTHORS_DICT,
+	KEY_AUTHOR_FIRST,
+	KEY_CLASS,
+	KEY_EDITORS_LIST,
+	KEY_ETAL_BOOL,
+	KEY_KEYWORDS_LIST,
+	KEY_MATTER_BOOL,
+	KEY_SERIES_ID,
+	KEY_SERIES_NAME,
+	KEY_SERIES_SECTION,
+	KEY_SERIES_TYPE,
+	KEY_TITLE,
+	KEY_YEAR
+	)
 from ..repo import get_series_dict
 
 
@@ -63,6 +84,28 @@ EXCLUDE_WORDS_LIST = ['advanced', 'advances', 'analyses', 'analysis', 'annual', 
 # ROUTINES
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+def get_default_metaentry_dict():
+
+	first_author_str, authors_dict, authors_etal_bool = string_to_authors_dict(DEFAULT_AUTHOR)
+
+	return {
+		KEY_ANNOTATION: DEFAULT_ANNOTATION,
+		KEY_AUTHOR_FIRST: first_author_str,
+		KEY_AUTHORS_DICT: authors_dict,
+		KEY_CLASS: DEFAULT_CLASS,
+		KEY_EDITORS_DICT: OrderedDict(),
+		KEY_ETAL_BOOL: authors_etal_bool,
+		KEY_KEYWORDS_LIST: [],
+		KEY_MATTER_BOOL: False,
+		KEY_SERIES_ID: '',
+		KEY_SERIES_NAME: '',
+		KEY_SERIES_SECTION: '',
+		KEY_SERIES_TYPE: '',
+		KEY_TITLE: DEFAULT_TITLE,
+		KEY_YEAR: DEFAULT_YEAR
+		}
+
+
 def get_book_from_bookid(year, bookid):
 
 	item_book = ''
@@ -88,8 +131,8 @@ def string_to_authors_dict(authors):
 	temp_author = ''
 	temp_author_k = ''
 	flag_first = False
-	first_author = ''
-	authors_etal = False
+	first_author_str = ''
+	authors_etal_bool = False
 
 	for jj in temp_list:
 		if (jj not in AUTHORS_EXCLUDE_LIST) and (not jj.isdigit()) and (len(jj) > 0):
@@ -103,14 +146,14 @@ def string_to_authors_dict(authors):
 				jj_id = jj + temp_author_k + '_' + str(id_count)
 				authors_dict.update({jj_id:(temp_author + jj)})
 				if not flag_first:
-					first_author = jj_id
+					first_author_str = jj_id
 					flag_first = True
 				temp_author = ''
 				temp_author_k = ''
 		if jj == lit_authors_etal:
-			authors_etal = True
+			authors_etal_bool = True
 
-	return first_author, authors_dict, authors_etal
+	return first_author_str, authors_dict, authors_etal_bool
 
 
 def string_to_keywords_list(in_str):
