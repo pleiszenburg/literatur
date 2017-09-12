@@ -30,19 +30,16 @@ specific language governing rights and limitations under the License.
 
 from .lib import (
 	get_book_from_bookid,
+	get_default_metaentry_dict,
 	string_to_authors_dict
 	)
 from .string import clean_str
 
 from ..const import (
 	AUTHORS_ETAL,
-	DEFAULT_ANNOTATION,
-	DEFAULT_AUTHOR,
-	DEFAULT_CLASS,
-	DEFAULT_TITLE,
-	DEFAULT_YEAR,
 	DEFAULT_YEAR_MAX,
 	DEFAULT_YEAR_MIN,
+	DELIMITER_FILENAME_SECTION,
 	DELIMITER_USERINPUT_BLOCK,
 	DELIMITER_USERINPUT_SERIES,
 	KEY_ANNOTATION,
@@ -80,7 +77,7 @@ def metaentry_dict_to_userinput_str(metaentry_dict):
 		if metaentry_dict[KEY_SERIES_SECTION] != '':
 			userinput_list += [
 				' ', DELIMITER_USERINPUT_SERIES,
-				' ', metaentry_dict[KEY_SERIES_SECTION].replace('.', ' ')
+				' ', ' '.join(metaentry_dict[KEY_SERIES_SECTION])
 				]
 	userinput_list += [cnt_n, DELIMITER_USERINPUT_BLOCK, cnt_n]
 	for author_key in list(metaentry_dict[KEY_AUTHORS_DICT].keys()):
@@ -113,74 +110,57 @@ def metaentry_dict_to_userinput_str(metaentry_dict):
 
 def userinput_str_to_metaentry_dict(userinput_str):
 
+	metaentry_dict = get_default_metaentry_dict()
 	fragments_list = userinput_str.split(DELIMITER_USERINPUT_BLOCK)
 
 	# Step 1: Class
-	item_class = DEFAULT_CLASS
 	if len(fragments_list) > 0:
 		item_class = clean_str(fragments_list[0]).upper().replace(' ', '-')
-		if item_class not in KNOWN_CLASSES_LIST:
-			item_class = DEFAULT_CLASS
+		if item_class in KNOWN_CLASSES_LIST:
+			metaentry_dict[KEY_CLASS] = item_class
 
-	# Step 2: Year
-	item_year = str(DEFAULT_YEAR)
-	item_bookid = ''
-	item_book = ''
-	item_editors = ''
-	item_type = ''
-	item_section = ''
+	# Step 2: Year & series
 	if len(fragments_list) > 1:
-		item_year_f = clean_str(fragments_list[1])
-		if len(item_year_f) > 3:
+		item_year_str = clean_str(fragments_list[1])
+		if len(item_year_str) > 3:
 			# Is year a number? Go back to default if not
-			if item_year_f[:4].isdigit():
-				item_year = item_year_f[:4]
+			if item_year_str[:4].isdigit():
+				item_year_int = int(item_year_str[:4])
 				# Check for unrealistic years
-				if int(item_year) > DEFAULT_YEAR_MAX or int(item_year) < DEFAULT_YEAR_MIN:
-					item_year = str(DEFAULT_YEAR)
+				if item_year_int <= DEFAULT_YEAR_MAX and item_year_int >= DEFAULT_YEAR_MIN:
+					metaentry_dict[KEY_YEAR] = item_year_int
 				# Fetch series etc
-				if len(item_year_f) > 4:
-					item_book_s = item_year_f[4:].split(DELIMITER_USERINPUT_SERIES)
-					item_bookid = item_book_s[0].strip(' ').replace(' ', '-')
-					item_book, item_editors, item_type = get_book_from_bookid(item_year, item_bookid)
+				if len(item_year_str) > 4:
+					item_book_s = item_year_str[4:].split(DELIMITER_USERINPUT_SERIES)
+					metaentry_dict[KEY_SERIES_ID] = item_book_s[0].strip(' ').replace(' ', DELIMITER_FILENAME_SUB)
+					(
+						metaentry_dict[KEY_SERIES_NAME],
+						metaentry_dict[KEY_EDITORS_DICT],
+						metaentry_dict[KEY_SERIES_TYPE]
+						) = get_book_from_bookid(item_year_int, metaentry_dict[KEY_SERIES_ID])
 					if len(item_book_s) > 1:
-						item_section = item_book_s[1].strip(' ')
+						metaentry_dict[KEY_SERIES_SECTION] = item_book_s[1].strip(' ').split(' ')
 
 	# Step 3: Authors
-	item_authors_d = DEFAULT_AUTHOR
 	if len(fragments_list) > 2:
-		item_authors_d = clean_str(fragments_list[2])
-		if len(item_authors_d) == 0:
-			item_authors_d = DEFAULT_AUTHOR
-	# Generate author dictionary
-	item_first, item_authors_dict, item_etal = string_to_authors_dict(item_authors_d.replace(' ', '-'))
+		item_authors_str = clean_str(fragments_list[2]).replace(' ', '-')
+		if len(item_authors_str) > 0:
+			(
+				metaentry_dict[KEY_AUTHOR_FIRST],
+				metaentry_dict[KEY_AUTHORS_DICT],
+				metaentry_dict[KEY_ETAL_BOOL]
+				) = string_to_authors_dict(item_authors_d)
 
 	# Step 4: Title
-	item_title_d = DEFAULT_TITLE
 	if len(fragments_list) > 3:
-		item_title_d = clean_str(fragments_list[3])
-		if len(item_title_d) == 0:
-			item_title_d = DEFAULT_TITLE
+		item_title_str = clean_str(fragments_list[3])
+		if len(item_title_str) > 0:
+			metaentry_dict[KEY_TITLE] = item_title_str
 
 	# Step 5: Annotation
-	item_ann_d = DEFAULT_ANNOTATION
 	if len(fragments_list) > 4:
-		item_ann_d = clean_str(fragments_list[4])
-		if len(item_ann_d) == 0:
-			item_ann_d = DEFAULT_ANNOTATION
+		item_ann_str = clean_str(fragments_list[4])
+		if len(item_ann_str) > 0:
+			metaentry_dict[KEY_ANNOTATION] = item_ann_str
 
-	# Build and object
-	return {
-		KEY_ANNOTATION: item_ann_d,
-		KEY_AUTHOR_FIRST: item_first,
-		KEY_AUTHORS_DICT: item_authors_dict,
-		KEY_CLASS: item_class,
-		KEY_EDITORS_LIST: item_editors,
-		KEY_ETAL_BOOL: item_etal,
-		KEY_SERIES_ID: item_bookid,
-		KEY_SERIES_NAME: item_book,
-		KEY_SERIES_TYPE: item_type,
-		KEY_SERIES_SECTION: item_section,
-		KEY_TITLE: item_title_d,
-		KEY_YEAR: item_year
-		}
+	return metaentry_dict
