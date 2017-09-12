@@ -41,6 +41,25 @@ from ..const import (
 # ROUTINES
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+def get_file_list(in_path):
+
+	out_list = []
+
+	# List all files in folder
+	ls_list = os.listdir(in_path)
+
+	# Clean list
+	for item in ls_list:
+		if os.path.isfile(os.path.join(in_path, item)):
+			if item not in IGNORE_FILE_LIST:
+				out_list.append(item)
+
+	# Sort them all
+	out_list.sort()
+
+	return out_list
+
+
 def get_recursive_filepathtuple_list(in_path):
 
 	filepathtuple_list = []

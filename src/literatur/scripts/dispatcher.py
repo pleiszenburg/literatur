@@ -61,7 +61,7 @@ def entry():
 		'duplicates': (script_duplicates, tuple()),
 		'meta': (script_metainfo, tuple()),
 		'stats': (script_stats, tuple()),
-		'rename': (script_ui_filerename, tuple(sys.argv,))
+		'rename': (script_ui_filerename, (sys.argv,))
 		}
 
 	parser = argparse.ArgumentParser(

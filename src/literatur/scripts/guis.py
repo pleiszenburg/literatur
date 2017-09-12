@@ -40,7 +40,7 @@ from .ui_filerename import ui_filerename_class
 # RUN GUI / APP
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-def script_ui_filerename(sys_argv = []):
+def script_ui_filerename(sys_argv = ['']):
 
 	app = QtWidgets.QApplication(sys_argv)
 	app_mainwindow = ui_filerename_class()

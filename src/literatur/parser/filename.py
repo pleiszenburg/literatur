@@ -197,7 +197,8 @@ def metaentry_dict_to_filename_str(metaentry_dict):
 	# Get authors
 	author_str = authors_dict_to_string(
 		metaentry_dict[KEY_AUTHORS_DICT],
-		max_length_int = FIMENAME_MAXLENGTH_INT - len(left_str) + len(right_str)
+		max_length_int = FIMENAME_MAXLENGTH_INT - len(left_str) + len(right_str),
+		etal_input_bool = metaentry_dict[KEY_ETAL_BOOL]
 		)
 
 	return left_str + author_str + right_str

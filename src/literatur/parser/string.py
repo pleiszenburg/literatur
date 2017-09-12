@@ -59,10 +59,10 @@ def clean_str(in_str):
 		out_str = out_str.replace(ii, '')
 
 	# Finally spaces become dashes and vice versa
-	lString = lString.replace(" ", "-")
-	lString = lString.replace("-", " ")
+	out_str = out_str.replace(" ", "-")
+	out_str = out_str.replace("-", " ")
 
 	# Remove multiple space
-	lString = ' '.join(lString.split())
+	out_str = ' '.join(out_str.split())
 
 	return out_str

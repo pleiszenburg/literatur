@@ -47,7 +47,6 @@ from ..const import (
 	KEY_AUTHORS_DICT,
 	KEY_CLASS,
 	KEY_EDITORS_DICT,
-	KEY_EDITORS_LIST,
 	KEY_ETAL_BOOL,
 	KEY_SERIES_ID,
 	KEY_SERIES_NAME,
@@ -77,7 +76,7 @@ def metaentry_dict_to_userinput_str(metaentry_dict):
 	userinput_list = [
 		metaentry_dict[KEY_CLASS], cnt_n,
 		DELIMITER_USERINPUT_BLOCK, cnt_n,
-		metaentry_dict[KEY_YEAR]
+		str(metaentry_dict[KEY_YEAR])
 		]
 	if metaentry_dict[KEY_SERIES_ID] != '':
 		userinput_list += [' ', metaentry_dict[KEY_SERIES_ID]]
@@ -145,7 +144,7 @@ def userinput_str_to_metaentry_dict(userinput_str):
 				metaentry_dict[KEY_AUTHOR_FIRST],
 				metaentry_dict[KEY_AUTHORS_DICT],
 				metaentry_dict[KEY_ETAL_BOOL]
-				) = string_to_authors_dict(item_authors_d)
+				) = string_to_authors_dict(item_authors_str)
 
 	# Step 4: Title
 	if len(fragments_list) > 3:

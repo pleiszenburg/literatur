@@ -49,6 +49,7 @@ from ..parser import (
 	metaentry_dict_to_userinput_str,
 	userinput_str_to_metaentry_dict
 	)
+from ..repo import get_file_list
 from ..ui import ui_filename_dialog_class
 
 
@@ -68,12 +69,12 @@ class ui_filerename_class(QtWidgets.QDialog):
 		self.ui.setupUi(self)
 
 		# Types of documents
-		self.documenttypes = KNOWN_CLASSES_LIST # Fetch from API
+		self.documenttypes = KNOWN_CLASSES_LIST.copy() # Fetch from API
 		self.documenttypes.sort()
 		self.ui.lwTypeCombo.addItems(self.documenttypes)
 
 		# Types of files
-		self.filetypes = filetypes.keys() # Fetch from API
+		self.filetypes = list(filetypes.keys()) # Fetch from API
 		self.filetypes.sort()
 		self.ui.lwFiletypeCombo.addItems(self.filetypes)
 
@@ -112,7 +113,7 @@ class ui_filerename_class(QtWidgets.QDialog):
 	def reloadfilelist(self):
 
 		self.ui.lwFileList.clear()
-		self.ui.lwFileList.addItems(get_dir_list(self.working_path)) # Fetch from API
+		self.ui.lwFileList.addItems(get_file_list(self.working_path)) # Fetch from API
 
 
 	def movefile(self):
@@ -166,7 +167,7 @@ class ui_filerename_class(QtWidgets.QDialog):
 		filename_str = self.ui.lwFileList.currentItem().data(0)
 
 		if follows_filename_convention_guess(filename_str):
-			metaentry_dict = filename_str_to_metaentry_dict(filename_str)
+			metaentry_dict, _ = filename_str_to_metaentry_dict(filename_str)
 			userinput_str = metaentry_dict_to_userinput_str(metaentry_dict)
 		else:
 			userinput_str = get_basic_userinput_str(filename_str)

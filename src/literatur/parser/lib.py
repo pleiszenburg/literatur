@@ -86,10 +86,10 @@ EXCLUDE_WORDS_LIST = ['advanced', 'advances', 'analyses', 'analysis', 'annual', 
 # ROUTINES
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-def authors_dict_to_string(authors_dict, max_length_int = None):
+def authors_dict_to_string(authors_dict, max_length_int = None, etal_input_bool = False):
 
 	max_length_bool = max_length_int is not None
-	authors_list = []
+	author_list = []
 	len_delimiter_int = len(DELIMITER_FILENAME_SUB)
 	len_authors_str_int = 0
 
@@ -111,7 +111,7 @@ def authors_dict_to_string(authors_dict, max_length_int = None):
 			author_list.append(author_tmp_str)
 
 	# ETAL flag from object?
-	if not etal_bool and metaentry_dict[lit_id_flag_etal]:
+	if not etal_bool and etal_input_bool:
 		author_list.append(AUTHORS_ETAL)
 		etal_bool = True
 
