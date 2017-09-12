@@ -161,6 +161,22 @@ def filename_str_to_metaentry_dict(filename_str):
 	return metaentry_dict, ''.join(item_msg).strip(' \n\t')
 
 
+def follows_filename_convention_guess(filename_str):
+	"""
+	Try *quick* guess: Is this a filename following the convention?
+	"""
+
+	items = filename_str.split(DELIMITER_FILENAME_BLOCK)
+
+	if len(items) > 2:
+		if items[0] in KNOWN_CLASSES_LIST:
+			if len(items[1]) > 3:
+				if items[1][:4].isdigit():
+					return True
+
+	return False
+
+
 def metaentry_dict_to_filename_str(metaentry_dict):
 
 	# Left of author block: Class, year, book and section
