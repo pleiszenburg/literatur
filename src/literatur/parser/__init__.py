@@ -23,3 +23,18 @@ specific language governing rights and limitations under the License.
 </LICENSE_BLOCK>
 
 """
+
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# IMPORT
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+from .filename import (
+	filename_str_to_metaentry_dict,
+	follows_filename_convention_guess,
+	metaentry_dict_to_filename_str
+	)
+from .userinput import (
+	get_basic_userinput_str,
+	metaentry_dict_to_userinput_str,
+	userinput_str_to_metaentry_dict
+	)
