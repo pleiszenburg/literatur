@@ -41,6 +41,8 @@ from .string import clean_str
 from ..const import (
 	ANNOTATION_LIST,
 	DELIMITER_FILENAME_BLOCK,
+	DELIMITER_FILENAME_SECTION,
+	DELIMITER_FILENAME_SUB,
 	FIMENAME_MAXLENGTH_INT,
 	FILENAME_SHORTLENGTH_INT,
 	KEY_ANNOTATION,
@@ -70,7 +72,6 @@ from ..const import (
 	MSG_DEBUG_YEARNAN,
 	TITLE_LENGTH_MIN_INT
 	)
-from ..filetypes import KNOWN_EXTENSIONS_LIST
 from ..repo import get_series_dict
 
 
@@ -96,14 +97,9 @@ def filename_str_to_metaentry_dict(filename_str):
 	# Check length filename
 	if len(filename_str) > FIMENAME_MAXLENGTH_INT:
 		debug_msg(MSG_DEBUG_FILENAMETOOLONG, filename_str)
-	# Split filename and extention if possible
-	extention_str, filename_clean_str = __extract_extension_from_filename_str__(filename_str)
-	# Check extention
-	if extention_str == '':
-		debug_msg(MSG_DEBUG_UNKNOWNEXTENSION, '?')
 
 	# Break file name into items
-	items = filename_clean_str.split(DELIMITER_FILENAME_BLOCK)
+	items = filename_str.split(DELIMITER_FILENAME_BLOCK)
 
 	# 1st item: Class
 	metaentry_dict[KEY_CLASS] = items[0]
@@ -111,7 +107,7 @@ def filename_str_to_metaentry_dict(filename_str):
 		debug_msg(MSG_DEBUG_UNKNOWNCLASS, metaentry_dict[KEY_CLASS])
 
 	# 2nd item: Year, series, section
-	items_block = items[1].split('.')
+	items_block = items[1].split(DELIMITER_FILENAME_SECTION)
 	if items_block[0].isdigit():
 		metaentry_dict[KEY_YEAR] = int(items_block[0])
 	else:
@@ -126,7 +122,7 @@ def filename_str_to_metaentry_dict(filename_str):
 		if metaentry_dict[KEY_SERIES_ID] not in list(get_series_dict().keys()):
 			debug_msg(MSG_DEBUG_UNKNWNSERIES, metaentry_dict[KEY_SERIES_ID])
 	if len(items_block) > 2:
-		metaentry_dict[KEY_SERIES_SECTION] = items_block[2].replace('-', '.')
+		metaentry_dict[KEY_SERIES_SECTION] = items_block[2].split(DELIMITER_FILENAME_SUB)
 
 	# 3rd item: Authors
 	(
@@ -137,7 +133,7 @@ def filename_str_to_metaentry_dict(filename_str):
 
 	# 4th item: Title
 	if len(items) > 3:
-		metaentry_dict[KEY_TITLE] = items[3].replace('-', ' ')
+		metaentry_dict[KEY_TITLE] = items[3].replace(DELIMITER_FILENAME_SUB, ' ')
 		metaentry_dict[KEY_KEYWORDS_LIST] = string_to_keywords_list(metaentry_dict[KEY_TITLE])
 		if (
 			len(metaentry_dict[KEY_TITLE]) < TITLE_LENGTH_MIN_INT
@@ -168,24 +164,23 @@ def filename_str_to_metaentry_dict(filename_str):
 	return metaentry_dict, ''.join(item_msg).strip(' \n\t')
 
 
-def metaentry_dict_to_filename_str(lwObject):
+def metaentry_dict_to_filename_str(metaentry_dict):
 
 	# Left of author block: Class, year, book and section
-	lFile_lAuthor = lwObject[lit_id_class] + "_" + lwObject[lit_id_year]
-	if lwObject[lit_id_bookid] != '':
-		lFile_lAuthor += "." + lwObject[lit_id_bookid]
-		if lwObject[lit_id_section] != '':
-			lFile_lAuthor += "." + lwObject[lit_id_section].replace(" ", "-")
-	lFile_lAuthor += "_"
+	left_str = metaentry_dict[KEY_CLASS] + DELIMITER_FILENAME_BLOCK + str(metaentry_dict[KEY_YEAR])
+	if metaentry_dict[KEY_SERIES_ID] != '':
+		left_str += DELIMITER_FILENAME_SECTION + metaentry_dict[KEY_SERIES_ID]
+		if len(metaentry_dict[KEY_SERIES_SECTION]) > 0:
+			left_str += DELIMITER_FILENAME_SECTION + DELIMITER_FILENAME_SUB.join([str(el) for el in metaentry_dict[KEY_SERIES_SECTION]])
+	left_str += DELIMITER_FILENAME_BLOCK
 
 	# Right of author block: Title, annotation, file format
-	lFile_rAuthor = "_" + lwObject[lit_id_title_d].replace(" ", "-")
-	if lwObject[lit_id_ann_d] != '':
-		lFile_rAuthor += "_" + lwObject[lit_id_ann_d].replace(" ", "-")
-	lFile_rAuthor += "." + lwObject[lit_id_fileformat]
+	right_str = DELIMITER_FILENAME_BLOCK + metaentry_dict[KEY_TITLE].replace(' ', DELIMITER_FILENAME_SUB)
+	if metaentry_dict[KEY_ANNOTATION] != '':
+		right_str += DELIMITER_FILENAME_BLOCK + metaentry_dict[KEY_ANNOTATION].replace(' ', DELIMITER_FILENAME_SUB)
 
 	# Length of filename without author block
-	lFile_len = len(lFile_lAuthor) + len(lFile_rAuthor)
+	lFile_len = len(left_str) + len(right_str)
 	# Length of author block
 	lFile_author_len = 0
 	# Empty author string
@@ -193,8 +188,8 @@ def metaentry_dict_to_filename_str(lwObject):
 
 	# Iterate over authors
 	check_etal = False
-	for uu in list(lwObject[lit_id_authors].keys()):
-		uu_temp = lwObject[lit_id_authors][uu].replace(" ", "-") + "-"
+	for uu in list(metaentry_dict[lit_id_authors].keys()):
+		uu_temp = metaentry_dict[lit_id_authors][uu].replace(" ", "-") + "-"
 		if (lFile_len + lFile_author_len + len(uu_temp) + len(lit_authors_etal)) <= lit_filename_maxlength:
 			lFile_author_len += len(uu_temp)
 			lFile_Author += uu_temp
@@ -204,35 +199,21 @@ def metaentry_dict_to_filename_str(lwObject):
 			check_etal = True
 			break
 	# ETAL flag from object?
-	if not check_etal and lwObject[lit_id_flag_etal]:
+	if not check_etal and metaentry_dict[lit_id_flag_etal]:
 		lFile_author_len += len(lit_authors_etal)
 		lFile_Author += lit_authors_etal
 		check_etal = True
 
 	lFile_Author = lFile_Author.strip('-')
 
-	lFile = lFile_lAuthor + lFile_Author + lFile_rAuthor
+	filename_str = left_str + lFile_Author + right_str
 
-	return lFile
-
-
-def __extract_extension_from_filename_str__(filename_str):
-
-	# Check for known file formats
-	for ext in KNOWN_EXTENSIONS_LIST:
-		if filename_str.endswith(ext) or filename_str.endswith(ext.upper()):
-			return ext, filename_str[:-(len(ext) + 1)]
-
-	return '', filename_str
+	return filename_str
 
 
 def __short_filename_str_for_log__(filename_str):
 
 	if len(filename_str) > FILENAME_SHORTLENGTH_INT:
-		ext, name = __extract_extension_from_filename_str__(filename_str)
-		short_name = name[:(FILENAME_SHORTLENGTH_INT - 10)] + '...' + name[-6:]
-		if ext != '':
-			short_name += '.' + ext
-		return short_name
+		return filename_str[:(FILENAME_SHORTLENGTH_INT - 10)] + '...' + filename_str[-6:]
 	else:
 		return filename_str

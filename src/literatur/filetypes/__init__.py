@@ -29,6 +29,7 @@ specific language governing rights and limitations under the License.
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 from .__typeinfo__ import (
+	get_extension_from_filename,
 	get_literatur_type_from_filename,
 	get_literatur_type_from_magicinfo,
 	get_magicinfo,

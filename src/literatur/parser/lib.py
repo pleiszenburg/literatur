@@ -38,6 +38,7 @@ from ..const import (
 	DEFAULT_CLASS,
 	DEFAULT_TITLE,
 	DEFAULT_YEAR,
+	DELIMITER_FILENAME_SUB,
 	KEY_ANNOTATION,
 	KEY_AUTHORS_DICT,
 	KEY_AUTHOR_FIRST,
@@ -99,7 +100,7 @@ def get_default_metaentry_dict():
 		KEY_MATTER_BOOL: False,
 		KEY_SERIES_ID: '',
 		KEY_SERIES_NAME: '',
-		KEY_SERIES_SECTION: '',
+		KEY_SERIES_SECTION: [],
 		KEY_SERIES_TYPE: '',
 		KEY_TITLE: DEFAULT_TITLE,
 		KEY_YEAR: DEFAULT_YEAR
@@ -125,7 +126,7 @@ def get_book_from_bookid(year, bookid):
 
 def string_to_authors_dict(authors):
 
-	temp_list = authors.replace('-', ' ').split(' ')
+	temp_list = authors.split(DELIMITER_FILENAME_SUB)
 
 	authors_dict = OrderedDict()
 	temp_author = ''
@@ -162,7 +163,7 @@ def string_to_keywords_list(in_str):
 	"""
 
 	alphabet_lowercase_list = list(string.ascii_lowercase)
-	word_list = in_str.replace('-', ' ').lower().split(' ')
+	word_list = in_str.lower().split(DELIMITER_FILENAME_SUB)
 	keywords_list = []
 
 	for word in word_list:

@@ -41,7 +41,6 @@ from ..const import (
 	DEFAULT_ANNOTATION,
 	DEFAULT_AUTHOR,
 	DEFAULT_CLASS,
-	DEFAULT_EXTENSION,
 	DEFAULT_TITLE,
 	DEFAULT_YEAR,
 	DEFAULT_YEAR_MAX,
@@ -55,7 +54,6 @@ from ..const import (
 	KEY_EDITORS_DICT,
 	KEY_EDITORS_LIST,
 	KEY_ETAL_BOOL,
-	KEY_EXTENSION,
 	KEY_SERIES_ID,
 	KEY_SERIES_NAME,
 	KEY_SERIES_SECTION,
@@ -98,15 +96,11 @@ def metaentry_dict_to_userinput_str(metaentry_dict):
 	userinput_list.append(cnt_n)
 	userinput_list.append(metaentry_dict[KEY_TITLE])
 	userinput_list.append(cnt_n)
-	userinput_list.append(DELIMITER_USERINPUT_BLOCK)
-	userinput_list.append(cnt_n)
 	if metaentry_dict[KEY_ANNOTATION] != '':
+		userinput_list.append(DELIMITER_USERINPUT_BLOCK)
+		userinput_list.append(cnt_n)
 		userinput_list.append(metaentry_dict[KEY_ANNOTATION])
-	userinput_list.append(cnt_n)
-	userinput_list.append(DELIMITER_USERINPUT_BLOCK)
-	userinput_list.append(cnt_n)
-	userinput_list.append(metaentry_dict[KEY_EXTENSION].lower())
-	userinput_list.append(cnt_n)
+		userinput_list.append(cnt_n)
 
 	userinput_str = ''.join(userinput_list)
 
@@ -182,14 +176,6 @@ def userinput_str_to_metaentry_dict(userinput_str):
 		if len(item_ann_d) == 0:
 			item_ann_d = DEFAULT_ANNOTATION
 
-	# Step 6: File format
-	item_fileformat = DEFAULT_EXTENSION
-	if len(fragments_list) > 5:
-		item_fileformat = fragments_list[5].replace('.', ' ')
-		item_fileformat = clean_str(item_fileformat).replace(' ', '.').lower()
-		if item_fileformat not in KNOWN_EXTENSIONS_LIST:
-			item_fileformat = DEFAULT_EXTENSION
-
 	# Build and object
 	return {
 		KEY_ANNOTATION: item_ann_d,
@@ -198,7 +184,6 @@ def userinput_str_to_metaentry_dict(userinput_str):
 		KEY_CLASS: item_class,
 		KEY_EDITORS_LIST: item_editors,
 		KEY_ETAL_BOOL: item_etal,
-		KEY_EXTENSION: item_fileformat,
 		KEY_SERIES_ID: item_bookid,
 		KEY_SERIES_NAME: item_book,
 		KEY_SERIES_TYPE: item_type,

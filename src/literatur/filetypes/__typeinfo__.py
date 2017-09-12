@@ -46,16 +46,26 @@ filetypes = __get_file_types__()
 # ROUTINES
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-def get_literatur_type_from_filename(filename):
+def get_extension_from_filename(filename_str):
 
-	return get_literatur_type_from_magicinfo(get_magicinfo(('', filename)))
+	# Check for known file formats
+	for ext in filetypes.keys():
+		if filename_str.endswith(ext) or filename_str.endswith(ext.upper()):
+			return ext, filename_str[:-(len(ext) + 1)]
+
+	return None, filename_str
 
 
-def get_literatur_type_from_magicinfo(magic_info):
+def get_literatur_type_from_filename(filename_str):
+
+	return get_literatur_type_from_magicinfo(get_magicinfo(('', filename_str)))
+
+
+def get_literatur_type_from_magicinfo(magic_info_str):
 
 	# Test magic info through all plugins, return true if one reports a match
 	for filetype in filetypes.keys():
-		if filetypes[filetype].test_magic_info(magic_info):
+		if filetypes[filetype].test_magic_info(magic_info_str):
 			return filetype
 
 	return None
