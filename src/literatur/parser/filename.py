@@ -164,17 +164,19 @@ def filename_str_to_metaentry_dict(filename_str):
 def metaentry_dict_to_filename_str(metaentry_dict):
 
 	# Left of author block: Class, year, book and section
-	left_str = metaentry_dict[KEY_CLASS] + DELIMITER_FILENAME_BLOCK + str(metaentry_dict[KEY_YEAR])
+	left_list = [metaentry_dict[KEY_CLASS], DELIMITER_FILENAME_BLOCK, str(metaentry_dict[KEY_YEAR])]
 	if metaentry_dict[KEY_SERIES_ID] != '':
-		left_str += DELIMITER_FILENAME_SECTION + metaentry_dict[KEY_SERIES_ID]
+		left_list += [DELIMITER_FILENAME_SECTION, metaentry_dict[KEY_SERIES_ID]]
 		if len(metaentry_dict[KEY_SERIES_SECTION]) > 0:
-			left_str += DELIMITER_FILENAME_SECTION + DELIMITER_FILENAME_SUB.join([str(el) for el in metaentry_dict[KEY_SERIES_SECTION]])
-	left_str += DELIMITER_FILENAME_BLOCK
+			left_list += [DELIMITER_FILENAME_SECTION, DELIMITER_FILENAME_SUB.join([str(el) for el in metaentry_dict[KEY_SERIES_SECTION]])]
+	left_list.append(DELIMITER_FILENAME_BLOCK)
+	left_str = ''.join(left_list)
 
 	# Right of author block: Title, annotation, file format
-	right_str = DELIMITER_FILENAME_BLOCK + metaentry_dict[KEY_TITLE].replace(' ', DELIMITER_FILENAME_SUB)
+	right_list = [DELIMITER_FILENAME_BLOCK, metaentry_dict[KEY_TITLE].replace(' ', DELIMITER_FILENAME_SUB)]
 	if metaentry_dict[KEY_ANNOTATION] != '':
-		right_str += DELIMITER_FILENAME_BLOCK + metaentry_dict[KEY_ANNOTATION].replace(' ', DELIMITER_FILENAME_SUB)
+		right_list += [DELIMITER_FILENAME_BLOCK, metaentry_dict[KEY_ANNOTATION].replace(' ', DELIMITER_FILENAME_SUB)]
+	right_str = ''.join(right_list)
 
 	# Get authors
 	author_str = authors_dict_to_string(
