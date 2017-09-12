@@ -6,7 +6,7 @@ LITERATUR
 Literature management with Python, Dropbox and MediaWiki
 https://github.com/pleiszenburg/literatur
 
-	src/literatur/ui/__init__.py: UI submodule init
+	src/literatur/scripts/guis.py: GUI entry points
 
 	Copyright (C) 2017 Sebastian M. Ernst <ernst@pleiszenburg.de>
 
@@ -24,8 +24,25 @@ specific language governing rights and limitations under the License.
 
 """
 
+
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # IMPORT
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-from .filerename import Ui_lwFileRenameDialog as ui_filename_dialog_class
+import sys
+
+from PyQt5 import QtWidgets
+
+from .ui_filerename import ui_filerename_class
+
+
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# RUN GUI / APP
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+def script_ui_filerename(sys_argv = []):
+
+	app = QtWidgets.QApplication(sys_argv)
+	app_mainwindow = ui_filerename_class()
+	app_mainwindow.show()
+	sys.exit(app.exec_())

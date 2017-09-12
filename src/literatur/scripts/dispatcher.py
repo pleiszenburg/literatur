@@ -32,6 +32,7 @@ import argparse
 import os # TODO remove?
 import sys # TODO remove?
 
+from .guis import script_ui_filerename
 from .lib import (
 	script_init,
 	script_commit,
@@ -59,7 +60,8 @@ def entry():
 		'dump': (script_dump, tuple()),
 		'duplicates': (script_duplicates, tuple()),
 		'meta': (script_metainfo, tuple()),
-		'stats': (script_stats, tuple())
+		'stats': (script_stats, tuple()),
+		'rename': (script_ui_filerename, tuple(sys.argv,))
 		}
 
 	parser = argparse.ArgumentParser(
