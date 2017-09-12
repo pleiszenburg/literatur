@@ -82,7 +82,11 @@ from ..repo import get_series_dict
 def filename_str_to_metaentry_dict(filename_str):
 
 	# Short filename for debugging
-	filename_short_str = __short_filename_str_for_log__(filename_str)
+	if len(filename_str) > FILENAME_SHORTLENGTH_INT:
+		filename_short_str = filename_str[:(FILENAME_SHORTLENGTH_INT - 10)] + '...' + filename_str[-6:]
+	else:
+		filename_short_str = filename_str
+
 	# Debug messages list
 	item_msg = []
 
@@ -209,11 +213,3 @@ def metaentry_dict_to_filename_str(metaentry_dict):
 	filename_str = left_str + lFile_Author + right_str
 
 	return filename_str
-
-
-def __short_filename_str_for_log__(filename_str):
-
-	if len(filename_str) > FILENAME_SHORTLENGTH_INT:
-		return filename_str[:(FILENAME_SHORTLENGTH_INT - 10)] + '...' + filename_str[-6:]
-	else:
-		return filename_str
