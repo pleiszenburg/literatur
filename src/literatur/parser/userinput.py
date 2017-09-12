@@ -34,8 +34,6 @@ from .lib import (
 	)
 from .string import clean_str
 
-from ..filetypes import KNOWN_EXTENSIONS_LIST
-
 from ..const import (
 	AUTHORS_ETAL,
 	DEFAULT_ANNOTATION,
@@ -71,40 +69,35 @@ from ..const import (
 def metaentry_dict_to_userinput_str(metaentry_dict):
 
 	cnt_n = '\n'
-	userinput_list = []
 
-	userinput_list.append(metaentry_dict[KEY_CLASS])
-	userinput_list.append(cnt_n)
-	userinput_list.append(DELIMITER_USERINPUT_BLOCK)
-	userinput_list.append(cnt_n)
-	userinput_list.append(metaentry_dict[KEY_YEAR])
+	userinput_list = [
+		metaentry_dict[KEY_CLASS], cnt_n,
+		DELIMITER_USERINPUT_BLOCK, cnt_n,
+		metaentry_dict[KEY_YEAR]
+		]
 	if metaentry_dict[KEY_SERIES_ID] != '':
-		userinput_list.append(' ' + metaentry_dict[KEY_SERIES_ID])
+		userinput_list += [' ', metaentry_dict[KEY_SERIES_ID]]
 		if metaentry_dict[KEY_SERIES_SECTION] != '':
-			userinput_list.append(
-				' ' + DELIMITER_USERINPUT_SERIES + ' ' + metaentry_dict[KEY_SERIES_SECTION].replace('.', ' ')
-				)
-	userinput_list.append(cnt_n)
-	userinput_list.append(DELIMITER_USERINPUT_BLOCK)
-	userinput_list.append(cnt_n)
+			userinput_list += [
+				' ', DELIMITER_USERINPUT_SERIES,
+				' ', metaentry_dict[KEY_SERIES_SECTION].replace('.', ' ')
+				]
+	userinput_list += [cnt_n, DELIMITER_USERINPUT_BLOCK, cnt_n]
 	for author_key in list(metaentry_dict[KEY_AUTHORS_DICT].keys()):
-		userinput_list.append(metaentry_dict[KEY_AUTHORS_DICT][author_key] + ' ')
+		userinput_list += [metaentry_dict[KEY_AUTHORS_DICT][author_key], ' ']
 	if metaentry_dict[KEY_ETAL_BOOL]:
-		userinput_list.append(AUTHORS_ETAL + ' ')
-	userinput_list.append(cnt_n)
-	userinput_list.append(DELIMITER_USERINPUT_BLOCK)
-	userinput_list.append(cnt_n)
-	userinput_list.append(metaentry_dict[KEY_TITLE])
-	userinput_list.append(cnt_n)
+		userinput_list += [AUTHORS_ETAL + ' ']
+	userinput_list += [
+		cnt_n, DELIMITER_USERINPUT_BLOCK, cnt_n,
+		metaentry_dict[KEY_TITLE], cnt_n
+		]
 	if metaentry_dict[KEY_ANNOTATION] != '':
-		userinput_list.append(DELIMITER_USERINPUT_BLOCK)
-		userinput_list.append(cnt_n)
-		userinput_list.append(metaentry_dict[KEY_ANNOTATION])
-		userinput_list.append(cnt_n)
+		userinput_list += [
+			DELIMITER_USERINPUT_BLOCK, cnt_n,
+			metaentry_dict[KEY_ANNOTATION], cnt_n
+			]
 
-	userinput_str = ''.join(userinput_list)
-
-	return userinput_str
+	return ''.join(userinput_list)
 
 	# userinput_list = []
 	#
