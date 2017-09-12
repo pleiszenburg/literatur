@@ -150,14 +150,6 @@ def filename_str_to_metaentry_dict(filename_str):
 	if metaentry_dict[KEY_MATTER_BOOL]:
 		debug_msg(MSG_DEBUG_RESERVEDTITLE, metaentry_dict[KEY_TITLE])
 
-	# # Deal with special files, frontmatters etc - TODO remove this section eventually
-	# if items[2].split('-')[0] in MATTER_LIST:
-	# 	item_title = '[' + items[2].replace('-', ' ') + ']'
-	# 	debug_msg(filename_str, item_msg, MSG_DEBUG_RESERVEDTITLE, item_title)
-	# 	# item_flag_sp = True
-	# # else:
-	# 	# item_flag_sp = False
-
 	# 5th item: Annotations (optional)
 	if len(items) > 4:
 		metaentry_dict[KEY_ANNOTATION] = ' '.join(items[4:])
