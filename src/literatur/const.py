@@ -105,12 +105,16 @@ KEY_CLASS = 'class'
 KEY_EDITORS_DICT = 'editors_dict'
 KEY_EDITORS_LIST = 'editors_list'
 KEY_ETAL_BOOL = 'etal'
-KEY_EXTENSION = 'extension'
+# KEY_EXTENSION = 'extension'
+# KEY_FILENAME = 'filename'
+KEY_KEYWORDS_LIST = 'keywords'
+KEY_MATTER_BOOL = 'matter'
 KEY_SERIES_ID = 'series_id'
 KEY_SERIES_NAME = 'series_name'
 KEY_SERIES_SECTION = 'series_section'
 KEY_SERIES_TYPE = 'series_type'
 KEY_TITLE = 'title'
+# KEY_URL = 'url'
 KEY_YEAR = 'year'
 
 
@@ -137,6 +141,24 @@ KNOWN_CLASSES_LIST = KNOWN_CLASSES_SP_LIST + [
 	'WEB', 'PROPOSAL', 'DATASHEET', 'SPEECH', 'SPEC',
 	'TUTORIAL', 'STANDARD', 'REVIEW', 'DATA', 'CALL'
 	]
+
+MATTER_LIST = ['plate', 'frontmatter', 'backmatter']
+
+ANNOTATION_LIST = ['OCR', 'WATERMARKED-DO-NOT-DISTRIBUTE', 'PREPRINT', 'SM', 'SM-PREPRINT']
+
+
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# MESSAGES
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+MSG_DEBUG_FILENAMETOOLONG = 'Filename too long'
+MSG_DEBUG_NOTITLE = 'No title'
+MSG_DEBUG_RESERVEDTITLE = 'Reserved special title'
+MSG_DEBUG_SHORTTITLE = 'Short title'
+MSG_DEBUG_UNEXPECTEDANNOTATION = 'Unexpected annotation'
+MSG_DEBUG_UNKNOWNCLASS = 'Unknown class'
+MSG_DEBUG_UNKNOWNEXTENSION = 'Unknown extension'
+MSG_DEBUG_UNKNWNSERIES = 'Unknown series'
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

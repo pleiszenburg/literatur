@@ -28,8 +28,43 @@ specific language governing rights and limitations under the License.
 # IMPORT
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+from collections import OrderedDict
+
+from .lib import (
+	get_book_from_bookid,
+	string_to_authors_dict,
+	string_to_keywords_list
+	)
 from .string import clean_str
 
+from ..const import (
+	ANNOTATION_LIST,
+	DEFAULT_TITLE,
+	KEY_ANNOTATION,
+	KEY_AUTHORS_DICT,
+	KEY_AUTHOR_FIRST,
+	KEY_CLASS,
+	KEY_EDITORS_LIST,
+	KEY_ETAL_BOOL,
+	KEY_KEYWORDS_LIST,
+	KEY_MATTER_BOOL,
+	KEY_SERIES_ID,
+	KEY_SERIES_NAME,
+	KEY_SERIES_SECTION,
+	KEY_SERIES_TYPE,
+	KEY_TITLE,
+	KEY_YEAR,
+	KNOWN_CLASSES_LIST,
+	MATTER_LIST,
+	MSG_DEBUG_FILENAMETOOLONG,
+	MSG_DEBUG_NOTITLE,
+	MSG_DEBUG_RESERVEDTITLE,
+	MSG_DEBUG_SHORTTITLE,
+	MSG_DEBUG_UNEXPECTEDANNOTATION,
+	MSG_DEBUG_UNKNOWNCLASS,
+	MSG_DEBUG_UNKNOWNEXTENSION,
+	MSG_DEBUG_UNKNWNSERIES
+	)
 from ..filetypes import KNOWN_EXTENSIONS_LIST
 
 
@@ -39,43 +74,41 @@ from ..filetypes import KNOWN_EXTENSIONS_LIST
 
 def filename_str_to_metaentry_dict(filename_str):
 
+	def debug_msg(filename_long_str, msg_list, msg_type_str, msg_str):
+		msg_list.append('%s: %s (%s)\n' % (
+			msg_type_str, msg_str, __short_filename_str_for_log__(filename_long_str)
+			))
+
+	cnt_n = '\n'
+
 	# Debug messages
 	item_msg = []
 
 	# Check length filename
 	if len(filename_str) > lit_filename_maxlength:
-		item_msg.append(lw_debug_filenametoolong + ': ' + __short_filename_str_for_log__(filename_str) + cnt_n)
+		debug_msg(item_msg, MSG_DEBUG_FILENAMETOOLONG, filename_str)
 
 	# Split filename and extention
 	item_fileformat, filename_str_clean = __extract_extension_from_filename_str__(filename_str)
 	if item_fileformat == '':
-		item_msg.append(lw_debug_unknownformat + ': ' + __short_filename_str_for_log__(filename_str) + cnt_n)
+		debug_msg(filename_str, item_msg, MSG_DEBUG_UNKNOWNEXTENSION, '?')
 
 	# Breake file name into items
 	items = filename_str_clean.split('_')
 
-	# Set empty hash
-	item_hash = ''
-
-	# Set empty file size
-	item_size = 0
-
-	# Set empty (Dropbox) URL
-	item_url = ''
-
 	# 1st item: Class
 	item_class = items[0]
-	if item_class not in lit_classes:
-		item_msg.append(lw_debug_unknownclass + ': ' + item_class + ' (' + __short_filename_str_for_log__(filename_str) + ')' + cnt_n)
+	if item_class not in KNOWN_CLASSES_LIST:
+		debug_msg(filename_str, item_msg, MSG_DEBUG_UNKNOWNCLASS, item_class)
 
 	# 2nd item: Year, series, section
 	items_block = items[1].split('.')
 	item_year = items_block[0]
 	if len(items_block) > 1:
 		item_bookid = items_block[1]
-		item_book, item_editors, item_type = lit_get_book_from_bookid(item_year, item_bookid)
+		item_book, item_editors, item_type = get_book_from_bookid(item_year, item_bookid)
 		if item_bookid not in list(lit_book_ids.keys()):
-			item_msg.append(lw_debug_unknownvolume + ': ' + item_bookid + ' (' + __short_filename_str_for_log__(filename_str) + ')' + cnt_n)
+			debug_msg(filename_str, item_msg, MSG_DEBUG_UNKNWNSERIES, item_bookid)
 	else:
 		item_bookid = ''
 		item_book = ''
@@ -93,22 +126,22 @@ def filename_str_to_metaentry_dict(filename_str):
 	if len(items) > 3:
 		item_title = items[3].replace('-', ' ')
 		item_keywords = string_to_keywords_list(item_title)
-		if len(item_title) < 12 and item_title.split(' ')[0] not in list_publication_special:
-			item_msg.append(lw_debug_shorttitle + ': ' + __short_filename_str_for_log__(filename_str) + cnt_n)
+		if len(item_title) < 12 and item_title.split(' ')[0] not in MATTER_LIST:
+			debug_msg(filename_str, item_msg, MSG_DEBUG_SHORTTITLE, item_title)
 	else:
-		item_msg.append(lw_debug_notitle + ': ' + __short_filename_str_for_log__(filename_str) + cnt_n)
-		item_title = lit_title_default
+		debug_msg(filename_str, item_msg, MSG_DEBUG_NOTITLE, '?')
+		item_title = DEFAULT_TITLE
 		item_keywords = []
 	# Handle special titles, frontmatters etc
-	if item_title.split(' ')[0] in list_publication_special:
+	if item_title.split(' ')[0] in MATTER_LIST:
 		item_flag_sp = True
 	else:
 		item_flag_sp = False
 
 	# Deal with special files, frontmatters etc - TODO remove this section eventually
-	if items[2].split('-')[0] in list_publication_special:
+	if items[2].split('-')[0] in MATTER_LIST:
 		item_title = '[' + items[2].replace('-', ' ') + ']'
-		item_msg.append(lw_debug_deprecatedtitle + ': ' + item_title + ' (' + __short_filename_str_for_log__(filename_str) + ')' + cnt_n)
+		debug_msg(filename_str, item_msg, MSG_DEBUG_RESERVEDTITLE, item_title)
 		# item_flag_sp = True
 	# else:
 		# item_flag_sp = False
@@ -120,39 +153,28 @@ def filename_str_to_metaentry_dict(filename_str):
 			item_ann_d = items[5:]
 			for zz in item_ann_d:
 				item_ann += ' ' + zz
-		if item_ann not in list_ann:
-			item_msg.append(lw_debug_annotation + ': ' + item_ann + ' (' + __short_filename_str_for_log__(filename_str) + ')' + cnt_n)
+		if item_ann not in ANNOTATION_LIST:
+			debug_msg(filename_str, item_msg, MSG_DEBUG_UNEXPECTEDANNOTATION, item_ann)
 	else:
 		item_ann = ''
 
 	# Build object
-	item_ii = {
-		lit_id_class:item_class,
-		lit_id_year:item_year,
-		lit_id_book:item_book,
-		lit_id_bookid:item_bookid,
-		lit_id_editors:item_editors,
-		lit_id_type:item_type,
-		lit_id_section:item_section,
-		lit_id_authors:item_names,
-		lit_id_firstauthor:item_first,
-		lit_id_flag_etal:item_etal,
-		lit_id_title:item_title,
-		lit_id_keywords:item_keywords,
-		lit_id_ann:item_ann,
-		lit_id_filename:filename_str,
-		lit_id_fileformat:item_fileformat,
-		lit_id_url:item_url,
-		lit_flag_sp:item_flag_sp,
-		lit_id_size:item_size,
-		lit_id_hash:item_hash
-		}
-
-	# Handle debug messages
-	item_msg = ''.join(item_msg)
-	item_msg = item_msg.strip(' \n\t')
-
-	return item_ii, item_msg
+	return {
+		KEY_ANNOTATION: item_ann,
+		KEY_AUTHOR_FIRST: item_first,
+		KEY_AUTHORS_DICT: item_names,
+		KEY_CLASS: item_class,
+		KEY_EDITORS_LIST: item_editors,
+		KEY_ETAL_BOOL: item_etal,
+		KEY_KEYWORDS_LIST: item_keywords,
+		KEY_MATTER_BOOL: item_flag_sp,
+		KEY_SERIES_ID: item_bookid,
+		KEY_SERIES_NAME: item_book,
+		KEY_SERIES_SECTION: item_section,
+		KEY_SERIES_TYPE: item_type,
+		KEY_TITLE: item_title,
+		KEY_YEAR: item_year
+		}, ''.join(item_msg).strip(' \n\t')
 
 
 def metaentry_dict_to_filename_str(lwObject):

@@ -29,9 +29,34 @@ specific language governing rights and limitations under the License.
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 from collections import OrderedDict
+import string
 
 from ..const import AUTHORS_EXCLUDE_LIST
 from ..repo import get_series_dict
+
+
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# CONST
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+# TODO use established lib instead
+EXCLUDE_WORDS_LIST = ['advanced', 'advances', 'analyses', 'analysis', 'annual', 'an', 'among', 'all', 'and', 'of', 'with',
+	'anomalous', 'anomaly', 'approach', 'approaches', 'approximation', 'are', 'around', 'articles', 'another', 'as', 'assessing',
+	'assessment', 'asset', 'assets', 'associated', 'at', 'au', 'available', 'back', 'based', 'basic', 'bd', 'be', 'become',
+	'behavior', 'behaviour', 'benefits', 'best', 'better', 'between', 'beyond', 'big', 'brief', 'briefing', 'build', 'building',
+	'built', 'by', 'can', 'capabilities', 'capability', 'capable', 'case', 'causes', 'ce', 'certify', 'chief', 'ci', 'ck',
+	'close', 'cm', 'cmas', 'comprehensive', 'concept', 'concepts', 'conceptual', 'concerning', 'concerns', 'conclusion',
+	'conjugated', 'considerations', 'content', 'context', 'continued', 'contribution', 'corrected', 'cr', 'on', 'data', 'de',
+	'days', 'december', 'der', 'des', 'details', 'developing', 'easily', 'for', 'from', 'high', 'hires', 'development', 'do',
+	'does', 'due', 'during', 'early', 'how', 'ii', 'iii', 'im', 'in', 'inside', 'into', 'is', 'it', 'its', 'iv', 'low',
+	'made', 'new', 'no', 'non', 'october', 'off', 'one', 'ongoing', 'only', 'onto', 'or', 'our', 'plate', 'pre', 're',
+	'results', 'short', 'small', 'smaller', 'soon', 'study', 'system', 'take', 'than', 'that', 'the', 'their', 'them',
+	'three', 'to', 'tp', 'tr', 'two', 'um', 'und', 'under', 'up', 'update', 'upon', 'vi', 'vii', 'viii', 'vs', 'we',
+	'what', 'who', 'will', 'without', 'zu', 'end', 'highly', 'imply', 'importance', 'important', 'improved', 'improvement',
+	'increasing', 'independent', 'indicate', 'initial', 'just', 'known', 'knowledge', 'large', 'largest', 'left', 'let', 'like',
+	'long', 'looking', 'lower', 'lucky', 'mid', 'not', 'novel', 'other', 'over', 'proper', 'recap', 'realizing', 'realize',
+	'reality', 'realities', 'realistic', 'real', 'recent', 'revealed', 'reveals', 'second', 'six', 'success', 'successful',
+	'understanding', 'understand', 'understood', 'unknown', 'viable', 'yet']
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -86,3 +111,30 @@ def string_to_authors_dict(authors):
 			authors_etal = True
 
 	return first_author, authors_dict, authors_etal
+
+
+def string_to_keywords_list(in_str):
+	"""
+	This routine is an ugly HACK and must be replaced by a real lexer.
+	"""
+
+	alphabet_lowercase_list = list(string.ascii_lowercase)
+	word_list = in_str.replace('-', ' ').lower().split(' ')
+	keywords_list = []
+
+	for word in word_list:
+		if (
+			word not in keywords_list
+			) and (
+			word not in alphabet_lowercase_list
+			) and (
+			word not in EXCLUDE_WORDS_LIST # TODO remove from this file (header)
+			):
+			if (
+				not word.isdigit()
+				) and (
+				not any(letter in word for letter in string.digits)
+				):
+				keywords_list.append(word)
+
+	return keywords_list
