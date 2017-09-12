@@ -6,7 +6,7 @@ LITERATUR
 Literature management with Python, Dropbox and MediaWiki
 https://github.com/pleiszenburg/literatur
 
-	src/literatur/legacy/renamegui.py: GUI for renaming files with name pattern
+	src/literatur/scripts/ui_filerename.py: GUI, renaming files w/ name pattern
 
 	Copyright (C) 2017 Sebastian M. Ernst <ernst@pleiszenburg.de>
 
@@ -31,11 +31,24 @@ specific language governing rights and limitations under the License.
 
 import os
 import shutil
-import pprint
+from pprint import pformat as pf
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 # from .file import *
+from ..const import (
+	MSG_DEBUG_FILEALREADYEXISTS,
+	KNOWN_CLASSES_LIST
+	)
+from ..filetypes import filetypes
+from ..parser import (
+	filename_str_to_metaentry_dict,
+	follows_filename_convention_guess,
+	get_basic_userinput_str,
+	metaentry_dict_to_filename_str,
+	metaentry_dict_to_userinput_str,
+	userinput_str_to_metaentry_dict
+	)
 from ..ui import ui_filename_dialog_class
 
 
@@ -51,16 +64,16 @@ class ui_filerename_class(QtWidgets.QDialog):
 
 		# Initializing window
 		QtWidgets.QWidget.__init__(self, parent)
-		self.ui = Ui_lwFileRenameDialog()
+		self.ui = ui_filename_dialog_class()
 		self.ui.setupUi(self)
 
 		# Types of documents
-		self.documenttypes = lit_classes # Fetch from API
+		self.documenttypes = KNOWN_CLASSES_LIST # Fetch from API
 		self.documenttypes.sort()
 		self.ui.lwTypeCombo.addItems(self.documenttypes)
 
 		# Types of files
-		self.filetypes = list_ext # Fetch from API
+		self.filetypes = filetypes.keys() # Fetch from API
 		self.filetypes.sort()
 		self.ui.lwFiletypeCombo.addItems(self.filetypes)
 
@@ -123,14 +136,14 @@ class ui_filerename_class(QtWidgets.QDialog):
 			else:
 
 				msgBox = QtGui.QMessageBox()
-				msgBox.setText(lw_debug_filealreadyexists)
+				msgBox.setText(MSG_DEBUG_FILEALREADYEXISTS)
 				msgBox.exec_()
 
 
 	def clearform(self):
 
-		self.ui.lwMetaText.setPlainText("")
-		self.ui.lwFilenameText.setPlainText("")
+		self.ui.lwMetaText.setPlainText('')
+		self.ui.lwFilenameText.setPlainText('')
 
 
 	def trackfilenamechange(self):
@@ -150,30 +163,37 @@ class ui_filerename_class(QtWidgets.QDialog):
 
 	def updateuserinput(self):
 
-		# Get file from list
-		item_text = self.ui.lwFileList.currentItem().data(0)
+		filename_str = self.ui.lwFileList.currentItem().data(0)
 
-		self.ui.lwPathLine.setPlainText(item_text)
-		self.ui.lwMetaText.setPlainText(generate_userinput(item_text))
+		if follows_filename_convention_guess(filename_str):
+			metaentry_dict = filename_str_to_metaentry_dict(filename_str)
+			userinput_str = metaentry_dict_to_userinput_str(metaentry_dict)
+		else:
+			userinput_str = get_basic_userinput_str(filename_str)
+
+		self.ui.lwPathLine.setPlainText(filename_str)
+		self.ui.lwMetaText.setPlainText(userinput_str)
 
 
 	def updatefilename(self):
 
-		lwFileObject = parse_userinput(str(self.ui.lwMetaText.toPlainText()))
-		lwFileName = generate_filename(lwFileObject)
+		userinput_str = str(self.ui.lwMetaText.toPlainText())
 
-		lwFileParserObject, item_msg = filename_to_lit_object(lwFileName)
-		lwFileParserObject_text = pprint.pformat(lwFileParserObject)
+		a_metaentry_dict = userinput_str_to_metaentry_dict(userinput_str)
+		filename_str = metaentry_dict_to_filename_str(a_metaentry_dict)
 
-		self.ui.lwFilenameText.setPlainText(lwFileName)
-		self.ui.lwParserText.setPlainText(lwFileParserObject_text)
+		b_metaentry_dict, debug_message_str = filename_str_to_metaentry_dict(filename_str)
+		b_metaentry_str = pf(b_metaentry_dict)
+
+		self.ui.lwFilenameText.setPlainText(filename_str)
+		self.ui.lwParserText.setPlainText(b_metaentry_str)
 
 		pal = QtGui.QPalette()
-		if item_msg != '':
+		if debug_message_str != '':
 			pal.setColor(QtGui.QPalette.Base, QtGui.QColor(200, 160, 160))
 		else:
 			pal.setColor(QtGui.QPalette.Base, QtGui.QColor(255, 255, 255))
-		self.ui.lwDebugText.setPlainText(item_msg)
+		self.ui.lwDebugText.setPlainText(debug_message_str)
 		self.ui.lwDebugText.setPalette(pal)
 
 	# Killing the app

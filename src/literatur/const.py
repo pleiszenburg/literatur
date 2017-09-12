@@ -159,6 +159,7 @@ TITLE_LENGTH_MIN_INT = 12
 # MESSAGES
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+MSG_DEBUG_FILEALREADYEXISTS = "File already exists."
 MSG_DEBUG_FILENAMETOOLONG = 'Filename too long'
 MSG_DEBUG_NOTITLE = 'No title'
 MSG_DEBUG_RESERVEDTITLE = 'Reserved special title'
