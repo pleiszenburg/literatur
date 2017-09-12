@@ -63,6 +63,13 @@ from ..const import (
 # ROUTINES
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+def get_basic_userinput_str(in_a_str, in_b_str = ''):
+
+	cnt_n = '\n'
+
+	return cnt_n + in_a_str + cnt_n + DELIMITER_USERINPUT_BLOCK + cnt_n + in_b_str + cnt_n
+
+
 def metaentry_dict_to_userinput_str(metaentry_dict):
 
 	cnt_n = '\n'
@@ -95,17 +102,6 @@ def metaentry_dict_to_userinput_str(metaentry_dict):
 			]
 
 	return ''.join(userinput_list)
-
-	# userinput_list = []
-	#
-	# if follow_convention_guess(item_filename):
-	#
-	# 	# ...
-	#
-	# else:
-	#
-	# 	fext, fname = filename_ext(item_filename)
-	# 	userinput = cnt_n + fname + cnt_n + DELIMITER_USERINPUT_BLOCK + cnt_n + fext + cnt_n
 
 
 def userinput_str_to_metaentry_dict(userinput_str):
