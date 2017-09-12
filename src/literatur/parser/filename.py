@@ -31,6 +31,7 @@ specific language governing rights and limitations under the License.
 from collections import OrderedDict
 
 from .lib import (
+	authors_dict_to_string,
 	get_book_from_bookid,
 	get_default_metaentry_dict,
 	string_to_authors_dict,
@@ -175,33 +176,10 @@ def metaentry_dict_to_filename_str(metaentry_dict):
 	if metaentry_dict[KEY_ANNOTATION] != '':
 		right_str += DELIMITER_FILENAME_BLOCK + metaentry_dict[KEY_ANNOTATION].replace(' ', DELIMITER_FILENAME_SUB)
 
-	# Length of filename without author block
-	lFile_len = len(left_str) + len(right_str)
-	# Length of author block
-	lFile_author_len = 0
-	# Empty author string
-	lFile_Author = ''
+	# Get authors
+	author_str = authors_dict_to_string(
+		metaentry_dict[KEY_AUTHORS_DICT],
+		max_length_int = FIMENAME_MAXLENGTH_INT - len(left_str) + len(right_str)
+		)
 
-	# Iterate over authors
-	check_etal = False
-	for uu in list(metaentry_dict[lit_id_authors].keys()):
-		uu_temp = metaentry_dict[lit_id_authors][uu].replace(" ", "-") + "-"
-		if (lFile_len + lFile_author_len + len(uu_temp) + len(lit_authors_etal)) <= lit_filename_maxlength:
-			lFile_author_len += len(uu_temp)
-			lFile_Author += uu_temp
-		else:
-			lFile_author_len += len(lit_authors_etal)
-			lFile_Author += lit_authors_etal
-			check_etal = True
-			break
-	# ETAL flag from object?
-	if not check_etal and metaentry_dict[lit_id_flag_etal]:
-		lFile_author_len += len(lit_authors_etal)
-		lFile_Author += lit_authors_etal
-		check_etal = True
-
-	lFile_Author = lFile_Author.strip('-')
-
-	filename_str = left_str + lFile_Author + right_str
-
-	return filename_str
+	return left_str + author_str + right_str

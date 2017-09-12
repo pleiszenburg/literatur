@@ -32,6 +32,7 @@ from collections import OrderedDict
 import string
 
 from ..const import (
+	AUTHORS_ETAL,
 	AUTHORS_EXCLUDE_LIST,
 	DEFAULT_ANNOTATION,
 	DEFAULT_AUTHOR,
@@ -85,6 +86,38 @@ EXCLUDE_WORDS_LIST = ['advanced', 'advances', 'analyses', 'analysis', 'annual', 
 # ROUTINES
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+def authors_dict_to_string(authors_dict, max_length_int = None):
+
+	max_length_bool = max_length_int is not None
+	authors_list = []
+	len_delimiter_int = len(DELIMITER_FILENAME_SUB)
+	len_authors_str_int = 0
+
+	etal_bool = False
+
+	for author_key in authors_dict.keys():
+
+		author_tmp_str = authors_dict[author_key].replace(' ', DELIMITER_FILENAME_SUB)
+
+		if max_length_bool:
+			if len_authors_str_int + len(author_tmp_str) <= max_length_int:
+				author_list.append(author_tmp_str)
+				len_authors_str_int += len(author_tmp_str) + len_delimiter_int
+			else:
+				author_list.append(AUTHORS_ETAL)
+				etal_bool = True
+				break
+		else:
+			author_list.append(author_tmp_str)
+
+	# ETAL flag from object?
+	if not etal_bool and metaentry_dict[lit_id_flag_etal]:
+		author_list.append(AUTHORS_ETAL)
+		etal_bool = True
+
+	return DELIMITER_FILENAME_SUB.join(author_list)
+
+
 def get_default_metaentry_dict():
 
 	first_author_str, authors_dict, authors_etal_bool = string_to_authors_dict(DEFAULT_AUTHOR)
@@ -124,9 +157,9 @@ def get_book_from_bookid(year, bookid):
 	return item_book, item_editors, item_type
 
 
-def string_to_authors_dict(authors):
+def string_to_authors_dict(authors_str):
 
-	temp_list = authors.split(DELIMITER_FILENAME_SUB)
+	temp_list = authors_str.split(DELIMITER_FILENAME_SUB)
 
 	authors_dict = OrderedDict()
 	temp_author = ''
@@ -151,7 +184,7 @@ def string_to_authors_dict(authors):
 					flag_first = True
 				temp_author = ''
 				temp_author_k = ''
-		if jj == lit_authors_etal:
+		if jj == AUTHORS_ETAL:
 			authors_etal_bool = True
 
 	return first_author_str, authors_dict, authors_etal_bool
