@@ -38,6 +38,14 @@ import humanize
 
 from .hash import get_file_hash
 
+from ..const import (
+	KEY_FILE,
+	KEY_FILE_TMP,
+	KEY_MTIME,
+	KEY_NAME,
+	KEY_PATH,
+	KEY_SIZE
+	)
 from ..filetypes import (
 	get_literatur_type_from_magicinfo,
 	get_magicinfo,
@@ -65,28 +73,28 @@ def add_change_report_to_entry(entry, entry_status):
 	if entry_status == STATUS_MV:
 
 		entry_report.append('Moved: "%s" -> "%s"' % (
-			os.path.join(entry['file']['path'], entry['file']['name']),
-			os.path.join(entry['_file']['path'], entry['_file']['name'])
+			os.path.join(entry[KEY_FILE][KEY_PATH], entry[KEY_FILE][KEY_NAME]),
+			os.path.join(entry[KEY_FILE_TMP][KEY_PATH], entry[KEY_FILE_TMP][KEY_NAME])
 			))
 
 	elif entry_status == STATUS_RW:
 
 		entry_report.append('Rewritten: "%s"' % (
-			os.path.join(entry['_file']['path'], entry['_file']['name'])
+			os.path.join(entry[KEY_FILE_TMP][KEY_PATH], entry[KEY_FILE_TMP][KEY_NAME])
 			))
 
 	elif entry_status == STATUS_CH:
 
-		size_diff = entry['_file']['size'] - entry['file']['size']
+		size_diff = entry[KEY_FILE_TMP][KEY_SIZE] - entry[KEY_FILE][KEY_SIZE]
 		if size_diff >= 0:
 			size_prefix = '+'
 		else:
 			size_prefix = '-'
 		entry_report.append('Changed: "%s" [%s] %s ago' % (
-			os.path.join(entry['file']['path'], entry['file']['name']),
+			os.path.join(entry[KEY_FILE][KEY_PATH], entry[KEY_FILE][KEY_NAME]),
 			size_prefix + humanize.naturalsize(abs(size_diff), gnu = True),
 			humanize.naturaldelta(
-				datetime.datetime.now() - datetime.datetime.fromtimestamp(entry['_file']['mtime'] / 1e9)
+				datetime.datetime.now() - datetime.datetime.fromtimestamp(entry[KEY_FILE_TMP][KEY_MTIME] / 1e9)
 				)
 			))
 
@@ -103,26 +111,26 @@ def add_change_report_to_entry(entry, entry_status):
 
 def add_id_to_entry(entry):
 
-	entry['file'].update({'id': get_entry_id(entry)})
+	entry[KEY_FILE].update({'id': get_entry_id(entry)})
 
 
 def add_info_to_entry(entry):
 
-	entry['file'].update(get_file_info((entry['file']['path'], entry['file']['name'])))
+	entry[KEY_FILE].update(get_file_info((entry[KEY_FILE][KEY_PATH], entry[KEY_FILE][KEY_NAME])))
 
 
 def add_hash_to_entry(entry):
 
-	entry['file'].update({
-		'hash': get_file_hash((entry['file']['path'], entry['file']['name']))
+	entry[KEY_FILE].update({
+		'hash': get_file_hash((entry[KEY_FILE][KEY_PATH], entry[KEY_FILE][KEY_NAME]))
 		})
 
 
 def add_magic_to_entry(entry):
 
-	entry['file'].update({
-		'magic': get_magicinfo((entry['file']['path'], entry['file']['name'])),
-		'mime': get_mimetype((entry['file']['path'], entry['file']['name']))
+	entry[KEY_FILE].update({
+		'magic': get_magicinfo((entry[KEY_FILE][KEY_PATH], entry[KEY_FILE][KEY_NAME])),
+		'mime': get_mimetype((entry[KEY_FILE][KEY_PATH], entry[KEY_FILE][KEY_NAME]))
 		})
 
 
@@ -139,24 +147,24 @@ def add_switched_to_entry(entry, switch_list = []):
 	else:
 		keys = list(routines_dict.keys())
 
-	if 'info' not in entry['file'].keys():
+	if 'info' not in entry[KEY_FILE].keys():
 		add_info_to_entry(entry)
-	if 'id' not in entry['file'].keys():
+	if 'id' not in entry[KEY_FILE].keys():
 		add_id_to_entry(entry)
 
 	for key in keys:
-		if key not in entry['file'].keys():
+		if key not in entry[KEY_FILE].keys():
 			routines_dict[key](entry)
 
 
 def add_type_to_entry(entry):
 
-	if 'magic' in entry['file'].keys():
-		magic_info = entry['file']['magic']
+	if 'magic' in entry[KEY_FILE].keys():
+		magic_info = entry[KEY_FILE]['magic']
 	else:
-		magic_info = get_magicinfo((entry['file']['path'], entry['file']['name']))
+		magic_info = get_magicinfo((entry[KEY_FILE][KEY_PATH], entry[KEY_FILE][KEY_NAME]))
 
-	entry['file'].update({
+	entry[KEY_FILE].update({
 		'type': get_literatur_type_from_magicinfo(magic_info)
 		})
 
@@ -170,7 +178,7 @@ def compare_entry_lists(a_entry_list, b_entry_list):
 
 	# Find moved and renamed files
 	diff_mv_list, a_entry_list, b_entry_list = __find_process_diff__(
-		a_entry_list, b_entry_list, ('inode', 'mtime', 'size'), STATUS_MV
+		a_entry_list, b_entry_list, ('inode', KEY_MTIME, KEY_SIZE), STATUS_MV
 		)
 
 	# Fetch missing information on b-list entries (hash, magic, mime, type)
@@ -182,12 +190,12 @@ def compare_entry_lists(a_entry_list, b_entry_list):
 
 	# Find files, which have likely been written to a new inode
 	diff_rw_list, a_entry_list, b_entry_list = __find_process_diff__(
-		a_entry_list, b_entry_list, ('hash', 'name', 'path'), STATUS_RW
+		a_entry_list, b_entry_list, ('hash', KEY_NAME, KEY_PATH), STATUS_RW
 		)
 
 	# Find files, where content was changed
 	diff_ch_list, a_entry_list, b_entry_list = __find_process_diff__(
-		a_entry_list, b_entry_list, ('name', 'path'), STATUS_CH
+		a_entry_list, b_entry_list, (KEY_NAME, KEY_PATH), STATUS_CH
 		)
 
 	# Remaining a-list was likely removed
@@ -202,9 +210,9 @@ def compare_entry_lists(a_entry_list, b_entry_list):
 def convert_filepathtuple_to_entry(filepath_tuple):
 
 	return {
-		'file': {
-			'path': filepath_tuple[0],
-			'name': filepath_tuple[1]
+		KEY_FILE: {
+			KEY_PATH: filepath_tuple[0],
+			KEY_NAME: filepath_tuple[1]
 			}
 		}
 
@@ -214,7 +222,7 @@ def find_duplicates_in_entry_list(entry_list):
 	entry_by_hash_dict = {}
 
 	for entry in entry_list:
-		hash_str = entry['file']['hash']
+		hash_str = entry[KEY_FILE]['hash']
 		if hash_str not in entry_by_hash_dict.keys():
 			entry_by_hash_dict.update({hash_str: [entry]})
 		else:
@@ -232,12 +240,12 @@ def find_duplicates_in_entry_list(entry_list):
 def __find_process_diff__(a_entry_list, b_entry_list, key_tuple, status_code):
 
 	def list_to_dict(entry_list, key_tuple):
-		return {tuple(entry['file'][key] for key in key_tuple): entry for entry in entry_list}
+		return {tuple(entry[KEY_FILE][key] for key in key_tuple): entry for entry in entry_list}
 
 	def update_entry(a_entry, b_entry, status_code):
 		a_entry.update({
 			'status': status_code,
-			'_file': b_entry['file']
+			KEY_FILE_TMP: b_entry[KEY_FILE]
 			})
 		add_change_report_to_entry(a_entry, status_code)
 		return a_entry
@@ -262,8 +270,8 @@ def __find_process_diff__(a_entry_list, b_entry_list, key_tuple, status_code):
 
 def get_entry_id(entry):
 
-	field_key_list = ['name', 'path', 'mode', 'inode', 'size', 'mtime']
-	field_value_list = [str(entry['file'][key]) for key in field_key_list]
+	field_key_list = [KEY_NAME, KEY_PATH, 'mode', 'inode', KEY_SIZE, KEY_MTIME]
+	field_value_list = [str(entry[KEY_FILE][key]) for key in field_key_list]
 	field_value_str = ' '.join(field_value_list)
 
 	hash_object = hashlib.sha256(field_value_str.encode())
@@ -279,15 +287,15 @@ def get_file_info(in_path_tuple):
 	return {
 		'mode': stat_info.st_mode,
 		'inode': stat_info.st_ino,
-		'size': stat_info.st_size,
-		'mtime': stat_info.st_mtime_ns
+		KEY_SIZE: stat_info.st_size,
+		KEY_MTIME: stat_info.st_mtime_ns
 		}
 
 
 def merge_entry_file_info(entry):
 
-	if '_file' in entry.keys():
-		entry['file'].update(entry['_file'])
-	for key in ['_file', 'report', 'status']:
+	if KEY_FILE_TMP in entry.keys():
+		entry[KEY_FILE].update(entry[KEY_FILE_TMP])
+	for key in [KEY_FILE_TMP, 'report', 'status']:
 		if key in entry.keys():
 			entry.pop(key)
