@@ -39,12 +39,23 @@ import humanize
 from .hash import get_file_hash
 
 from ..const import (
+	KEY_ALL,
 	KEY_FILE,
 	KEY_FILE_TMP,
+	KEY_ID,
+	KEY_INFO,
+	KEY_INODE,
+	KEY_HASH,
+	KEY_MAGIC,
+	KEY_MIME,
+	KEY_MODE,
 	KEY_MTIME,
 	KEY_NAME,
 	KEY_PATH,
-	KEY_SIZE
+	KEY_REPORT,
+	KEY_SIZE,
+	KEY_STATUS,
+	KEY_TYPE
 	)
 from ..filetypes import (
 	get_literatur_type_from_magicinfo,
@@ -104,14 +115,14 @@ def add_change_report_to_entry(entry, entry_status):
 		raise # TODO
 
 	entry.update({
-		'status': entry_status,
-		'report': entry_report
+		KEY_STATUS: entry_status,
+		KEY_REPORT: entry_report
 		})
 
 
 def add_id_to_entry(entry):
 
-	entry[KEY_FILE].update({'id': get_entry_id(entry)})
+	entry[KEY_FILE].update({KEY_ID: get_entry_id(entry)})
 
 
 def add_info_to_entry(entry):
@@ -122,34 +133,34 @@ def add_info_to_entry(entry):
 def add_hash_to_entry(entry):
 
 	entry[KEY_FILE].update({
-		'hash': get_file_hash((entry[KEY_FILE][KEY_PATH], entry[KEY_FILE][KEY_NAME]))
+		KEY_HASH: get_file_hash((entry[KEY_FILE][KEY_PATH], entry[KEY_FILE][KEY_NAME]))
 		})
 
 
 def add_magic_to_entry(entry):
 
 	entry[KEY_FILE].update({
-		'magic': get_magicinfo((entry[KEY_FILE][KEY_PATH], entry[KEY_FILE][KEY_NAME])),
-		'mime': get_mimetype((entry[KEY_FILE][KEY_PATH], entry[KEY_FILE][KEY_NAME]))
+		KEY_MAGIC: get_magicinfo((entry[KEY_FILE][KEY_PATH], entry[KEY_FILE][KEY_NAME])),
+		KEY_MIME: get_mimetype((entry[KEY_FILE][KEY_PATH], entry[KEY_FILE][KEY_NAME]))
 		})
 
 
 def add_switched_to_entry(entry, switch_list = []):
 
 	routines_dict = {
-		'hash': add_hash_to_entry,
-		'magic': add_magic_to_entry,
-		'type': add_type_to_entry
+		KEY_HASH: add_hash_to_entry,
+		KEY_MAGIC: add_magic_to_entry,
+		KEY_TYPE: add_type_to_entry
 		}
 
-	if 'all' not in switch_list:
+	if KEY_ALL not in switch_list:
 		keys = switch_list
 	else:
 		keys = list(routines_dict.keys())
 
-	if 'info' not in entry[KEY_FILE].keys():
+	if KEY_INFO not in entry[KEY_FILE].keys():
 		add_info_to_entry(entry)
-	if 'id' not in entry[KEY_FILE].keys():
+	if KEY_ID not in entry[KEY_FILE].keys():
 		add_id_to_entry(entry)
 
 	for key in keys:
@@ -159,13 +170,13 @@ def add_switched_to_entry(entry, switch_list = []):
 
 def add_type_to_entry(entry):
 
-	if 'magic' in entry[KEY_FILE].keys():
-		magic_info = entry[KEY_FILE]['magic']
+	if KEY_MAGIC in entry[KEY_FILE].keys():
+		magic_info = entry[KEY_FILE][KEY_MAGIC]
 	else:
 		magic_info = get_magicinfo((entry[KEY_FILE][KEY_PATH], entry[KEY_FILE][KEY_NAME]))
 
 	entry[KEY_FILE].update({
-		'type': get_literatur_type_from_magicinfo(magic_info)
+		KEY_TYPE: get_literatur_type_from_magicinfo(magic_info)
 		})
 
 
@@ -173,24 +184,24 @@ def compare_entry_lists(a_entry_list, b_entry_list):
 
 	# Find unchanged files
 	diff_uc_list, a_entry_list, b_entry_list = __find_process_diff__(
-		a_entry_list, b_entry_list, ('id',), STATUS_UC
+		a_entry_list, b_entry_list, (KEY_ID,), STATUS_UC
 		)
 
 	# Find moved and renamed files
 	diff_mv_list, a_entry_list, b_entry_list = __find_process_diff__(
-		a_entry_list, b_entry_list, ('inode', KEY_MTIME, KEY_SIZE), STATUS_MV
+		a_entry_list, b_entry_list, (KEY_INODE, KEY_MTIME, KEY_SIZE), STATUS_MV
 		)
 
 	# Fetch missing information on b-list entries (hash, magic, mime, type)
 	b_entry_list = run_in_parallel_with_return(
-		partial(add_switched_to_entry, switch_list = ['all']),
+		partial(add_switched_to_entry, switch_list = [KEY_ALL]),
 		b_entry_list,
 		add_return = True
 		)
 
 	# Find files, which have likely been written to a new inode
 	diff_rw_list, a_entry_list, b_entry_list = __find_process_diff__(
-		a_entry_list, b_entry_list, ('hash', KEY_NAME, KEY_PATH), STATUS_RW
+		a_entry_list, b_entry_list, (KEY_HASH, KEY_NAME, KEY_PATH), STATUS_RW
 		)
 
 	# Find files, where content was changed
@@ -222,7 +233,7 @@ def find_duplicates_in_entry_list(entry_list):
 	entry_by_hash_dict = {}
 
 	for entry in entry_list:
-		hash_str = entry[KEY_FILE]['hash']
+		hash_str = entry[KEY_FILE][KEY_HASH]
 		if hash_str not in entry_by_hash_dict.keys():
 			entry_by_hash_dict.update({hash_str: [entry]})
 		else:
@@ -244,7 +255,7 @@ def __find_process_diff__(a_entry_list, b_entry_list, key_tuple, status_code):
 
 	def update_entry(a_entry, b_entry, status_code):
 		a_entry.update({
-			'status': status_code,
+			KEY_STATUS: status_code,
 			KEY_FILE_TMP: b_entry[KEY_FILE]
 			})
 		add_change_report_to_entry(a_entry, status_code)
@@ -270,7 +281,7 @@ def __find_process_diff__(a_entry_list, b_entry_list, key_tuple, status_code):
 
 def get_entry_id(entry):
 
-	field_key_list = [KEY_NAME, KEY_PATH, 'mode', 'inode', KEY_SIZE, KEY_MTIME]
+	field_key_list = [KEY_NAME, KEY_PATH, KEY_MODE, KEY_INODE, KEY_SIZE, KEY_MTIME]
 	field_value_list = [str(entry[KEY_FILE][key]) for key in field_key_list]
 	field_value_str = ' '.join(field_value_list)
 
@@ -285,8 +296,8 @@ def get_file_info(in_path_tuple):
 	stat_info = os.stat(in_path)
 
 	return {
-		'mode': stat_info.st_mode,
-		'inode': stat_info.st_ino,
+		KEY_MODE: stat_info.st_mode,
+		KEY_INODE: stat_info.st_ino,
 		KEY_SIZE: stat_info.st_size,
 		KEY_MTIME: stat_info.st_mtime_ns
 		}
@@ -296,6 +307,6 @@ def merge_entry_file_info(entry):
 
 	if KEY_FILE_TMP in entry.keys():
 		entry[KEY_FILE].update(entry[KEY_FILE_TMP])
-	for key in [KEY_FILE_TMP, 'report', 'status']:
+	for key in [KEY_FILE_TMP, KEY_REPORT, KEY_STATUS]:
 		if key in entry.keys():
 			entry.pop(key)
