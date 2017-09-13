@@ -106,8 +106,7 @@ class ui_filerename_class(QtWidgets.QDialog):
 			self.working_path,
 			self.ui.lwFileList.currentItem().data(0)
 			)
-		pdf_command = external_pdfviewer_command.replace(external_pdfviewer_file, pdf_file)
-		os.system(pdf_command)
+		os.system('okular "%s" &' % pdf_file)
 
 
 	def reloadfilelist(self):
