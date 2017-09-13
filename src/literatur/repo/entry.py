@@ -36,10 +36,8 @@ from pprint import pprint as pp
 
 import humanize
 
-from ..file import (
-	get_file_info,
-	get_file_hash
-	)
+from .hash import get_file_hash
+
 from ..filetypes import (
 	get_literatur_type_from_magicinfo,
 	get_magicinfo,
@@ -271,6 +269,19 @@ def get_entry_id(entry):
 	hash_object = hashlib.sha256(field_value_str.encode())
 
 	return hash_object.hexdigest()
+
+
+def get_file_info(in_path_tuple):
+
+	in_path = os.path.join(*in_path_tuple)
+	stat_info = os.stat(in_path)
+
+	return {
+		'mode': stat_info.st_mode,
+		'inode': stat_info.st_ino,
+		'size': stat_info.st_size,
+		'mtime': stat_info.st_mtime_ns
+		}
 
 
 def merge_entry_file_info(entry):
