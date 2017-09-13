@@ -37,6 +37,8 @@ from ..const import (
 	FILE_DB_CURRENT,
 	FILE_DB_JOURNAL,
 	FILE_DB_MASTER,
+	KEY_JOURNAL,
+	KEY_MASTER,
 	PATH_REPO,
 	PATH_SUB_DB,
 	PATH_SUB_DBBACKUP
@@ -49,9 +51,9 @@ from ..const import (
 
 def merge_at_root_path(root_path, target, mode = 'mp'):
 
-	if target == 'journal':
+	if target == KEY_JOURNAL:
 		merge_a, merge_b = FILE_DB_CURRENT + '.' + mode, FILE_DB_JOURNAL + '.' + mode
-	elif target == 'master':
+	elif target == KEY_MASTER:
 		merge_a, merge_b = FILE_DB_JOURNAL + '.' + mode, FILE_DB_MASTER + '.' + mode
 	else:
 		raise #
