@@ -196,7 +196,7 @@ def string_to_keywords_list(in_str):
 	"""
 
 	alphabet_lowercase_list = list(string.ascii_lowercase)
-	word_list = in_str.lower().split(DELIMITER_FILENAME_SUB)
+	word_list = in_str.lower().split(' ')
 	keywords_list = []
 
 	for word in word_list:

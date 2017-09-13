@@ -31,7 +31,8 @@ specific language governing rights and limitations under the License.
 from .lib import (
 	get_book_from_bookid,
 	get_default_metaentry_dict,
-	string_to_authors_dict
+	string_to_authors_dict,
+	string_to_keywords_list
 	)
 from .string import clean_str
 
@@ -48,6 +49,7 @@ from ..const import (
 	KEY_CLASS,
 	KEY_EDITORS_DICT,
 	KEY_ETAL_BOOL,
+	KEY_KEYWORDS_LIST,
 	KEY_SERIES_ID,
 	KEY_SERIES_NAME,
 	KEY_SERIES_SECTION,
@@ -151,6 +153,7 @@ def userinput_str_to_metaentry_dict(userinput_str):
 		item_title_str = clean_str(fragments_list[3])
 		if len(item_title_str) > 0:
 			metaentry_dict[KEY_TITLE] = item_title_str
+			metaentry_dict[KEY_KEYWORDS_LIST] = string_to_keywords_list(item_title_str)
 
 	# Step 5: Annotation
 	if len(fragments_list) > 4:
