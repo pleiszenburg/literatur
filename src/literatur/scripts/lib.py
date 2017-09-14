@@ -36,7 +36,16 @@ import os
 from pprint import pprint as pp
 import sys
 
-from ..const import REPORT_MAX_LINES
+from ..const import (
+	KEY_ALL,
+	KEY_FILE,
+	KEY_JOURNAL,
+	KEY_MAGIC,
+	KEY_MIME,
+	KEY_NAME,
+	KEY_PATH,
+	REPORT_MAX_LINES
+	)
 from ..repo import (
 	add_switched_to_entry,
 	init_repo_folders_at_root_path,
@@ -111,7 +120,7 @@ def script_diff():
 		]:
 		if len(rp_list) <= REPORT_MAX_LINES:
 			for entry in rp_list:
-				print('%s: "%s"' % (rp_message, os.path.join(entry['file']['path'], entry['file']['name'])))
+				print('%s: "%s"' % (rp_message, os.path.join(entry[KEY_FILE][KEY_PATH], entry[KEY_FILE][KEY_NAME])))
 		else:
 			print('%s: [%d files]' % (rp_message, len(rp_list)))
 
@@ -153,7 +162,7 @@ def script_duplicates():
 	pp(duplicates_dict)
 
 
-def script_merge(target = 'journal'):
+def script_merge(target = KEY_JOURNAL):
 
 	try:
 		root_dir = find_root_path_with_message(need_to_find = True)
@@ -168,7 +177,7 @@ def script_metainfo(current_path, file_list):
 	meta = []
 	for filename in file_list:
 		entry = convert_filepathtuple_to_entry((current_path, filename))
-		add_switched_to_entry(entry, {'all': True})
+		add_switched_to_entry(entry, {KEY_ALL: True})
 		meta.append(entry)
 
 	pp(meta)
@@ -183,8 +192,8 @@ def script_stats():
 
 	entries_list = load_index_from_root_path(root_dir)
 
-	magic_list = [entry['file']['magic'] for entry in entries_list]
-	mime_list = [entry['file']['mime'] for entry in entries_list]
+	magic_list = [entry[KEY_FILE][KEY_MAGIC] for entry in entries_list]
+	mime_list = [entry[KEY_FILE][KEY_MIME] for entry in entries_list]
 
 	magic_dict = Counter(magic_list)
 	mime_dict = Counter(mime_list)
