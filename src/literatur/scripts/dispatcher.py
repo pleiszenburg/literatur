@@ -32,6 +32,8 @@ import argparse
 import os # TODO remove?
 import sys # TODO remove?
 
+import click
+
 from .guis import script_ui_filerename
 from .lib import (
 	script_init,
@@ -44,53 +46,58 @@ from .lib import (
 	script_stats
 	)
 
+from ..repo import repository_class
+pass_repository_decorator = click.make_pass_decorator(repository_class, ensure = True)
+
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # ROUTINES
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-def entry():
 
-	commands_dict = {
-		'init': (script_init, tuple()),
-		'commit': (script_commit, tuple()),
-		'merge_journal': (script_merge, ('journal',)),
-		'merge_master': (script_merge, ('master',)),
-		'diff': (script_diff, tuple()),
-		'dump': (script_dump, tuple()),
-		'duplicates': (script_duplicates, tuple()),
-		'meta': (script_metainfo, tuple()),
-		'stats': (script_stats, tuple()),
-		'rename': (script_ui_filerename, (sys.argv,))
-		}
+@click.group()
+@click.pass_context
+def entry(click_context):
+	"""LITERATUR
 
-	parser = argparse.ArgumentParser(
-		prog = 'LITERATUR',
-		description = 'Literature management with Python, Dropbox and MediaWiki'
-		)
-	parser.add_argument(
-		dest = 'command',
-		nargs = 1,
-		action = 'store',
-		type = str,
-		choices = list(commands_dict.keys())
-		)
-	args = parser.parse_args()
+	Literature management with Python, Dropbox and MediaWiki
+	"""
 
-	cmd_routine, cmd_arguments = commands_dict[args.command[0]]
-	cmd_routine(*cmd_arguments)
-	# TODO fix input for meta
+	click_context.obj = repository_class()
 
 
-def __get_arg_file_list__():
+@entry.command()
+@pass_repository_decorator
+def diff(repo):
+	"""Shows uncommited changes.
+	"""
 
-	ret_files = []
-	ret_else = []
+	script_diff()
 
-	for argument in sys.argv[1:]:
-		if os.path.isfile(argument):
-			ret_files.append(argument)
-		else:
-			ret_else.append(argument)
 
-	return ret_files, ret_else
+# 	commands_dict = {
+# 		'init': (script_init, tuple()),
+# 		'commit': (script_commit, tuple()),
+# 		'merge_journal': (script_merge, ('journal',)),
+# 		'merge_master': (script_merge, ('master',)),
+## 		'diff': (script_diff, tuple()),
+# 		'dump': (script_dump, tuple()),
+# 		'duplicates': (script_duplicates, tuple()),
+# 		'meta': (script_metainfo, tuple()),
+# 		'stats': (script_stats, tuple()),
+# 		'rename': (script_ui_filerename, (sys.argv,))
+# 		}
+#
+#
+# def __get_arg_file_list__():
+#
+# 	ret_files = []
+# 	ret_else = []
+#
+# 	for argument in sys.argv[1:]:
+# 		if os.path.isfile(argument):
+# 			ret_files.append(argument)
+# 		else:
+# 			ret_else.append(argument)
+#
+# 	return ret_files, ret_else

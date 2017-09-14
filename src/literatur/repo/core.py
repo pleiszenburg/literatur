@@ -6,7 +6,7 @@ LITERATUR
 Literature management with Python, Dropbox and MediaWiki
 https://github.com/pleiszenburg/literatur
 
-	src/literatur/repo/__init__.py: Repository management
+	src/literatur/repo/core.py: Defines a click-compatible repository class
 
 	Copyright (C) 2017 Sebastian M. Ernst <ernst@pleiszenburg.de>
 
@@ -28,26 +28,21 @@ specific language governing rights and limitations under the License.
 # IMPORT
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-from .core import repository_class
-from .entry import (
-	add_switched_to_entry,
-	compare_entry_lists,
-	convert_filepathtuple_to_entry,
-	find_duplicates_in_entry_list
-	)
-from .fs import get_file_list
-from .index import (
-	create_index_from_path,
-	update_index_at_root_path
-	)
-from .merge import (
-	merge_at_root_path
-	)
-from .series import get_series_dict
-from .storage import (
-	init_repo_folders_at_root_path,
-	find_root_path,
-	find_root_path_with_message,
-	load_index_from_root_path,
-	store_index_at_root_path
-	)
+# TODO
+
+
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# CLASS
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+class repository_class():
+
+	root_dir = ''
+	current_dir = ''
+	current_relative_path = ''
+
+	def __init__(self):
+
+		self.root_dir = ''
+		self.current_dir = ''
+		self.current_relative_path = ''
