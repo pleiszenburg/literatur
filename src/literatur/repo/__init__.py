@@ -36,7 +36,3 @@ from .entry import (
 	find_duplicates_in_entry_list
 	)
 from .fs import get_file_list
-from .merge import (
-	merge_at_root_path
-	)
-from .series import get_series_dict

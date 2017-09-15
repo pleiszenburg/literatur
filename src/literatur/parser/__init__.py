@@ -33,6 +33,7 @@ from .filename import (
 	follows_filename_convention_guess,
 	metaentry_dict_to_filename_str
 	)
+from .lib import ctime_to_datestring
 from .userinput import (
 	get_basic_userinput_str,
 	metaentry_dict_to_userinput_str,

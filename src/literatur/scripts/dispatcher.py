@@ -49,6 +49,8 @@ from .guis import script_ui_filerename
 
 from ..const import (
 	KEY_FILE,
+	KEY_JOURNAL,
+	KEY_MASTER,
 	KEY_NAME,
 	KEY_PATH,
 	KEY_REPORT,
@@ -91,7 +93,7 @@ def commit(repo):
 @entry.command()
 @pass_repository_decorator
 def diff(repo):
-	"""Shows uncommited changes
+	"""Show uncommited changes
 	"""
 
 	if repo.initialized_bool:
@@ -103,7 +105,7 @@ def diff(repo):
 @entry.command()
 @pass_repository_decorator
 def dump(repo):
-	"""Dumps repository database
+	"""Dump repository database
 	"""
 
 	if repo.initialized_bool:
@@ -115,7 +117,7 @@ def dump(repo):
 @entry.command()
 @pass_repository_decorator
 def duplicates(repo):
-	"""Finds duplicate entries in repository
+	"""Find duplicate entries in repository
 	"""
 
 	if repo.initialized_bool:
@@ -125,9 +127,26 @@ def duplicates(repo):
 
 
 @entry.command()
+@click.argument(
+	'branch',
+	nargs = 1,
+	type = click.Choice([KEY_JOURNAL, KEY_MASTER])
+	)
+@pass_repository_decorator
+def merge(repo, branch):
+	"""Dumps repository database
+	"""
+
+	if repo.initialized_bool:
+		repo.merge(branch)
+	else:
+		print(MSG_DEBUG_NOREPOSITORY)
+
+
+@entry.command()
 @pass_repository_decorator
 def init(repo):
-	"""Creates an literature repository
+	"""Create a literature repository
 	"""
 
 	if not repo.initialized_bool:
@@ -139,8 +158,8 @@ def init(repo):
 # 	commands_dict = {
 ## 		'init': (script_init, tuple()),
 ## 		'commit': (script_commit, tuple()),
-# 		'merge_journal': (script_merge, ('journal',)),
-# 		'merge_master': (script_merge, ('master',)),
+## 		'merge_journal': (script_merge, ('journal',)),
+## 		'merge_master': (script_merge, ('master',)),
 ## 		'diff': (script_diff, tuple()),
 ## 		'dump': (script_dump, tuple()),
 ## 		'duplicates': (script_duplicates, tuple()),
