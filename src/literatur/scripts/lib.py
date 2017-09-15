@@ -48,15 +48,15 @@ from ..const import (
 	)
 from ..repo import (
 	add_switched_to_entry,
-	init_repo_folders_at_root_path,
+	# init_repo_folders_at_root_path,
 	compare_entry_lists,
 	convert_filepathtuple_to_entry,
 	create_index_from_path,
 	find_duplicates_in_entry_list,
 	find_root_path_with_message,
-	load_index_from_root_path,
+	# load_index_from_root_path,
 	merge_at_root_path,
-	store_index_at_root_path,
+	# store_index_at_root_path,
 	update_index_at_root_path
 	)
 
@@ -64,89 +64,6 @@ from ..repo import (
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # ROUTINES
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-def script_init():
-
-	try:
-		find_root_path_with_message(need_to_find = False)
-	except:
-		sys.exit()
-
-	# Create folders for repo meta data
-	current_path = os.getcwd()
-
-	# Init folders
-	init_repo_folders_at_root_path(current_path)
-
-	# Init empty database
-	store_index_at_root_path([], current_path)
-
-
-def script_commit():
-
-	try:
-		root_dir = find_root_path_with_message(need_to_find = True)
-	except:
-		sys.exit()
-
-	updated_entries_list = update_index_at_root_path(root_dir)
-
-	store_index_at_root_path(updated_entries_list, root_dir)
-
-
-def script_diff():
-
-	try:
-		root_dir = find_root_path_with_message(need_to_find = True)
-	except:
-		sys.exit()
-
-	old_entries_list = load_index_from_root_path(root_dir)
-	new_entries_list = create_index_from_path(root_dir)
-
-	# Compare old list vs new list
-	uc_list, rw_list, rm_list, nw_list, ch_list, mv_list = compare_entry_lists(old_entries_list, new_entries_list)
-
-	for rp_message, rp_list in [
-		('Unchanged', uc_list),
-		('Rewritten', rw_list)
-		]:
-		if len(rp_list) > 0:
-			print('%s: [%d files]' % (rp_message, len(rp_list)))
-
-	for rp_message, rp_list in [
-		('New', nw_list),
-		('Removed', rm_list)
-		]:
-		if len(rp_list) <= REPORT_MAX_LINES:
-			for entry in rp_list:
-				print('%s: "%s"' % (rp_message, os.path.join(entry[KEY_FILE][KEY_PATH], entry[KEY_FILE][KEY_NAME])))
-		else:
-			print('%s: [%d files]' % (rp_message, len(rp_list)))
-
-	for rp_message, rp_list in [
-		('Moved', mv_list),
-		('Changed', ch_list)
-		]:
-		if len(rp_list) <= REPORT_MAX_LINES:
-			for entry in rp_list:
-				for rp_line in entry['report']:
-					print(rp_line)
-		else:
-			print('%s: [%d files]' % (rp_message, len(rp_list)))
-
-
-def script_dump():
-
-	try:
-		root_dir = find_root_path_with_message(need_to_find = True)
-	except:
-		sys.exit()
-
-	entries_list = load_index_from_root_path(root_dir)
-
-	store_index_at_root_path(entries_list, root_dir, mode = 'json')
-
 
 def script_duplicates():
 

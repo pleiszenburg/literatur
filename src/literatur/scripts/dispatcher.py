@@ -29,23 +29,33 @@ specific language governing rights and limitations under the License.
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 import argparse
-import os # TODO remove?
+import os
+from pprint import pprint as pp
 import sys # TODO remove?
 
 import click
 
 from .guis import script_ui_filerename
-from .lib import (
-	script_init,
-	script_commit,
-	script_merge,
-	script_diff,
-	script_dump,
-	script_duplicates,
-	script_metainfo,
-	script_stats
-	)
+# from .lib import (
+# 	#script_init,
+# 	#script_commit,
+# 	script_merge,
+# 	#script_diff,
+# 	script_dump,
+# 	script_duplicates,
+# 	script_metainfo,
+# 	script_stats
+# 	)
 
+from ..const import (
+	KEY_FILE,
+	KEY_NAME,
+	KEY_PATH,
+	KEY_REPORT,
+	MSG_DEBUG_INREPOSITORY,
+	MSG_DEBUG_NOREPOSITORY,
+	REPORT_MAX_LINES
+	)
 from ..repo import repository_class
 pass_repository_decorator = click.make_pass_decorator(repository_class, ensure = True)
 
@@ -68,21 +78,72 @@ def entry(click_context):
 
 @entry.command()
 @pass_repository_decorator
-def diff(repo):
-	"""Shows uncommited changes.
+def commit(repo):
+	"""Record changes to the repository
 	"""
 
-	script_diff()
+	if repo.initialized_bool:
+		repo.commit()
+	else:
+		print(MSG_DEBUG_NOREPOSITORY)
+
+
+@entry.command()
+@pass_repository_decorator
+def diff(repo):
+	"""Shows uncommited changes
+	"""
+
+	if repo.initialized_bool:
+		__print_diff__(*(repo.diff()))
+	else:
+		print(MSG_DEBUG_NOREPOSITORY)
+
+
+@entry.command()
+@pass_repository_decorator
+def dump(repo):
+	"""Dumps repository database
+	"""
+
+	if repo.initialized_bool:
+		repo.dump()
+	else:
+		print(MSG_DEBUG_NOREPOSITORY)
+
+
+@entry.command()
+@pass_repository_decorator
+def duplicates(repo):
+	"""Finds duplicate entries in repository
+	"""
+
+	if repo.initialized_bool:
+		__print_duplicates__(repo.find_duplicates())
+	else:
+		print(MSG_DEBUG_NOREPOSITORY)
+
+
+@entry.command()
+@pass_repository_decorator
+def init(repo):
+	"""Creates an literature repository
+	"""
+
+	if not repo.initialized_bool:
+		repo.init()
+	else:
+		print(MSG_DEBUG_INREPOSITORY % repo.root_path)
 
 
 # 	commands_dict = {
-# 		'init': (script_init, tuple()),
-# 		'commit': (script_commit, tuple()),
+## 		'init': (script_init, tuple()),
+## 		'commit': (script_commit, tuple()),
 # 		'merge_journal': (script_merge, ('journal',)),
 # 		'merge_master': (script_merge, ('master',)),
 ## 		'diff': (script_diff, tuple()),
-# 		'dump': (script_dump, tuple()),
-# 		'duplicates': (script_duplicates, tuple()),
+## 		'dump': (script_dump, tuple()),
+## 		'duplicates': (script_duplicates, tuple()),
 # 		'meta': (script_metainfo, tuple()),
 # 		'stats': (script_stats, tuple()),
 # 		'rename': (script_ui_filerename, (sys.argv,))
@@ -101,3 +162,39 @@ def diff(repo):
 # 			ret_else.append(argument)
 #
 # 	return ret_files, ret_else
+
+
+def __print_diff__(uc_list, rw_list, rm_list, nw_list, ch_list, mv_list):
+
+	for rp_message, rp_list in [
+		('Unchanged', uc_list),
+		('Rewritten', rw_list)
+		]:
+		if len(rp_list) > 0:
+			print('%s: [%d files]' % (rp_message, len(rp_list)))
+
+	for rp_message, rp_list in [
+		('New', nw_list),
+		('Removed', rm_list)
+		]:
+		if len(rp_list) <= REPORT_MAX_LINES:
+			for entry in rp_list:
+				print('%s: "%s"' % (rp_message, os.path.join(entry[KEY_FILE][KEY_PATH], entry[KEY_FILE][KEY_NAME])))
+		else:
+			print('%s: [%d files]' % (rp_message, len(rp_list)))
+
+	for rp_message, rp_list in [
+		('Moved', mv_list),
+		('Changed', ch_list)
+		]:
+		if len(rp_list) <= REPORT_MAX_LINES:
+			for entry in rp_list:
+				for rp_line in entry[KEY_REPORT]:
+					print(rp_line)
+		else:
+			print('%s: [%d files]' % (rp_message, len(rp_list)))
+
+
+def __print_duplicates__(duplicates_list):
+
+	pp(duplicates_list)

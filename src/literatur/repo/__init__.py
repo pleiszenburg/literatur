@@ -36,18 +36,7 @@ from .entry import (
 	find_duplicates_in_entry_list
 	)
 from .fs import get_file_list
-from .index import (
-	create_index_from_path,
-	update_index_at_root_path
-	)
 from .merge import (
 	merge_at_root_path
 	)
 from .series import get_series_dict
-from .storage import (
-	init_repo_folders_at_root_path,
-	find_root_path,
-	find_root_path_with_message,
-	load_index_from_root_path,
-	store_index_at_root_path
-	)
