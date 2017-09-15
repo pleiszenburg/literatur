@@ -65,20 +65,6 @@ from ..repo import (
 # ROUTINES
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-def script_duplicates():
-
-	try:
-		root_dir = find_root_path_with_message(need_to_find = True)
-	except:
-		sys.exit()
-
-	entries_list = load_index_from_root_path(root_dir)
-
-	duplicates_dict = find_duplicates_in_entry_list(entries_list)
-
-	pp(duplicates_dict)
-
-
 def script_merge(target = KEY_JOURNAL):
 
 	try:
