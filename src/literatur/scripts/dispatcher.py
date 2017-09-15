@@ -172,25 +172,6 @@ def stats(repo):
 		print(MSG_DEBUG_NOREPOSITORY)
 
 
-# 	commands_dict = {
-# 		'meta': (script_metainfo, tuple()),
-# 		'rename': (script_ui_filerename, (sys.argv,))
-# 		}
-
-# def __get_arg_file_list__():
-#
-# 	ret_files = []
-# 	ret_else = []
-#
-# 	for argument in sys.argv[1:]:
-# 		if os.path.isfile(argument):
-# 			ret_files.append(argument)
-# 		else:
-# 			ret_else.append(argument)
-#
-# 	return ret_files, ret_else
-
-
 def __print_diff__(uc_list, rw_list, rm_list, nw_list, ch_list, mv_list):
 
 	for rp_message, rp_list in [
