@@ -33,7 +33,7 @@ PATH_SUB_DB = 'db'
 PATH_SUB_DBBACKUP = 'db/backup'
 PATH_SUB_REPORTS = 'reports'
 
-PATH_REPO = '.l'
+PATH_REPO = '.lit'
 
 IGNORE_DIR_LIST = [
 	PATH_REPO,

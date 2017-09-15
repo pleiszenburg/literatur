@@ -32,6 +32,7 @@ The following Python packages are required:
 - ``tqdm``
 - ``humanize``
 - ``msgpack-python``
+- ``click``
 
 Installation
 ============
@@ -46,8 +47,8 @@ Basic usage & philosophy
 ========================
 
 Think of *git* with two hard-coded branches (``journal`` and ``master``) and a staging area (``current``).
-Think of the folder ``.l`` like you would think about ``.git``.
-Find reports and analysis data in ``.l/reports``.
+Think of the folder ``.lit`` like you would think about ``.git``.
+Find reports and analysis data in ``.lit/reports``.
 
 First, run ``lit init`` at the root of a new repository.
 Show difference to ``current`` index with ``lit diff``.
@@ -74,11 +75,14 @@ Full list of commands
 	lit init
 	lit diff
 	lit commit
-	lit merge_journal
-	lit merge_master
+	lit merge BRANCH
 	lit dump
+	lit duplicates
 	lit stats
-	lit meta
+	lit file [FILE(s) ...]
+	lit rename
+
+Check ``lit --help`` or ``lit COMMAND --help`` for details.
 
 Need help?
 ==========

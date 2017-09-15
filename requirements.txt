@@ -14,3 +14,4 @@ xmltodict
 tqdm
 humanize
 msgpack-python
+click
