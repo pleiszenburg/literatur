@@ -36,16 +36,6 @@ import sys # TODO remove?
 import click
 
 from .guis import script_ui_filerename
-# from .lib import (
-# 	#script_init,
-# 	#script_commit,
-# 	script_merge,
-# 	#script_diff,
-# 	script_dump,
-# 	script_duplicates,
-# 	script_metainfo,
-# 	script_stats
-# 	)
 
 from ..const import (
 	KEY_FILE,
@@ -168,19 +158,10 @@ def stats(repo):
 
 
 # 	commands_dict = {
-## 		'init': (script_init, tuple()),
-## 		'commit': (script_commit, tuple()),
-## 		'merge_journal': (script_merge, ('journal',)),
-## 		'merge_master': (script_merge, ('master',)),
-## 		'diff': (script_diff, tuple()),
-## 		'dump': (script_dump, tuple()),
-## 		'duplicates': (script_duplicates, tuple()),
 # 		'meta': (script_metainfo, tuple()),
-## 		'stats': (script_stats, tuple()),
 # 		'rename': (script_ui_filerename, (sys.argv,))
 # 		}
-#
-#
+
 # def __get_arg_file_list__():
 #
 # 	ret_files = []

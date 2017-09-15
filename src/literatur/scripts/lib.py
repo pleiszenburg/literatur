@@ -65,15 +65,6 @@ from ..repo import (
 # ROUTINES
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-def script_merge(target = KEY_JOURNAL):
-
-	try:
-		root_dir = find_root_path_with_message(need_to_find = True)
-	except:
-		sys.exit()
-
-	merge_at_root_path(root_dir, target)
-
 
 def script_metainfo(current_path, file_list):
 
@@ -84,22 +75,3 @@ def script_metainfo(current_path, file_list):
 		meta.append(entry)
 
 	pp(meta)
-
-
-def script_stats():
-
-	try:
-		root_dir = find_root_path_with_message(need_to_find = True)
-	except:
-		sys.exit()
-
-	entries_list = load_index_from_root_path(root_dir)
-
-	magic_list = [entry[KEY_FILE][KEY_MAGIC] for entry in entries_list]
-	mime_list = [entry[KEY_FILE][KEY_MIME] for entry in entries_list]
-
-	magic_dict = Counter(magic_list)
-	mime_dict = Counter(mime_list)
-
-	pp(OrderedDict(sorted(magic_dict.items(), key = lambda t: t[1])))
-	pp(OrderedDict(sorted(mime_dict.items(), key = lambda t: t[1])))
