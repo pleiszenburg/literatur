@@ -140,7 +140,7 @@ def file(repo, file):
 	)
 @pass_repository_decorator
 def merge(repo, branch):
-	"""Merge repository changes from staging to journal or journal to master
+	"""Merge repository changes from current to journal or journal to master
 	"""
 
 	if repo.initialized_bool:

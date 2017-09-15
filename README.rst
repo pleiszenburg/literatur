@@ -52,14 +52,14 @@ Find reports and analysis data in ``.l/reports``.
 First, run ``lit init`` at the root of a new repository.
 Show difference to ``current`` index with ``lit diff``.
 Commit to the ``current`` index with ``lit commit``.
-Merge the changes into the ``journal`` branch with ``lit merge_journal``.
-Make changes permanent by further merging them into ``master`` with ``lit merge_master``.
+Merge the changes into the ``journal`` branch with ``lit merge journal``.
+Make changes permanent by further merging them into ``master`` with ``lit merge master``.
 Dump the database into plain text files with ``lit dump``.
 Find duplicates in the repository by file hash with ``lit duplicates``.
-Get meta information from file with ``lit meta``, JSON output.
+Get meta information from file with ``lit file``, JSON output.
 Show repository statistics with ``lit stats``.
+Adjust filenames following patterns with ``lit rename``.
 
-.. _Add literature and adjust the filenames with ``l_rename``.
 .. _Check the repository state, i.e. the file names, with ``l_sanity``.
 .. _Generate all sorts of useful reports with ``l_report``.
 .. _Determine the type of a file with ``l_file``, JSON output.
