@@ -28,6 +28,10 @@ specific language governing rights and limitations under the License.
 # IMPORT
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+from collections import (
+	Counter,
+	OrderedDict
+	)
 import os
 import pickle
 from pprint import pprint as pp
@@ -48,9 +52,12 @@ from ..const import (
 	FILE_DB_CURRENT,
 	FILE_DB_JOURNAL,
 	FILE_DB_MASTER,
+	KEY_FILE,
 	KEY_JSON,
 	KEY_JOURNAL,
+	KEY_MAGIC,
 	KEY_MASTER,
+	KEY_MIME,
 	KEY_MP,
 	KEY_PKL,
 	PATH_REPO,
@@ -147,6 +154,29 @@ class repository_class():
 				self.__load_index__()
 
 			return find_duplicates_in_entry_list(self.index_dict_list)
+
+		else:
+
+			raise # TODO
+
+
+	def get_stats(self):
+
+		if self.initialized_bool:
+
+			if not self.index_loaded_bool:
+				self.__load_index__()
+
+			magic_list = [entry[KEY_FILE][KEY_MAGIC] for entry in self.index_dict_list]
+			mime_list = [entry[KEY_FILE][KEY_MIME] for entry in self.index_dict_list]
+
+			magic_dict = Counter(magic_list)
+			mime_dict = Counter(mime_list)
+
+			return {
+				KEY_MAGIC: OrderedDict(sorted(magic_dict.items(), key = lambda t: t[1])),
+				KEY_MIME: OrderedDict(sorted(mime_dict.items(), key = lambda t: t[1]))
+				}
 
 		else:
 

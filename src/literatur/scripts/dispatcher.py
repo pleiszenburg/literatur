@@ -155,6 +155,18 @@ def init(repo):
 		print(MSG_DEBUG_INREPOSITORY % repo.root_path)
 
 
+@entry.command()
+@pass_repository_decorator
+def stats(repo):
+	"""Display repository statistics
+	"""
+
+	if repo.initialized_bool:
+		__print_stats__(repo.get_stats())
+	else:
+		print(MSG_DEBUG_NOREPOSITORY)
+
+
 # 	commands_dict = {
 ## 		'init': (script_init, tuple()),
 ## 		'commit': (script_commit, tuple()),
@@ -164,7 +176,7 @@ def init(repo):
 ## 		'dump': (script_dump, tuple()),
 ## 		'duplicates': (script_duplicates, tuple()),
 # 		'meta': (script_metainfo, tuple()),
-# 		'stats': (script_stats, tuple()),
+## 		'stats': (script_stats, tuple()),
 # 		'rename': (script_ui_filerename, (sys.argv,))
 # 		}
 #
@@ -217,3 +229,10 @@ def __print_diff__(uc_list, rw_list, rm_list, nw_list, ch_list, mv_list):
 def __print_duplicates__(duplicates_list):
 
 	pp(duplicates_list)
+
+
+def __print_stats__(stats_dict):
+
+	for key in stats_dict.keys():
+		print(key)
+		pp(stats_dict[key])
