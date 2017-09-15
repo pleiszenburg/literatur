@@ -52,6 +52,7 @@ from ..const import (
 	FILE_DB_CURRENT,
 	FILE_DB_JOURNAL,
 	FILE_DB_MASTER,
+	KEY_ALL,
 	KEY_FILE,
 	KEY_JSON,
 	KEY_JOURNAL,
@@ -158,6 +159,16 @@ class repository_class():
 		else:
 
 			raise # TODO
+
+
+	def get_file_metainfo(self, filename):
+
+		# TODO check if it is already in DB etc ...
+
+		entry = convert_filepathtuple_to_entry((self.current_path, filename))
+		add_switched_to_entry(entry, {KEY_ALL: True})
+
+		return entry
 
 
 	def get_stats(self):

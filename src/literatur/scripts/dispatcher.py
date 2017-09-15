@@ -118,6 +118,21 @@ def duplicates(repo):
 
 @entry.command()
 @click.argument(
+	'file',
+	nargs = -1,
+	type = click.Path(exists = True)
+	)
+@pass_repository_decorator
+def file(repo, file):
+	"""Get meta information on file(s)
+	"""
+
+	for filename in file:
+		__print_file_metainfo__(repo.get_file_metainfo(filename))
+
+
+@entry.command()
+@click.argument(
 	'branch',
 	nargs = 1,
 	type = click.Choice([KEY_JOURNAL, KEY_MASTER])
@@ -210,6 +225,11 @@ def __print_diff__(uc_list, rw_list, rm_list, nw_list, ch_list, mv_list):
 def __print_duplicates__(duplicates_list):
 
 	pp(duplicates_list)
+
+
+def __print_file_metainfo__(metainfo_dict):
+
+	pp(metainfo_dict)
 
 
 def __print_stats__(stats_dict):
