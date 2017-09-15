@@ -39,6 +39,7 @@ from .lib import (
 	)
 from .string import clean_str
 
+from ..config import get_series_dict
 from ..const import (
 	ANNOTATION_LIST,
 	DELIMITER_FILENAME_BLOCK,
@@ -73,7 +74,6 @@ from ..const import (
 	MSG_DEBUG_YEARNAN,
 	TITLE_LENGTH_MIN_INT
 	)
-from ..repo import get_series_dict
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

@@ -29,68 +29,203 @@ specific language governing rights and limitations under the License.
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 import argparse
-import os # TODO remove?
+from importlib import import_module
+import os
+from pprint import pprint as pp
 import sys # TODO remove?
 
+import click
+
 from .guis import script_ui_filerename
-from .lib import (
-	script_init,
-	script_commit,
-	script_merge,
-	script_diff,
-	script_dump,
-	script_duplicates,
-	script_metainfo,
-	script_stats
+
+from ..const import (
+	KEY_FILE,
+	KEY_JOURNAL,
+	KEY_MASTER,
+	KEY_NAME,
+	KEY_PATH,
+	KEY_REPORT,
+	MSG_DEBUG_INREPOSITORY,
+	MSG_DEBUG_NOREPOSITORY,
+	REPORT_MAX_LINES
 	)
+from ..repo import repository_class
+pass_repository_decorator = click.make_pass_decorator(repository_class, ensure = True)
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # ROUTINES
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-def entry():
 
-	commands_dict = {
-		'init': (script_init, tuple()),
-		'commit': (script_commit, tuple()),
-		'merge_journal': (script_merge, ('journal',)),
-		'merge_master': (script_merge, ('master',)),
-		'diff': (script_diff, tuple()),
-		'dump': (script_dump, tuple()),
-		'duplicates': (script_duplicates, tuple()),
-		'meta': (script_metainfo, tuple()),
-		'stats': (script_stats, tuple()),
-		'rename': (script_ui_filerename, (sys.argv,))
-		}
+@click.group()
+@click.pass_context
+def entry(click_context):
+	"""LITERATUR
 
-	parser = argparse.ArgumentParser(
-		prog = 'LITERATUR',
-		description = 'Literature management with Python, Dropbox and MediaWiki'
-		)
-	parser.add_argument(
-		dest = 'command',
-		nargs = 1,
-		action = 'store',
-		type = str,
-		choices = list(commands_dict.keys())
-		)
-	args = parser.parse_args()
+	Literature management with Python, Dropbox and MediaWiki
+	"""
 
-	cmd_routine, cmd_arguments = commands_dict[args.command[0]]
-	cmd_routine(*cmd_arguments)
-	# TODO fix input for meta
+	click_context.obj = repository_class()
 
 
-def __get_arg_file_list__():
+@entry.command()
+@pass_repository_decorator
+def commit(repo):
+	"""Record changes to the repository
+	"""
 
-	ret_files = []
-	ret_else = []
+	if repo.initialized_bool:
+		repo.commit()
+	else:
+		print(MSG_DEBUG_NOREPOSITORY)
 
-	for argument in sys.argv[1:]:
-		if os.path.isfile(argument):
-			ret_files.append(argument)
+
+@entry.command()
+@pass_repository_decorator
+def diff(repo):
+	"""Show uncommited changes
+	"""
+
+	if repo.initialized_bool:
+		__print_diff__(*(repo.diff()))
+	else:
+		print(MSG_DEBUG_NOREPOSITORY)
+
+
+@entry.command()
+@pass_repository_decorator
+def dump(repo):
+	"""Dump repository database
+	"""
+
+	if repo.initialized_bool:
+		repo.dump()
+	else:
+		print(MSG_DEBUG_NOREPOSITORY)
+
+
+@entry.command()
+@pass_repository_decorator
+def duplicates(repo):
+	"""Find duplicate entries in repository
+	"""
+
+	if repo.initialized_bool:
+		__print_duplicates__(repo.find_duplicates())
+	else:
+		print(MSG_DEBUG_NOREPOSITORY)
+
+
+@entry.command()
+@click.argument(
+	'file',
+	nargs = -1,
+	type = click.Path(exists = True)
+	)
+@pass_repository_decorator
+def file(repo, file):
+	"""Get meta information on file(s)
+	"""
+
+	for filename in file:
+		__print_file_metainfo__(repo.get_file_metainfo(filename))
+
+
+@entry.command()
+@click.argument(
+	'branch',
+	nargs = 1,
+	type = click.Choice([KEY_JOURNAL, KEY_MASTER])
+	)
+@pass_repository_decorator
+def merge(repo, branch):
+	"""Merge repository changes from staging to journal or journal to master
+	"""
+
+	if repo.initialized_bool:
+		repo.merge(branch)
+	else:
+		print(MSG_DEBUG_NOREPOSITORY)
+
+
+@entry.command()
+@pass_repository_decorator
+def init(repo):
+	"""Create a literature repository
+	"""
+
+	if not repo.initialized_bool:
+		repo.init()
+	else:
+		print(MSG_DEBUG_INREPOSITORY % repo.root_path)
+
+
+@entry.command()
+@pass_repository_decorator
+def rename(repo):
+	"""Launch GUI for renaming files
+	"""
+
+	guis = import_module('literatur.scripts.guis')
+	guis.script_ui_filerename()
+
+
+@entry.command()
+@pass_repository_decorator
+def stats(repo):
+	"""Display repository statistics
+	"""
+
+	if repo.initialized_bool:
+		__print_stats__(repo.get_stats())
+	else:
+		print(MSG_DEBUG_NOREPOSITORY)
+
+
+def __print_diff__(uc_list, rw_list, rm_list, nw_list, ch_list, mv_list):
+
+	for rp_message, rp_list in [
+		('Unchanged', uc_list),
+		('Rewritten', rw_list)
+		]:
+		if len(rp_list) > 0:
+			print('%s: [%d files]' % (rp_message, len(rp_list)))
+
+	for rp_message, rp_list in [
+		('New', nw_list),
+		('Removed', rm_list)
+		]:
+		if len(rp_list) <= REPORT_MAX_LINES:
+			for entry in rp_list:
+				print('%s: "%s"' % (rp_message, os.path.join(entry[KEY_FILE][KEY_PATH], entry[KEY_FILE][KEY_NAME])))
 		else:
-			ret_else.append(argument)
+			print('%s: [%d files]' % (rp_message, len(rp_list)))
 
-	return ret_files, ret_else
+	for rp_message, rp_list in [
+		('Moved', mv_list),
+		('Changed', ch_list)
+		]:
+		if len(rp_list) <= REPORT_MAX_LINES:
+			for entry in rp_list:
+				for rp_line in entry[KEY_REPORT]:
+					print(rp_line)
+		else:
+			print('%s: [%d files]' % (rp_message, len(rp_list)))
+
+
+def __print_duplicates__(duplicates_list):
+
+	pp(duplicates_list)
+
+
+def __print_file_metainfo__(metainfo_dict):
+
+	pp(metainfo_dict)
+
+
+def __print_stats__(stats_dict):
+
+	for key in stats_dict.keys():
+		print(key)
+		pp(stats_dict[key])

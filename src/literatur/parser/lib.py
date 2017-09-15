@@ -30,7 +30,9 @@ specific language governing rights and limitations under the License.
 
 from collections import OrderedDict
 import string
+import time
 
+from ..config import get_series_dict
 from ..const import (
 	AUTHORS_ETAL,
 	AUTHORS_EXCLUDE_LIST,
@@ -55,7 +57,6 @@ from ..const import (
 	KEY_TITLE,
 	KEY_YEAR
 	)
-from ..repo import get_series_dict
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -116,6 +117,19 @@ def authors_dict_to_string(authors_dict, max_length_int = None, etal_input_bool 
 		etal_bool = True
 
 	return DELIMITER_FILENAME_SUB.join(author_list)
+
+
+def ctime_to_datestring(ctime):
+
+	# Get time in sec, convert to GMT and time object
+	ctime_object = time.gmtime(ctime)
+
+	# Convert time object into string
+	ctime_string = "{:04d}-{:02d}-{:02d}_{:02d}-{:02d}-{:02d}".format(
+		ctime_object.tm_year, ctime_object.tm_mon, ctime_object.tm_mday, ctime_object.tm_hour, ctime_object.tm_min, ctime_object.tm_sec
+		)
+
+	return ctime_string
 
 
 def get_default_metaentry_dict():
