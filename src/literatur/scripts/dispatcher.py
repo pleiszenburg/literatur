@@ -29,6 +29,7 @@ specific language governing rights and limitations under the License.
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 import argparse
+from importlib import import_module
 import os
 from pprint import pprint as pp
 import sys # TODO remove?
@@ -158,6 +159,16 @@ def init(repo):
 		repo.init()
 	else:
 		print(MSG_DEBUG_INREPOSITORY % repo.root_path)
+
+
+@entry.command()
+@pass_repository_decorator
+def rename(repo):
+	"""Launch GUI for renaming files
+	"""
+
+	guis = import_module('literatur.scripts.guis')
+	guis.script_ui_filerename()
 
 
 @entry.command()
