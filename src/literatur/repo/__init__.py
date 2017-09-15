@@ -29,10 +29,4 @@ specific language governing rights and limitations under the License.
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 from .core import repository_class
-from .entry import (
-	add_switched_to_entry,
-	compare_entry_lists,
-	convert_filepathtuple_to_entry,
-	find_duplicates_in_entry_list
-	)
 from .fs import get_file_list
