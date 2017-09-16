@@ -81,6 +81,8 @@ class entry_class():
 		} # file information
 	f_ch_dict = {} # dict for updated file information
 	m_dict = {} # meta information
+	status = None # Changed, moved, ...
+	report = None # Detailes on status
 
 
 	def __init__(self, file_dict = None, meta_dict = None, filepath_tuple = None, root_path = None):
@@ -119,6 +121,8 @@ class entry_class():
 
 		self.f_dict.update(self.f_ch_dict)
 		self.f_ch_dict = {}
+		self.report = None
+		self.status = None
 		self.update_existence()
 
 
