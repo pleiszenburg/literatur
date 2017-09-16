@@ -28,6 +28,7 @@ specific language governing rights and limitations under the License.
 # IMPORT
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+import hashlib
 import os
 
 from ..const import (
@@ -110,6 +111,58 @@ class entry_class():
 	def update_existence(self):
 
 		self.f_dict[KEY_EXISTS_BOOL] = self.check_existence_and_return()
+
+
+	def update_id(self):
+
+		if self.f_dict[KEY_EXISTS_BOOL]:
+
+			field_key_list = [KEY_NAME, KEY_PATH, KEY_MODE, KEY_INODE, KEY_SIZE, KEY_MTIME]
+			field_value_list = [
+				str(self.f_dict[key]) for key in field_key_list
+				]
+			field_value_str = ' '.join(field_value_list)
+
+			hash_object = hashlib.sha256(field_value_str.encode())
+
+			self.f_dict[KEY_ID] = hash_object.hexdigest()
+
+		else:
+
+			raise # TODO
+
+
+	def update_hash(self):
+
+		if self.f_dict[KEY_EXISTS_BOOL]:
+
+			in_path = os.path.join(self.get_full_path(), self.f_dict[KEY_NAME])
+			blocksize = 65536
+			hasher = hashlib.sha256()
+
+			f = open(in_path, 'rb')
+			buf = f.read(blocksize)
+			while len(buf) > 0:
+				hasher.update(buf)
+				buf = f.read(blocksize)
+			f.close()
+
+			self.f_dict[KEY_HASH] = hasher.hexdigest()
+
+		else:
+
+			raise # TODO
+
+
+	def update_magic(self):
+
+		if self.f_dict[KEY_EXISTS_BOOL]:
+
+			pass
+
+		else:
+
+			raise # TODO
 
 
 	def update_fileinfo(self):
