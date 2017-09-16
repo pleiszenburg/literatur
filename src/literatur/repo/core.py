@@ -68,7 +68,10 @@ from ..const import (
 	PATH_SUB_REPORTS
 	)
 from ..entry import entry_class
-from ..parallel import run_in_parallel_with_return
+from ..parallel import (
+	run_in_parallel_with_return,
+	run_routines_on_objects_in_parallel_and_return
+	)
 from ..parser import ctime_to_datestring
 
 
@@ -300,22 +303,21 @@ class repository_class():
 		# Build new index of paths and filenames
 		filepathtuple_list = get_recursive_filepathtuple_list(self.root_path)
 		# Convert index into list of entries
-		entries_dict_list = [entry_class(
+		entries_list = [entry_class(
 			filepath_tuple = item,
 			root_path = self.root_path
 			) for item in filepathtuple_list]
 
 		# Run index helper in parallel
-		entries_dict_list = run_in_parallel_with_return(
-			add_switched_to_entry,
-			entries_dict_list,
-			add_return = True
+		entries_list = run_routines_on_objects_in_parallel_and_return(
+			entries_list,
+			['update_existence', 'update_fileinfo', 'update_id']
 			)
 
 		# Restore old CWD
 		os.chdir(self.current_path)
 
-		return entries_dict_list
+		return entries_list
 
 
 	def __load_index__(self, mode = KEY_MP, force_reload = False):
