@@ -32,9 +32,9 @@ import hashlib
 import os
 
 from ..const import (
-	KEY_ALL,
-	KEY_FILE,
-	KEY_FILE_TMP,
+	# KEY_ALL,
+	# KEY_FILE,
+	# KEY_FILE_TMP,
 	KEY_ID,
 	KEY_INFO,
 	KEY_INODE,
@@ -45,9 +45,9 @@ from ..const import (
 	KEY_MTIME,
 	KEY_NAME,
 	KEY_PATH,
-	KEY_REPORT,
+	# KEY_REPORT,
 	KEY_SIZE,
-	KEY_STATUS,
+	# KEY_STATUS,
 	KEY_TYPE
 	)
 from ..filetypes import (
