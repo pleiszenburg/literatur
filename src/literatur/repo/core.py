@@ -122,10 +122,10 @@ class repository_class():
 			if not self.index_loaded_bool:
 				self.__load_index__()
 			old_entries_list = self.index_list
-			new_entries_list = self.__generate_index_and_return__()
+			new_entries_light_list = self.__generate_light_index_and_return__()
 
 			# Compare old list vs new list and return result
-			return compare_entry_lists(old_entries_list, new_entries_list)
+			return compare_entry_lists(old_entries_list, new_entries_light_list)
 
 		else:
 
@@ -300,7 +300,7 @@ class repository_class():
 		raise # TODO
 
 
-	def __generate_index_and_return__(self):
+	def __generate_light_index_and_return__(self):
 
 		# Set CWD to root
 		os.chdir(self.root_path)

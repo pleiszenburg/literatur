@@ -28,30 +28,37 @@ specific language governing rights and limitations under the License.
 # IMPORT
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-from ..parallel import run_in_parallel_with_return
+from ..const import (
+	STATUS_CH,
+	STATUS_MV,
+	STATUS_NW,
+	STATUS_RM,
+	STATUS_RW,
+	STATUS_UC
+	)
+from ..parallel import run_routines_on_objects_in_parallel_and_return
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # ROUTINES
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-def compare_entry_lists(a_entry_list, b_entry_list):
+def compare_entry_lists(a_entry_list, b_entry_light_list):
 
 	# Find unchanged files
-	diff_uc_list, a_entry_list, b_entry_list = __find_process_diff__(
-		a_entry_list, b_entry_list, (KEY_ID,), STATUS_UC
+	diff_uc_list, a_entry_list, b_entry_light_list = __find_process_diff__(
+		a_entry_list, b_entry_light_list, (KEY_ID,), STATUS_UC
 		)
 
 	# Find moved and renamed files
-	diff_mv_list, a_entry_list, b_entry_list = __find_process_diff__(
-		a_entry_list, b_entry_list, (KEY_INODE, KEY_MTIME, KEY_SIZE), STATUS_MV
+	diff_mv_list, a_entry_list, b_entry_light_list = __find_process_diff__(
+		a_entry_list, b_entry_light_list, (KEY_INODE, KEY_MTIME, KEY_SIZE), STATUS_MV
 		)
 
 	# Fetch missing information on b-list entries (hash, magic, mime, type)
-	b_entry_list = run_in_parallel_with_return(
-		partial(add_switched_to_entry, switch_list = [KEY_ALL]),
-		b_entry_list,
-		add_return = True
+	b_entry_list = run_routines_on_objects_in_parallel_and_return(
+		b_entry_light_list,
+		['update_hash', 'update_magic', 'update_type']
 		)
 
 	# Find files, which have likely been written to a new inode
