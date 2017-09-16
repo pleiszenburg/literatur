@@ -170,8 +170,19 @@ class repository_class():
 
 		# TODO check if it is already in DB etc ...
 
-		entry = convert_filepathtuple_to_entry((self.current_path, filename))
-		add_switched_to_entry(entry, {KEY_ALL: True})
+		entry = entry_class(
+			filepath_tuple = (self.current_path, filename),
+			root_path = self.root_path
+			)
+		for routine_name in [
+			'update_existence',
+			'update_fileinfo',
+			'update_id',
+			'update_hash',
+			'update_magic',
+			'update_type'
+			]:
+			getattr(entry, routine_name)()
 
 		return entry
 
