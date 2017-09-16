@@ -50,6 +50,11 @@ from ..const import (
 	KEY_STATUS,
 	KEY_TYPE
 	)
+from ..filetypes import (
+	get_literatur_type_from_magicinfo,
+	get_magicinfo,
+	get_mimetype
+	)
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -158,7 +163,11 @@ class entry_class():
 
 		if self.f_dict[KEY_EXISTS_BOOL]:
 
-			pass
+			path = self.get_full_path()
+			self.f_dict.update({
+				KEY_MAGIC: get_magicinfo((path, self.f_dict[KEY_NAME])),
+				KEY_MIME: get_mimetype((path, self.f_dict[KEY_NAME]))
+				})
 
 		else:
 
@@ -180,3 +189,8 @@ class entry_class():
 		else:
 
 			raise # TODO
+
+
+	def update_type(self):
+
+		pass
