@@ -63,6 +63,7 @@ from ..filetypes import (
 
 class entry_class():
 
+
 	root_path = '' # Root path of repository
 	f_dict = {
 		KEY_EXISTS_BOOL: False,
@@ -193,4 +194,4 @@ class entry_class():
 
 	def update_type(self):
 
-		pass
+		self.f_dict[KEY_TYPE] = get_literatur_type_from_magicinfo(self.f_dict[KEY_MAGIC])
