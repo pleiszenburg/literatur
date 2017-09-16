@@ -30,22 +30,27 @@ specific language governing rights and limitations under the License.
 
 import hashlib
 import os
+from pprint import pformat as pf
 
 import humanize
 
 from ..const import (
 	KEY_EXISTS_BOOL,
+	KEY_FILE,
 	KEY_ID,
 	KEY_INFO,
 	KEY_INODE,
 	KEY_HASH,
 	KEY_MAGIC,
+	KEY_META,
 	KEY_MIME,
 	KEY_MODE,
 	KEY_MTIME,
 	KEY_NAME,
 	KEY_PATH,
+	KEY_REPORT,
 	KEY_SIZE,
+	KEY_STATUS,
 	KEY_TYPE,
 	STATUS_CH,
 	STATUS_MV,
@@ -105,6 +110,24 @@ class entry_class():
 
 		if root_path is not None and type(root_path) == str:
 			self.root_path = root_path
+
+
+	def __repr__(self):
+
+		if self.status is None:
+			return pf({
+				KEY_FILE: self.f_dict,
+				KEY_META: self.m_dict
+				})
+		else:
+			merged_f_dict = {key: self.f_dict[key] for key in self.f_dict.keys()}
+			merged_f_dict.update(self.f_ch_dict)
+			return pf({
+				KEY_FILE: merged_f_dict,
+				KEY_META: self.m_dict,
+				KEY_REPORT: self.report,
+				KEY_STATUS: self.status
+				})
 
 
 	def check_existence_and_return(self):
