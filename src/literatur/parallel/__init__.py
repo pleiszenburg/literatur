@@ -81,6 +81,29 @@ def run_in_parallel_with_return(func_handle, parameter_list, add_return = False)
 	return return_list
 
 
+def run_routines_on_objects_in_parallel_and_return(in_object_list, routine_list):
+
+	object_count = len(in_object_list)
+	func_handle = partial(__run_routines_on_object_and_return__, routine_list)
+
+	with multiprocessing.Pool(processes = NUM_CORES) as p:
+
+		out_object_list = list(tqdm.tqdm(p.imap_unordered(
+			func_handle,
+			(in_object for in_object in in_object_list),
+			get_optimal_chunksize(object_count)
+			), total = object_count))
+
+	return out_object_list
+
+
+def __run_routines_on_object_and_return__(routine_list, in_object):
+
+	for routine_name in routine_list:
+		getattr(in_object, routine_name)()
+	return in_object
+
+
 def __wrapper_with_return__(func_handle, mutable_object, **kw):
 	func_handle(mutable_object, **kw)
 	return mutable_object

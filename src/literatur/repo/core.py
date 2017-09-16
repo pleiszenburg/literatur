@@ -300,7 +300,10 @@ class repository_class():
 		# Build new index of paths and filenames
 		filepathtuple_list = get_recursive_filepathtuple_list(self.root_path)
 		# Convert index into list of entries
-		entries_dict_list = [convert_filepathtuple_to_entry(item) for item in filepathtuple_list]
+		entries_dict_list = [entry_class(
+			filepath_tuple = item,
+			root_path = self.root_path
+			) for item in filepathtuple_list]
 
 		# Run index helper in parallel
 		entries_dict_list = run_in_parallel_with_return(
