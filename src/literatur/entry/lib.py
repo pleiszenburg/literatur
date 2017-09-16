@@ -29,6 +29,13 @@ specific language governing rights and limitations under the License.
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 from ..const import (
+	KEY_ID,
+	KEY_INODE,
+	KEY_HASH,
+	KEY_MTIME,
+	KEY_NAME,
+	KEY_PATH,
+	KEY_SIZE,
 	STATUS_CH,
 	STATUS_MV,
 	STATUS_NW,

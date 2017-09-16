@@ -80,7 +80,7 @@ class repository_class():
 	root_path = ''
 	initialized_bool = False
 
-	index_dict_list = []
+	index_list = []
 	index_loaded_bool = False
 
 
