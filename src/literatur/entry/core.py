@@ -31,10 +31,9 @@ specific language governing rights and limitations under the License.
 import hashlib
 import os
 
+import humanize
+
 from ..const import (
-	# KEY_ALL,
-	# KEY_FILE,
-	# KEY_FILE_TMP,
 	KEY_ID,
 	KEY_INFO,
 	KEY_INODE,
@@ -45,10 +44,14 @@ from ..const import (
 	KEY_MTIME,
 	KEY_NAME,
 	KEY_PATH,
-	# KEY_REPORT,
 	KEY_SIZE,
-	# KEY_STATUS,
-	KEY_TYPE
+	KEY_TYPE,
+	STATUS_CH,
+	STATUS_MV,
+	STATUS_NW,
+	STATUS_RM,
+	STATUS_RW,
+	STATUS_UC
 	)
 from ..filetypes import (
 	get_literatur_type_from_magicinfo,
@@ -108,6 +111,47 @@ class entry_class():
 		if os.path.isfile(os.path.join(self.get_full_path(), self.f_dict[KEY_NAME])):
 			return True
 		return False
+
+
+	def generate_report(self):
+
+		self.report = []
+
+		if self.status == STATUS_MV:
+
+			self.report.append('Moved: "%s" -> "%s"' % (
+				os.path.join(self.f_dict[KEY_PATH]), self.f_dict[KEY_NAME]),
+				os.path.join(self.f_ch_dict[KEY_PATH], self.f_ch_dict[KEY_NAME])
+				))
+
+		elif self.status == STATUS_RW:
+
+			self.report.append('Rewritten: "%s"' % (
+				os.path.join(self.f_ch_dict[KEY_PATH], self.f_ch_dict[KEY_NAME])
+				))
+
+		elif self.status == STATUS_CH:
+
+			size_diff = self.f_ch_dict[KEY_SIZE] - self.f_dict[KEY_SIZE]
+			if size_diff >= 0:
+				size_prefix = '+'
+			else:
+				size_prefix = '-'
+			self.report.append('Changed: "%s" [%s] %s ago' % (
+				os.path.join(self.f_dict[KEY_PATH], self.f_dict[KEY_NAME]),
+				size_prefix + humanize.naturalsize(abs(size_diff), gnu = True),
+				humanize.naturaldelta(
+					datetime.datetime.now() - datetime.datetime.fromtimestamp(self.f_ch_dict[KEY_MTIME] / 1e9)
+					)
+				))
+
+		elif self.status in [STATUS_UC, STATUS_RM, STATUS_NW]:
+
+			pass
+
+		else:
+
+			raise # TODO
 
 
 	def get_full_path(self):
