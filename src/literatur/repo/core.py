@@ -107,7 +107,7 @@ class repository_class():
 			if not self.index_loaded_bool:
 				self.__load_index__()
 
-			self.index_dict_list = self.__update_index_and_return__()
+			self.index_list = self.__update_index_and_return__()
 
 			self.__store_index__()
 
@@ -122,7 +122,7 @@ class repository_class():
 
 			if not self.index_loaded_bool:
 				self.__load_index__()
-			old_entries_list = self.index_dict_list
+			old_entries_list = self.index_list
 			new_entries_list = self.__generate_index_and_return__()
 
 			# Compare old list vs new list and return result
@@ -154,7 +154,7 @@ class repository_class():
 			if not self.index_loaded_bool:
 				self.__load_index__()
 
-			return find_duplicates_in_entry_list(self.index_dict_list)
+			return find_duplicates_in_entry_list(self.index_list)
 
 		else:
 
@@ -178,8 +178,8 @@ class repository_class():
 			if not self.index_loaded_bool:
 				self.__load_index__()
 
-			magic_list = [entry[KEY_FILE][KEY_MAGIC] for entry in self.index_dict_list]
-			mime_list = [entry[KEY_FILE][KEY_MIME] for entry in self.index_dict_list]
+			magic_list = [entry[KEY_FILE][KEY_MAGIC] for entry in self.index_list]
+			mime_list = [entry[KEY_FILE][KEY_MIME] for entry in self.index_list]
 
 			magic_dict = Counter(magic_list)
 			mime_dict = Counter(mime_list)
@@ -319,14 +319,14 @@ class repository_class():
 
 			if mode == KEY_PKL:
 				f = open(os.path.join(self.root_path, PATH_REPO, PATH_SUB_DB, FILE_DB_CURRENT + '.' + mode), 'rb')
-				self.index_dict_list = pickle.load(f)
+				self.index_list = pickle.load(f)
 				f.close()
 				self.index_loaded_bool = True
 			elif mode == KEY_MP:
 				f = open(os.path.join(self.root_path, PATH_REPO, PATH_SUB_DB, FILE_DB_CURRENT + '.' + mode), 'rb')
 				msg_pack = f.read()
 				f.close()
-				self.index_dict_list = msgpack.unpackb(msg_pack, encoding = 'utf-8')
+				self.index_list = msgpack.unpackb(msg_pack, encoding = 'utf-8')
 				self.index_loaded_bool = True
 			elif mode == KEY_JSON:
 				print('load_index from JSON not supported')
@@ -345,16 +345,16 @@ class repository_class():
 
 			if mode == KEY_PKL:
 				f = open(os.path.join(self.root_path, PATH_REPO, PATH_SUB_DB, FILE_DB_CURRENT + '.' + mode), 'wb+')
-				pickle.dump(self.index_dict_list, f, -1)
+				pickle.dump(self.index_list, f, -1)
 				f.close()
 			elif mode == KEY_MP:
-				msg_pack = msgpack.packb(self.index_dict_list, use_bin_type = True)
+				msg_pack = msgpack.packb(self.index_list, use_bin_type = True)
 				f = open(os.path.join(self.root_path, PATH_REPO, PATH_SUB_DB, FILE_DB_CURRENT + '.' + mode), 'wb+')
 				f.write(msg_pack)
 				f.close()
 			elif mode == KEY_JSON:
 				f = open(os.path.join(self.root_path, PATH_REPO, PATH_SUB_REPORTS, FILE_DB_CURRENT + '.' + mode), 'w+')
-				pp(self.index_dict_list, stream = f)
+				pp(self.index_list, stream = f)
 				f.close()
 			else:
 				raise # TODO
