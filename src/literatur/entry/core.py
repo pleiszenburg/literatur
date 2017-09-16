@@ -64,7 +64,7 @@ from ..filetypes import (
 class entry_class():
 
 
-	root_path = '' # Root path of repository
+	root_path = None # Root path of repository
 	f_dict = {
 		KEY_EXISTS_BOOL: False,
 		KEY_HASH: '',
@@ -109,7 +109,7 @@ class entry_class():
 
 	def get_full_path(self):
 
-		if self.root_path != '':
+		if self.root_path is not None:
 			return os.path.join(self.root_path, self.f_dict[KEY_PATH])
 		return self.f_dict[KEY_PATH]
 
