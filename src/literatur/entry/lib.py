@@ -103,14 +103,12 @@ def find_duplicates_in_entry_list(entry_list):
 def __find_process_diff__(a_entry_list, b_entry_list, key_tuple, status_code):
 
 	def list_to_dict(entry_list, key_tuple):
-		return {tuple(entry[KEY_FILE][key] for key in key_tuple): entry for entry in entry_list}
+		return {tuple(entry.f_dict[key] for key in key_tuple): entry for entry in entry_list}
 
 	def update_entry(a_entry, b_entry, status_code):
-		a_entry.update({
-			KEY_STATUS: status_code,
-			KEY_FILE_TMP: b_entry[KEY_FILE]
-			})
-		add_change_report_to_entry(a_entry, status_code)
+		a_entry.status = status_code
+		a_entry.f_ch_dict.update(b_entry.f_dict)
+		a_entry.generate_report()
 		return a_entry
 
 	a_entry_dict = list_to_dict(a_entry_list, key_tuple)
