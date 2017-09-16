@@ -86,11 +86,7 @@ def run_routines_on_objects_in_parallel_and_return(in_object_list, routine_list)
 	object_count = len(in_object_list)
 	func_handle = partial(__run_routines_on_object_and_return__, routine_list)
 
-	try:
-		func_name = func_handle.__name__
-	except:
-		func_name = 'partial(%s)' % func_handle.func.__name__
-	print('Running (l/l): %s' % func_name)
+	print('Running: [%s]' % ', '.join(routine_list))
 
 	with multiprocessing.Pool(processes = NUM_CORES) as p:
 
