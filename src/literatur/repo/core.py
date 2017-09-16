@@ -39,13 +39,13 @@ import shutil
 
 import msgpack
 
-from .entry import (
-	add_switched_to_entry,
-	compare_entry_lists,
-	convert_filepathtuple_to_entry,
-	find_duplicates_in_entry_list,
-	merge_entry_file_info
-	)
+# from .entry import (
+# 	add_switched_to_entry,
+# 	compare_entry_lists,
+# 	convert_filepathtuple_to_entry,
+# 	find_duplicates_in_entry_list,
+# 	merge_entry_file_info
+# 	)
 from .fs import get_recursive_filepathtuple_list
 
 from ..const import (
@@ -58,6 +58,7 @@ from ..const import (
 	KEY_JOURNAL,
 	KEY_MAGIC,
 	KEY_MASTER,
+	KEY_META,
 	KEY_MIME,
 	KEY_MP,
 	KEY_PKL,
@@ -66,6 +67,7 @@ from ..const import (
 	PATH_SUB_DBBACKUP,
 	PATH_SUB_REPORTS
 	)
+from ..entry import entry_class
 from ..parallel import run_in_parallel_with_return
 from ..parser import ctime_to_datestring
 
@@ -319,20 +321,28 @@ class repository_class():
 
 			if mode == KEY_PKL:
 				f = open(os.path.join(self.root_path, PATH_REPO, PATH_SUB_DB, FILE_DB_CURRENT + '.' + mode), 'rb')
-				self.index_list = pickle.load(f)
+				import_list = pickle.load(f)
 				f.close()
 				self.index_loaded_bool = True
 			elif mode == KEY_MP:
 				f = open(os.path.join(self.root_path, PATH_REPO, PATH_SUB_DB, FILE_DB_CURRENT + '.' + mode), 'rb')
 				msg_pack = f.read()
 				f.close()
-				self.index_list = msgpack.unpackb(msg_pack, encoding = 'utf-8')
+				import_list = msgpack.unpackb(msg_pack, encoding = 'utf-8')
 				self.index_loaded_bool = True
 			elif mode == KEY_JSON:
 				print('load_index from JSON not supported')
 				raise # TODO
 			else:
 				raise # TODO
+
+			self.index_loaded_bool:
+
+				self.index_list = [entry_class(
+					file_dict = entry_dict[KEY_FILE],
+					meta_dict = entry_dict[KEY_META],
+					root_path = self.root_path
+					) for entry_dict in import_list]
 
 		else:
 
@@ -341,20 +351,25 @@ class repository_class():
 
 	def __store_index__(self, mode = KEY_MP, force_store = False):
 
+		export_list = [{
+			KEY_FILE: entry.f_dict,
+			KEY_META: entry.m_dict
+			} for entry in self.index_list]
+
 		if self.index_loaded_bool or force_store:
 
 			if mode == KEY_PKL:
 				f = open(os.path.join(self.root_path, PATH_REPO, PATH_SUB_DB, FILE_DB_CURRENT + '.' + mode), 'wb+')
-				pickle.dump(self.index_list, f, -1)
+				pickle.dump(export_list, f, -1)
 				f.close()
 			elif mode == KEY_MP:
-				msg_pack = msgpack.packb(self.index_list, use_bin_type = True)
+				msg_pack = msgpack.packb(export_list, use_bin_type = True)
 				f = open(os.path.join(self.root_path, PATH_REPO, PATH_SUB_DB, FILE_DB_CURRENT + '.' + mode), 'wb+')
 				f.write(msg_pack)
 				f.close()
 			elif mode == KEY_JSON:
 				f = open(os.path.join(self.root_path, PATH_REPO, PATH_SUB_REPORTS, FILE_DB_CURRENT + '.' + mode), 'w+')
-				pp(self.index_list, stream = f)
+				pp(export_list, stream = f)
 				f.close()
 			else:
 				raise # TODO
