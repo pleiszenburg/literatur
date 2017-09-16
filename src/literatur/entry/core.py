@@ -94,7 +94,7 @@ class entry_class():
 			self.f_dict.update({
 				KEY_PATH: filepath_tuple[0],
 				KEY_NAME: filepath_tuple[1]
-				}
+				})
 
 		if root_path is not None and type(root_path) == str:
 			self.root_path = root_path
