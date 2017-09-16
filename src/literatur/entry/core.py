@@ -223,7 +223,7 @@ class entry_class():
 		if self.f_dict[KEY_EXISTS_BOOL]:
 
 			in_path = os.path.join(self.get_full_path(), self.f_dict[KEY_NAME])
-			blocksize = 65536
+			blocksize = 8 * 1024 * 1024 # 65536
 			hasher = hashlib.sha256()
 
 			f = open(in_path, 'rb')
