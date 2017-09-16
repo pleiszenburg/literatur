@@ -39,13 +39,6 @@ import shutil
 
 import msgpack
 
-# from .entry import (
-# 	add_switched_to_entry,
-# 	compare_entry_lists,
-# 	convert_filepathtuple_to_entry,
-# 	find_duplicates_in_entry_list,
-# 	merge_entry_file_info
-# 	)
 from .fs import get_recursive_filepathtuple_list
 
 from ..const import (
@@ -67,11 +60,12 @@ from ..const import (
 	PATH_SUB_DBBACKUP,
 	PATH_SUB_REPORTS
 	)
-from ..entry import entry_class
-from ..parallel import (
-	run_in_parallel_with_return,
-	run_routines_on_objects_in_parallel_and_return
+from ..entry import (
+	compare_entry_lists,
+	entry_class,
+	find_duplicates_in_entry_list
 	)
+from ..parallel import run_routines_on_objects_in_parallel_and_return
 from ..parser import ctime_to_datestring
 
 
