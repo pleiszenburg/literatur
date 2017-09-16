@@ -79,6 +79,7 @@ class entry_class():
 		KEY_SIZE: -1,
 		KEY_TYPE: ''
 		} # file information
+	f_ch_dict = {} # dict for updated file information
 	m_dict = {} # meta information
 
 
@@ -112,6 +113,13 @@ class entry_class():
 		if self.root_path is not None:
 			return os.path.join(self.root_path, self.f_dict[KEY_PATH])
 		return self.f_dict[KEY_PATH]
+
+
+	def merge_f_dict(self):
+
+		self.f_dict.update(self.f_ch_dict)
+		self.f_ch_dict = {}
+		self.update_existence()
 
 
 	def update_existence(self):

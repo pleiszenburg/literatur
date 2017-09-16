@@ -392,10 +392,9 @@ class repository_class():
 		os.chdir(self.root_path)
 
 		# Update file information on new entries
-		updated_entries_list = run_in_parallel_with_return(
-			merge_entry_file_info,
+		updated_entries_list = run_routines_on_objects_in_parallel_and_return(
 			uc_list + rw_list + rm_list + nw_list + ch_list + mv_list,
-			add_return = True
+			['merge_f_dict']
 			)
 
 		# Restore old CWD
