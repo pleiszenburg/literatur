@@ -85,7 +85,7 @@ def find_duplicates_in_entry_list(entry_list):
 	entry_by_hash_dict = {}
 
 	for entry in entry_list:
-		hash_str = entry[KEY_FILE][KEY_HASH]
+		hash_str = entry.f_dict[KEY_HASH]
 		if hash_str not in entry_by_hash_dict.keys():
 			entry_by_hash_dict.update({hash_str: [entry]})
 		else:
