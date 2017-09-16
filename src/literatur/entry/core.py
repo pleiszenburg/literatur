@@ -68,28 +68,28 @@ from ..filetypes import (
 class entry_class():
 
 
-	root_path = None # Root path of repository
-	f_dict = {
-		KEY_EXISTS_BOOL: False,
-		KEY_HASH: '',
-		KEY_ID: '',
-		KEY_INODE: -1,
-		KEY_MAGIC: '',
-		KEY_MIME: '',
-		KEY_MODE: -1,
-		KEY_MTIME: -1,
-		KEY_NAME: '',
-		KEY_PATH: '',
-		KEY_SIZE: -1,
-		KEY_TYPE: ''
-		} # file information
-	f_ch_dict = {} # dict for updated file information
-	m_dict = {} # meta information
-	status = None # Changed, moved, ...
-	report = None # Detailes on status
-
-
 	def __init__(self, file_dict = None, meta_dict = None, filepath_tuple = None, root_path = None):
+
+		# Set defaults
+		self.root_path = None # Root path of repository
+		self.f_dict = {
+			KEY_EXISTS_BOOL: False,
+			KEY_HASH: '',
+			KEY_ID: '',
+			KEY_INODE: -1,
+			KEY_MAGIC: '',
+			KEY_MIME: '',
+			KEY_MODE: -1,
+			KEY_MTIME: -1,
+			KEY_NAME: '',
+			KEY_PATH: '',
+			KEY_SIZE: -1,
+			KEY_TYPE: ''
+			} # file information
+		self.f_ch_dict = {} # dict for updated file information
+		self.m_dict = {} # meta information
+		self.status = None # Changed, moved, ...
+		self.report = None # Detailes on status
 
 		if file_dict is not None and type(file_dict) == dict:
 			self.f_dict.update(file_dict)

@@ -75,16 +75,14 @@ from ..parser import ctime_to_datestring
 class repository_class():
 
 
-	current_path = ''
-	current_relative_path = ''
-	root_path = ''
-	initialized_bool = False
-
-	index_list = []
-	index_loaded_bool = False
-
-
 	def __init__(self):
+
+		# Set defauls
+		self.current_relative_path = ''
+		self.root_path = ''
+		self.initialized_bool = False
+		self.index_list = []
+		self.index_loaded_bool = False
 
 		self.current_path = os.getcwd()
 
