@@ -39,12 +39,10 @@ import click
 from .guis import script_ui_filerename
 
 from ..const import (
-	KEY_FILE,
 	KEY_JOURNAL,
 	KEY_MASTER,
 	KEY_NAME,
 	KEY_PATH,
-	KEY_REPORT,
 	MSG_DEBUG_INREPOSITORY,
 	MSG_DEBUG_NOREPOSITORY,
 	REPORT_MAX_LINES
@@ -198,7 +196,7 @@ def __print_diff__(uc_list, rw_list, rm_list, nw_list, ch_list, mv_list):
 		]:
 		if len(rp_list) <= REPORT_MAX_LINES:
 			for entry in rp_list:
-				print('%s: "%s"' % (rp_message, os.path.join(entry[KEY_FILE][KEY_PATH], entry[KEY_FILE][KEY_NAME])))
+				print('%s: "%s"' % (rp_message, os.path.join(entry.f_dict[KEY_PATH], entry.f_dict[KEY_NAME])))
 		else:
 			print('%s: [%d files]' % (rp_message, len(rp_list)))
 
@@ -208,7 +206,7 @@ def __print_diff__(uc_list, rw_list, rm_list, nw_list, ch_list, mv_list):
 		]:
 		if len(rp_list) <= REPORT_MAX_LINES:
 			for entry in rp_list:
-				for rp_line in entry[KEY_REPORT]:
+				for rp_line in entry.report:
 					print(rp_line)
 		else:
 			print('%s: [%d files]' % (rp_message, len(rp_list)))

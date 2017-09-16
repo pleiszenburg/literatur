@@ -45,7 +45,6 @@ from ..const import (
 	FILE_DB_CURRENT,
 	FILE_DB_JOURNAL,
 	FILE_DB_MASTER,
-	KEY_ALL,
 	KEY_FILE,
 	KEY_JSON,
 	KEY_JOURNAL,
@@ -346,7 +345,7 @@ class repository_class():
 			else:
 				raise # TODO
 
-			self.index_loaded_bool:
+			if self.index_loaded_bool:
 
 				self.index_list = [entry_class(
 					file_dict = entry_dict[KEY_FILE],

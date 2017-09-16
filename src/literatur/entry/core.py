@@ -34,6 +34,7 @@ import os
 import humanize
 
 from ..const import (
+	KEY_EXISTS_BOOL,
 	KEY_ID,
 	KEY_INFO,
 	KEY_INODE,
@@ -76,7 +77,7 @@ class entry_class():
 		KEY_MAGIC: '',
 		KEY_MIME: '',
 		KEY_MODE: -1,
-		KEY_MTIME: -1
+		KEY_MTIME: -1,
 		KEY_NAME: '',
 		KEY_PATH: '',
 		KEY_SIZE: -1,
@@ -120,7 +121,7 @@ class entry_class():
 		if self.status == STATUS_MV:
 
 			self.report.append('Moved: "%s" -> "%s"' % (
-				os.path.join(self.f_dict[KEY_PATH]), self.f_dict[KEY_NAME]),
+				os.path.join(self.f_dict[KEY_PATH], self.f_dict[KEY_NAME]),
 				os.path.join(self.f_ch_dict[KEY_PATH], self.f_ch_dict[KEY_NAME])
 				))
 
