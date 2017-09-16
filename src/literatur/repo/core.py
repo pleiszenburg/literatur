@@ -39,25 +39,18 @@ import shutil
 
 import msgpack
 
-from .entry import (
-	add_switched_to_entry,
-	compare_entry_lists,
-	convert_filepathtuple_to_entry,
-	find_duplicates_in_entry_list,
-	merge_entry_file_info
-	)
 from .fs import get_recursive_filepathtuple_list
 
 from ..const import (
 	FILE_DB_CURRENT,
 	FILE_DB_JOURNAL,
 	FILE_DB_MASTER,
-	KEY_ALL,
 	KEY_FILE,
 	KEY_JSON,
 	KEY_JOURNAL,
 	KEY_MAGIC,
 	KEY_MASTER,
+	KEY_META,
 	KEY_MIME,
 	KEY_MP,
 	KEY_PKL,
@@ -66,7 +59,12 @@ from ..const import (
 	PATH_SUB_DBBACKUP,
 	PATH_SUB_REPORTS
 	)
-from ..parallel import run_in_parallel_with_return
+from ..entry import (
+	compare_entry_lists,
+	entry_class,
+	find_duplicates_in_entry_list
+	)
+from ..parallel import run_routines_on_objects_in_parallel_and_return
 from ..parser import ctime_to_datestring
 
 
@@ -77,16 +75,14 @@ from ..parser import ctime_to_datestring
 class repository_class():
 
 
-	current_path = ''
-	current_relative_path = ''
-	root_path = ''
-	initialized_bool = False
-
-	index_dict_list = []
-	index_loaded_bool = False
-
-
 	def __init__(self):
+
+		# Set defauls
+		self.current_relative_path = ''
+		self.root_path = ''
+		self.initialized_bool = False
+		self.index_list = []
+		self.index_loaded_bool = False
 
 		self.current_path = os.getcwd()
 
@@ -107,7 +103,7 @@ class repository_class():
 			if not self.index_loaded_bool:
 				self.__load_index__()
 
-			self.index_dict_list = self.__update_index_and_return__()
+			self.index_list = self.__update_index_and_return__()
 
 			self.__store_index__()
 
@@ -122,11 +118,11 @@ class repository_class():
 
 			if not self.index_loaded_bool:
 				self.__load_index__()
-			old_entries_list = self.index_dict_list
-			new_entries_list = self.__generate_index_and_return__()
+			old_entries_list = self.index_list
+			new_entries_light_list = self.__generate_light_index_and_return__()
 
 			# Compare old list vs new list and return result
-			return compare_entry_lists(old_entries_list, new_entries_list)
+			return compare_entry_lists(old_entries_list, new_entries_light_list)
 
 		else:
 
@@ -154,7 +150,7 @@ class repository_class():
 			if not self.index_loaded_bool:
 				self.__load_index__()
 
-			return find_duplicates_in_entry_list(self.index_dict_list)
+			return find_duplicates_in_entry_list(self.index_list)
 
 		else:
 
@@ -165,8 +161,19 @@ class repository_class():
 
 		# TODO check if it is already in DB etc ...
 
-		entry = convert_filepathtuple_to_entry((self.current_path, filename))
-		add_switched_to_entry(entry, {KEY_ALL: True})
+		entry = entry_class(
+			filepath_tuple = (self.current_path, filename),
+			root_path = self.root_path
+			)
+		for routine_name in [
+			'update_existence',
+			'update_fileinfo',
+			'update_id',
+			'update_hash',
+			'update_magic',
+			'update_type'
+			]:
+			getattr(entry, routine_name)()
 
 		return entry
 
@@ -178,8 +185,8 @@ class repository_class():
 			if not self.index_loaded_bool:
 				self.__load_index__()
 
-			magic_list = [entry[KEY_FILE][KEY_MAGIC] for entry in self.index_dict_list]
-			mime_list = [entry[KEY_FILE][KEY_MIME] for entry in self.index_dict_list]
+			magic_list = [entry.f_dict[KEY_MAGIC] for entry in self.index_list]
+			mime_list = [entry.f_dict[KEY_MIME] for entry in self.index_list]
 
 			magic_dict = Counter(magic_list)
 			mime_dict = Counter(mime_list)
@@ -290,7 +297,7 @@ class repository_class():
 		raise # TODO
 
 
-	def __generate_index_and_return__(self):
+	def __generate_light_index_and_return__(self):
 
 		# Set CWD to root
 		os.chdir(self.root_path)
@@ -298,19 +305,21 @@ class repository_class():
 		# Build new index of paths and filenames
 		filepathtuple_list = get_recursive_filepathtuple_list(self.root_path)
 		# Convert index into list of entries
-		entries_dict_list = [convert_filepathtuple_to_entry(item) for item in filepathtuple_list]
+		entries_list = [entry_class(
+			filepath_tuple = item,
+			root_path = self.root_path
+			) for item in filepathtuple_list]
 
 		# Run index helper in parallel
-		entries_dict_list = run_in_parallel_with_return(
-			add_switched_to_entry,
-			entries_dict_list,
-			add_return = True
+		entries_list = run_routines_on_objects_in_parallel_and_return(
+			entries_list,
+			['update_existence', 'update_fileinfo', 'update_id']
 			)
 
 		# Restore old CWD
 		os.chdir(self.current_path)
 
-		return entries_dict_list
+		return entries_list
 
 
 	def __load_index__(self, mode = KEY_MP, force_reload = False):
@@ -319,20 +328,28 @@ class repository_class():
 
 			if mode == KEY_PKL:
 				f = open(os.path.join(self.root_path, PATH_REPO, PATH_SUB_DB, FILE_DB_CURRENT + '.' + mode), 'rb')
-				self.index_dict_list = pickle.load(f)
+				import_list = pickle.load(f)
 				f.close()
 				self.index_loaded_bool = True
 			elif mode == KEY_MP:
 				f = open(os.path.join(self.root_path, PATH_REPO, PATH_SUB_DB, FILE_DB_CURRENT + '.' + mode), 'rb')
 				msg_pack = f.read()
 				f.close()
-				self.index_dict_list = msgpack.unpackb(msg_pack, encoding = 'utf-8')
+				import_list = msgpack.unpackb(msg_pack, encoding = 'utf-8')
 				self.index_loaded_bool = True
 			elif mode == KEY_JSON:
 				print('load_index from JSON not supported')
 				raise # TODO
 			else:
 				raise # TODO
+
+			if self.index_loaded_bool:
+
+				self.index_list = [entry_class(
+					file_dict = entry_dict[KEY_FILE],
+					meta_dict = entry_dict[KEY_META],
+					root_path = self.root_path
+					) for entry_dict in import_list]
 
 		else:
 
@@ -341,20 +358,25 @@ class repository_class():
 
 	def __store_index__(self, mode = KEY_MP, force_store = False):
 
+		export_list = [{
+			KEY_FILE: entry.f_dict,
+			KEY_META: entry.m_dict
+			} for entry in self.index_list]
+
 		if self.index_loaded_bool or force_store:
 
 			if mode == KEY_PKL:
 				f = open(os.path.join(self.root_path, PATH_REPO, PATH_SUB_DB, FILE_DB_CURRENT + '.' + mode), 'wb+')
-				pickle.dump(self.index_dict_list, f, -1)
+				pickle.dump(export_list, f, -1)
 				f.close()
 			elif mode == KEY_MP:
-				msg_pack = msgpack.packb(self.index_dict_list, use_bin_type = True)
+				msg_pack = msgpack.packb(export_list, use_bin_type = True)
 				f = open(os.path.join(self.root_path, PATH_REPO, PATH_SUB_DB, FILE_DB_CURRENT + '.' + mode), 'wb+')
 				f.write(msg_pack)
 				f.close()
 			elif mode == KEY_JSON:
 				f = open(os.path.join(self.root_path, PATH_REPO, PATH_SUB_REPORTS, FILE_DB_CURRENT + '.' + mode), 'w+')
-				pp(self.index_dict_list, stream = f)
+				pp(export_list, stream = f)
 				f.close()
 			else:
 				raise # TODO
@@ -372,10 +394,9 @@ class repository_class():
 		os.chdir(self.root_path)
 
 		# Update file information on new entries
-		updated_entries_list = run_in_parallel_with_return(
-			merge_entry_file_info,
+		updated_entries_list = run_routines_on_objects_in_parallel_and_return(
 			uc_list + rw_list + rm_list + nw_list + ch_list + mv_list,
-			add_return = True
+			['merge_f_dict']
 			)
 
 		# Restore old CWD

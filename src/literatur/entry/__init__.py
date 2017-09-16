@@ -6,7 +6,7 @@ LITERATUR
 Literature management with Python, Dropbox and MediaWiki
 https://github.com/pleiszenburg/literatur
 
-	src/literatur/repo/hash.py: hashing files
+	src/literatur/entry/__init__.py: Entry management
 
 	Copyright (C) 2017 Sebastian M. Ernst <ernst@pleiszenburg.de>
 
@@ -24,33 +24,12 @@ specific language governing rights and limitations under the License.
 
 """
 
-
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # IMPORT
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-import hashlib
-import os
-
-
-# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-# ROUTINES
-# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-def get_file_hash(in_path_tuple):
-
-	in_path = os.path.join(*in_path_tuple)
-	blocksize = 65536
-	hasher = hashlib.sha256()
-
-	f = open(in_path, 'rb')
-
-	buf = f.read(blocksize)
-
-	while len(buf) > 0:
-		hasher.update(buf)
-		buf = f.read(blocksize)
-
-	f.close()
-
-	return hasher.hexdigest()
+from .core import entry_class
+from .lib import (
+	compare_entry_lists,
+	find_duplicates_in_entry_list
+	)
