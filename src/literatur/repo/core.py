@@ -32,6 +32,7 @@ from collections import (
 	Counter,
 	OrderedDict
 	)
+import json
 import os
 import pickle
 from pprint import pprint as pp
@@ -39,21 +40,28 @@ import shutil
 
 import msgpack
 
-from .fs import get_recursive_filepathtuple_list
-
 from ..const import (
 	FILE_DB_CURRENT,
 	FILE_DB_JOURNAL,
 	FILE_DB_MASTER,
+	IGNORE_DIR_LIST,
+	IGNORE_FILE_LIST,
+	KEY_EXISTS_BOOL,
 	KEY_FILE,
+	KEY_INODE,
 	KEY_JSON,
 	KEY_JOURNAL,
 	KEY_MAGIC,
 	KEY_MASTER,
 	KEY_META,
 	KEY_MIME,
+	KEY_MODE,
 	KEY_MP,
+	KEY_MTIME,
+	KEY_NAME,
+	KEY_PATH,
 	KEY_PKL,
+	KEY_SIZE,
 	PATH_REPO,
 	PATH_SUB_DB,
 	PATH_SUB_DBBACKUP,
@@ -297,24 +305,61 @@ class repository_class():
 		raise # TODO
 
 
+	def __get_recursive_inventory_list__(self, scan_root_path, files_dict_list):
+
+		relative_path = os.path.relpath(scan_root_path, self.root_path)
+
+		# Scan below current working directory and generate an iterator
+		for item in os.scandir(scan_root_path):
+
+			if item.is_file():
+
+				# Append to list of file is not ignored
+				if item.name not in IGNORE_FILE_LIST:
+					item_stat = item.stat()
+					files_dict_list.append({
+						KEY_EXISTS_BOOL: True,
+						KEY_INODE: item_stat.st_ino,
+						KEY_MODE: item_stat.st_mode,
+						KEY_MTIME: item_stat.st_mtime_ns,
+						KEY_NAME: item.name,
+						KEY_PATH: relative_path,
+						KEY_SIZE: item_stat.st_size
+						})
+
+			elif item.is_dir():
+
+				# Dive deeper if directory is not ignored
+				if item.name not in IGNORE_DIR_LIST:
+					self.__get_recursive_inventory_list__(item.path, files_dict_list)
+
+			elif item.is_symlink():
+
+				print('ERROR: Symlinks not supported, %s' % item.path)
+
+			else:
+
+				raise # TODO
+
+
 	def __generate_light_index_and_return__(self):
 
 		# Set CWD to root
 		os.chdir(self.root_path)
 
 		# Build new index of paths and filenames
-		filepathtuple_list = get_recursive_filepathtuple_list(self.root_path)
+		files_dict_list = []
+		self.__get_recursive_inventory_list__(self.root_path, files_dict_list)
+
 		# Convert index into list of entries
 		entries_list = [entry_class(
-			filepath_tuple = item,
+			file_dict = item,
 			root_path = self.root_path
-			) for item in filepathtuple_list]
+			) for item in files_dict_list]
 
 		# Run index helper in parallel
-		entries_list = run_routines_on_objects_in_parallel_and_return(
-			entries_list,
-			['update_existence', 'update_fileinfo', 'update_id']
-			)
+		for entry in entries_list:
+			entry.update_id()
 
 		# Restore old CWD
 		os.chdir(self.current_path)
@@ -376,7 +421,7 @@ class repository_class():
 				f.close()
 			elif mode == KEY_JSON:
 				f = open(os.path.join(self.root_path, PATH_REPO, PATH_SUB_REPORTS, FILE_DB_CURRENT + '.' + mode), 'w+')
-				pp(export_list, stream = f)
+				json.dump(export_list, f, indent = '\t', sort_keys = True)
 				f.close()
 			else:
 				raise # TODO
@@ -388,14 +433,14 @@ class repository_class():
 
 	def __update_index_and_return__(self):
 
-		uc_list, rw_list, rm_list, nw_list, ch_list, mv_list = self.diff()
+		uc_list, rw_list, _, nw_list, ch_list, mv_list = self.diff()
 
 		# Set CWD to root
 		os.chdir(self.root_path)
 
 		# Update file information on new entries
 		updated_entries_list = run_routines_on_objects_in_parallel_and_return(
-			uc_list + rw_list + rm_list + nw_list + ch_list + mv_list,
+			uc_list + rw_list + nw_list + ch_list + mv_list,
 			['merge_f_dict']
 			)
 

@@ -73,24 +73,26 @@ from ..filetypes import (
 class entry_class():
 
 
-	def __init__(self, file_dict = None, meta_dict = None, filepath_tuple = None, root_path = None):
+	def __init__(self,
+		file_dict = None, meta_dict = None, filepath_tuple = None,
+		root_path = None
+		):
 
 		# Set defaults
 		self.root_path = None # Root path of repository
-		self.f_dict = {
-			KEY_EXISTS_BOOL: False,
-			KEY_HASH: '',
-			KEY_ID: '',
-			KEY_INODE: -1,
-			KEY_MAGIC: '',
-			KEY_MIME: '',
-			KEY_MODE: -1,
-			KEY_MTIME: -1,
-			KEY_NAME: '',
-			KEY_PATH: '',
-			KEY_SIZE: -1,
-			KEY_TYPE: ''
-			} # file information
+		self.f_dict = {} # file information
+			# KEY_EXISTS_BOOL: None,
+			# KEY_HASH: None,
+			# KEY_ID: None,
+			# KEY_INODE: None,
+			# KEY_MAGIC: None,
+			# KEY_MIME: None,
+			# KEY_MODE: None,
+			# KEY_MTIME: None,
+			# KEY_NAME: None,
+			# KEY_PATH: None,
+			# KEY_SIZE: None,
+			# KEY_TYPE: None
 		self.f_ch_dict = {} # dict for updated file information
 		self.m_dict = {} # meta information
 		self.status = None # Changed, moved, ...
@@ -191,7 +193,7 @@ class entry_class():
 		self.f_ch_dict = {}
 		self.report = None
 		self.status = None
-		self.update_existence()
+		# self.update_existence()
 
 
 	def update_existence(self):

@@ -31,10 +31,7 @@ specific language governing rights and limitations under the License.
 import os
 from pathlib import PurePath
 
-from ..const import (
-	IGNORE_DIR_LIST,
-	IGNORE_FILE_LIST
-	)
+from ..const import IGNORE_FILE_LIST
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -58,25 +55,3 @@ def get_file_list(in_path):
 	out_list.sort()
 
 	return out_list
-
-
-def get_recursive_filepathtuple_list(in_path):
-
-	filepathtuple_list = []
-
-	for path, dir_list, file_list in os.walk(in_path):
-
-		# ignore a bunch of folders
-		path_list = PurePath(path).parts
-		if any(item in IGNORE_DIR_LIST for item in path_list):
-			continue
-
-		for filename in file_list:
-
-			# ignore a bunch of files
-			if filename in IGNORE_FILE_LIST:
-				continue
-
-			filepathtuple_list.append((os.path.relpath(path, in_path), filename))
-
-	return filepathtuple_list
