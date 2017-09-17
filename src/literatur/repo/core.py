@@ -302,19 +302,26 @@ class repository_class():
 		# Set CWD to root
 		os.chdir(self.root_path)
 
+		import time
+		_start = time.time()
+
 		# Build new index of paths and filenames
 		filepathtuple_list = get_recursive_filepathtuple_list(self.root_path)
+		print('After recursive scan %d' % ((time.time() - _start) * 1000))
+
 		# Convert index into list of entries
 		entries_list = [entry_class(
 			filepath_tuple = item,
 			root_path = self.root_path
 			) for item in filepathtuple_list]
+		print('After entry_class %d' % ((time.time() - _start) * 1000))
 
 		# Run index helper in parallel
 		entries_list = run_routines_on_objects_in_parallel_and_return(
 			entries_list,
 			['update_existence', 'update_fileinfo', 'update_id']
 			)
+		print('After update_fileinfo %d' % ((time.time() - _start) * 1000))
 
 		# Restore old CWD
 		os.chdir(self.current_path)
