@@ -32,6 +32,7 @@ from collections import (
 	Counter,
 	OrderedDict
 	)
+import json
 import os
 import pickle
 from pprint import pprint as pp
@@ -426,7 +427,7 @@ class repository_class():
 				f.close()
 			elif mode == KEY_JSON:
 				f = open(os.path.join(self.root_path, PATH_REPO, PATH_SUB_REPORTS, FILE_DB_CURRENT + '.' + mode), 'w+')
-				pp(export_list, stream = f)
+				json.dump(export_list, f, indent = '\t', sort_keys = True)
 				f.close()
 			else:
 				raise # TODO
