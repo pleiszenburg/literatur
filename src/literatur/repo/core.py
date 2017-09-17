@@ -307,7 +307,7 @@ class repository_class():
 
 	def __get_recursive_inventory_list__(self, scan_root_path, files_dict_list):
 
-		relative_path = os.path.relpath(self.root_path, scan_root_path)
+		relative_path = os.path.relpath(scan_root_path, self.root_path)
 
 		# Scan below current working directory and generate an iterator
 		for item in os.scandir(scan_root_path):
