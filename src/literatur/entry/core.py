@@ -73,7 +73,10 @@ from ..filetypes import (
 class entry_class():
 
 
-	def __init__(self, file_dict = None, meta_dict = None, filepath_tuple = None, root_path = None):
+	def __init__(self,
+		file_dict = None, meta_dict = None, filepath_tuple = None,
+		root_path = None
+		):
 
 		# Set defaults
 		self.root_path = None # Root path of repository
