@@ -71,9 +71,14 @@ setup(
 	download_url = 'https://github.com/pleiszenburg/literatur/archive/v%s.tar.gz' % _version_,
 	license = 'LGPLv2',
 	keywords = ['literature'],
-	scripts = glob(os.path.join('scripts', '*')),
 	include_package_data = True,
-	install_requires = [],
+	install_requires = [
+		'Click',
+		],
+	entry_points = '''
+		[console_scripts]
+		lit = literature.scripts:entry
+		''',
 	zip_safe = False,
 	extras_require = {},
 	entry_points = {},
