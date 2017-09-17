@@ -80,9 +80,13 @@ def compare_entry_lists(a_entry_list, b_entry_light_list):
 
 	# Remaining a-list was likely removed
 	diff_rm_list = a_entry_list
+	for entry in diff_rm_list:
+		entry.status = STATUS_RM
 
 	# Remaining b-list was likely added as new
 	diff_nw_list = b_entry_list
+	for entry in diff_nw_list:
+		entry.status = STATUS_NW
 
 	return diff_uc_list, diff_rw_list, diff_rm_list, diff_nw_list, diff_ch_list, diff_mv_list
 
