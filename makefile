@@ -43,10 +43,10 @@ upload_test:
 	done
 
 install:
-	pip install .[dev]
+	pip install --process-dependency-links .[dev]
 
 install_link:
-	pip install -e .[dev]
+	pip install --process-dependency-links -e .[dev]
 
 test:
 	make docu

@@ -73,7 +73,7 @@ setup(
 	keywords = ['literature'],
 	include_package_data = True,
 	dependency_links = [
-		'git+https://github.com/alexz-enwp/wikitools.git@py3#egg=wikitools'
+		'https://github.com/s-m-e/wikitools/tarball/py3_bump#egg=wikitools-1.99'
 		],
 	install_requires = [
 		'click',
@@ -85,6 +85,7 @@ setup(
 		'PyQt5',
 		'python-magic',
 		'tqdm',
+		'wikitools==1.99',
 		'xmltodict'
 		],
 	extras_require = {'dev': [
@@ -97,11 +98,9 @@ setup(
 		]},
 	entry_points = '''
 		[console_scripts]
-		lit = literature.scripts:entry
+		lit = literatur.scripts:entry
 		''',
 	zip_safe = False,
-	extras_require = {},
-	entry_points = {},
 	classifiers = [
 		'Development Status :: 3 - Alpha',
 		'Intended Audience :: Science/Research',
