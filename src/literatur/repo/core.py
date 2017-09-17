@@ -347,25 +347,19 @@ class repository_class():
 		# Set CWD to root
 		os.chdir(self.root_path)
 
-		import time
-		_start = time.time()
-
 		# Build new index of paths and filenames
 		files_dict_list = []
 		self.__get_recursive_inventory_list__(self.root_path, files_dict_list)
-		print('After recursive scan %d' % ((time.time() - _start) * 1000))
 
 		# Convert index into list of entries
 		entries_list = [entry_class(
 			file_dict = item,
 			root_path = self.root_path
 			) for item in files_dict_list]
-		print('After entry_class %d' % ((time.time() - _start) * 1000))
 
 		# Run index helper in parallel
 		for entry in entries_list:
 			entry.update_id()
-		print('After update_fileinfo %d' % ((time.time() - _start) * 1000))
 
 		# Restore old CWD
 		os.chdir(self.current_path)
