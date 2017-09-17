@@ -439,14 +439,14 @@ class repository_class():
 
 	def __update_index_and_return__(self):
 
-		uc_list, rw_list, rm_list, nw_list, ch_list, mv_list = self.diff()
+		uc_list, rw_list, _, nw_list, ch_list, mv_list = self.diff()
 
 		# Set CWD to root
 		os.chdir(self.root_path)
 
 		# Update file information on new entries
 		updated_entries_list = run_routines_on_objects_in_parallel_and_return(
-			uc_list + rw_list + rm_list + nw_list + ch_list + mv_list,
+			uc_list + rw_list + nw_list + ch_list + mv_list,
 			['merge_f_dict']
 			)
 
