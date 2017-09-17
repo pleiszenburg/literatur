@@ -43,12 +43,10 @@ upload_test:
 	done
 
 install:
-	pip install -r requirements.txt
-	pip install .
+	pip install .[dev]
 
 install_link:
-	pip install -r requirements.txt
-	pip install -e .
+	pip install -e .[dev]
 
 test:
 	make docu

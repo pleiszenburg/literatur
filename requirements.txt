@@ -1,17 +1,2 @@
-setuptools
-wheel
-pytest
-Sphinx
-sphinx_rtd_theme
-twine
--e git+https://github.com/alexz-enwp/wikitools.git@py3#egg=wikitools
-dropbox
-PyQt5
-networkx
-pdfminer.six
-python-magic
-xmltodict
-tqdm
-humanize
-msgpack-python
-click
+--index-url https://pypi.python.org/simple/
+-e .[dev]

@@ -72,9 +72,29 @@ setup(
 	license = 'LGPLv2',
 	keywords = ['literature'],
 	include_package_data = True,
-	install_requires = [
-		'Click',
+	dependency_links = [
+		'git+https://github.com/alexz-enwp/wikitools.git@py3#egg=wikitools'
 		],
+	install_requires = [
+		'click',
+		'dropbox',
+		'humanize',
+		'msgpack-python',
+		'networkx',
+		'pdfminer.six',
+		'PyQt5',
+		'python-magic',
+		'tqdm',
+		'xmltodict'
+		],
+	extras_require = {'dev': [
+		'pytest',
+		'setuptools',
+		'Sphinx',
+		'sphinx_rtd_theme',
+		'twine',
+		'wheel'
+		]},
 	entry_points = '''
 		[console_scripts]
 		lit = literature.scripts:entry
