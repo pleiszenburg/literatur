@@ -29,12 +29,12 @@ specific language governing rights and limitations under the License.
 # IMPORT
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+import os
 from setuptools import (
 	find_packages,
 	setup
 	)
-import os
-from glob import glob
+# from glob import glob
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -90,6 +90,7 @@ setup(
 		],
 	extras_require = {'dev': [
 		'pytest',
+		'python-language-server',
 		'setuptools',
 		'Sphinx',
 		'sphinx_rtd_theme',
