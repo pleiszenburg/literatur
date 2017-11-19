@@ -28,6 +28,7 @@ specific language governing rights and limitations under the License.
 # IMPORT
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+import datetime
 import hashlib
 import os
 from pprint import pformat as pf
@@ -38,7 +39,7 @@ from ..const import (
 	KEY_EXISTS_BOOL,
 	KEY_FILE,
 	KEY_ID,
-	KEY_INFO,
+	# KEY_INFO,
 	KEY_INODE,
 	KEY_HASH,
 	KEY_MAGIC,
