@@ -28,15 +28,14 @@ specific language governing rights and limitations under the License.
 # IMPORT
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-import argparse
 from importlib import import_module
 import os
 from pprint import pprint as pp
-import sys # TODO remove?
 
 import click
 
-from .guis import script_ui_filerename
+# TODO reimplement with click
+# from .guis import script_ui_filerename
 
 from ..const import (
 	KEY_JOURNAL,
