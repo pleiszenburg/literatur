@@ -29,12 +29,12 @@ specific language governing rights and limitations under the License.
 # IMPORT
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+import os
 from setuptools import (
 	find_packages,
 	setup
 	)
-import os
-from glob import glob
+# from glob import glob
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -49,7 +49,7 @@ _version_ = '0.0.3'
 # List all versions of Python which are supported
 confirmed_python_versions = [
 	('Programming Language :: Python :: %s' % x)
-	for x in '3.4 3.5 3.6'.split()
+	for x in '3.5 3.6'.split()
 	]
 
 
@@ -71,12 +71,37 @@ setup(
 	download_url = 'https://github.com/pleiszenburg/literatur/archive/v%s.tar.gz' % _version_,
 	license = 'LGPLv2',
 	keywords = ['literature'],
-	scripts = glob(os.path.join('scripts', '*')),
 	include_package_data = True,
-	install_requires = [],
+	dependency_links = [
+		'https://github.com/s-m-e/wikitools/tarball/py3_bump#egg=wikitools-1.99'
+		],
+	install_requires = [
+		'click',
+		'dropbox',
+		'humanize',
+		'msgpack-python',
+		'networkx',
+		'pdfminer.six',
+		'PyQt5',
+		'python-magic',
+		'tqdm',
+		'wikitools==1.99',
+		'xmltodict'
+		],
+	extras_require = {'dev': [
+		'pytest',
+		'python-language-server',
+		'setuptools',
+		'Sphinx',
+		'sphinx_rtd_theme',
+		'twine',
+		'wheel'
+		]},
+	entry_points = '''
+		[console_scripts]
+		lit = literatur.scripts:entry
+		''',
 	zip_safe = False,
-	extras_require = {},
-	entry_points = {},
 	classifiers = [
 		'Development Status :: 3 - Alpha',
 		'Intended Audience :: Science/Research',
