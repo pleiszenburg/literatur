@@ -48,6 +48,8 @@ from ..const import (
 	IGNORE_FILE_LIST,
 	KEY_EXISTS_BOOL,
 	KEY_FILE,
+	KEY_FILES,
+	KEY_GROUPS,
 	KEY_INODE,
 	KEY_JSON,
 	KEY_JOURNAL,
@@ -62,6 +64,7 @@ from ..const import (
 	KEY_PATH,
 	KEY_PKL,
 	KEY_SIZE,
+	KEY_TAGS,
 	PATH_REPO,
 	PATH_SUB_DB,
 	PATH_SUB_DBBACKUP,
@@ -85,14 +88,30 @@ class repository_class():
 
 	def __init__(self):
 
-		# Set defauls
+		# Default folders
 		self.current_relative_path = ''
-		self.root_path = ''
-		self.initialized_bool = False
-		self.index_list = []
-		self.index_loaded_bool = False
-
 		self.current_path = os.getcwd()
+		self.root_path = ''
+
+		# Is the directory we're in (or any above) initialized?
+		self.initialized_bool = False
+
+		# Index dicts ({ID: entry, ...})
+		self.index_dict_dict = {
+			KEY_FILES: {},
+			KEY_GROUPS: {},
+			KEY_TAGS: {}
+			}
+
+		# Index lists ([entry, ...])
+		self.index_list_dict = {
+			KEY_FILES: [],
+			KEY_GROUPS: [],
+			KEY_TAGS: []
+			}
+
+		# Have index dicts been loaded?
+		self.index_loaded_bool = False
 
 		try:
 			self.root_path = self.__find_root_path__(self.current_path)
@@ -396,6 +415,22 @@ class repository_class():
 		else:
 
 			raise # TODO
+
+
+	def __update_index_dicts_from_lists__(self, index_key_list = []):
+
+		for index_key in index_key_list:
+			self.index_dict_dict[index_key].clear()
+			self.index_dict_dict[index_key].update({
+				entry.p_dict[KEY_ID]: entry for entry in self.index_list_dict[index_key]
+				})
+
+
+	def __update_index_lists_from_dicts__(self, index_key_list = []):
+
+		for index_key in index_key_list:
+			self.index_list_dict[index_key].clear()
+			self.index_list_dict[index_key] += list(index_dict_dict[index_key].items())
 
 
 	def __store_index__(self, mode = KEY_MP, force_store = False):
