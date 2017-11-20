@@ -53,6 +53,7 @@ from ..const import (
 	KEY_SIZE,
 	KEY_STATUS,
 	KEY_TYPE,
+	MSG_DEBUG_STATUS,
 	STATUS_CH,
 	STATUS_MV,
 	STATUS_NW,
@@ -121,7 +122,7 @@ class entry_class():
 				KEY_ID: self.id,
 				KEY_META: self.m_dict,
 				KEY_REPORT: self.report,
-				KEY_STATUS: self.status,
+				KEY_STATUS: '%s (%d)' % (MSG_DEBUG_STATUS[self.status], self.status),
 				KEY_TYPE: self.type
 				})
 
@@ -139,14 +140,16 @@ class entry_class():
 
 		if self.status == STATUS_MV:
 
-			self.report.append('Moved: "%s" -> "%s"' % (
+			self.report.append('%s: "%s" -> "%s"' % (
+				MSG_DEBUG_STATUS[STATUS_MV],
 				os.path.join(self.f_dict[KEY_PATH], self.f_dict[KEY_NAME]),
 				os.path.join(self.f_ch_dict[KEY_PATH], self.f_ch_dict[KEY_NAME])
 				))
 
 		elif self.status == STATUS_RW:
 
-			self.report.append('Rewritten: "%s"' % (
+			self.report.append('%s: "%s"' % (
+				MSG_DEBUG_STATUS[STATUS_RW],
 				os.path.join(self.f_ch_dict[KEY_PATH], self.f_ch_dict[KEY_NAME])
 				))
 
@@ -157,7 +160,8 @@ class entry_class():
 				size_prefix = '+'
 			else:
 				size_prefix = '-'
-			self.report.append('Changed: "%s" [%s] %s ago' % (
+			self.report.append('%s: "%s" [%s] %s ago' % (
+				MSG_DEBUG_STATUS[STATUS_CH],
 				os.path.join(self.f_dict[KEY_PATH], self.f_dict[KEY_NAME]),
 				size_prefix + humanize.naturalsize(abs(size_diff), gnu = True),
 				humanize.naturaldelta(

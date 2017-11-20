@@ -35,13 +35,21 @@ from pprint import pprint as pp
 import click
 
 from ..const import (
+	KEY_FILES,
 	KEY_JOURNAL,
 	KEY_MASTER,
 	KEY_NAME,
 	KEY_PATH,
 	MSG_DEBUG_INREPOSITORY,
 	MSG_DEBUG_NOREPOSITORY,
-	REPORT_MAX_LINES
+	MSG_DEBUG_STATUS,
+	REPORT_MAX_LINES,
+	STATUS_UC,
+	STATUS_RM,
+	STATUS_NW,
+	STATUS_CH,
+	STATUS_MV,
+	STATUS_RW
 	)
 from ..repo import repository_class
 pass_repository_decorator = click.make_pass_decorator(repository_class, ensure = True)
@@ -181,32 +189,32 @@ def stats(repo):
 def __print_diff__(uc_list, rw_list, rm_list, nw_list, ch_list, mv_list):
 
 	for rp_message, rp_list in [
-		('Unchanged', uc_list),
-		('Rewritten', rw_list)
+		(MSG_DEBUG_STATUS[STATUS_UC], uc_list),
+		(MSG_DEBUG_STATUS[STATUS_RW], rw_list)
 		]:
 		if len(rp_list) > 0:
-			print('%s: [%d files]' % (rp_message, len(rp_list)))
+			print('%s: [%d %s]' % (rp_message, len(rp_list), KEY_FILES))
 
 	for rp_message, rp_list in [
-		('New', nw_list),
-		('Removed', rm_list)
+		(MSG_DEBUG_STATUS[STATUS_NW], nw_list),
+		(MSG_DEBUG_STATUS[STATUS_RM], rm_list)
 		]:
 		if len(rp_list) <= REPORT_MAX_LINES:
 			for entry in rp_list:
 				print('%s: "%s"' % (rp_message, os.path.join(entry.f_dict[KEY_PATH], entry.f_dict[KEY_NAME])))
 		else:
-			print('%s: [%d files]' % (rp_message, len(rp_list)))
+			print('%s: [%d %s]' % (rp_message, len(rp_list), KEY_FILES))
 
 	for rp_message, rp_list in [
-		('Moved', mv_list),
-		('Changed', ch_list)
+		(MSG_DEBUG_STATUS[STATUS_MV], mv_list),
+		(MSG_DEBUG_STATUS[STATUS_CH], ch_list)
 		]:
 		if len(rp_list) <= REPORT_MAX_LINES:
 			for entry in rp_list:
 				for rp_line in entry.report:
 					print(rp_line)
 		else:
-			print('%s: [%d files]' % (rp_message, len(rp_list)))
+			print('%s: [%d %s]' % (rp_message, len(rp_list), KEY_FILES))
 
 
 def __print_duplicates__(duplicates_list):

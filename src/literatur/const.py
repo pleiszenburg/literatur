@@ -109,6 +109,7 @@ KEY_AUTHOR_FIRST = 'author_first'
 KEY_AUTHORS_DICT = 'authors_dict'
 KEY_CLASS = 'class'
 KEY_FILE = 'file'
+KEY_FILES = 'files'
 KEY_EDITORS_DICT = 'editors_dict'
 KEY_ETAL_BOOL = 'etal'
 KEY_EXISTS_BOOL = 'exists'
@@ -188,6 +189,15 @@ MSG_DEBUG_UNKNOWNCLASS = 'Unknown class'
 MSG_DEBUG_UNKNOWNEXTENSION = 'Unknown extension'
 MSG_DEBUG_UNKNWNSERIES = 'Unknown series'
 MSG_DEBUG_YEARNAN = 'Year not a number'
+
+MSG_DEBUG_STATUS = {
+	STATUS_UC: 'Unchanged',
+	STATUS_RM: 'Removed',
+	STATUS_NW: 'New',
+	STATUS_CH: 'Changed',
+	STATUS_MV: 'Moved',
+	STATUS_RW: 'Rewritten'
+	}
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
