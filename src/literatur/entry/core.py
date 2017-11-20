@@ -39,6 +39,7 @@ from ..const import (
 	KEY_EXISTS_BOOL,
 	KEY_FILE,
 	KEY_ID,
+	KEY_GROUP,
 	# KEY_INFO,
 	KEY_INODE,
 	KEY_HASH,
@@ -80,29 +81,43 @@ class entry_class():
 
 
 	def __init__(self,
-		file_dict = None, meta_dict = None, filepath_tuple = None, storage_dict = None
+		file_dict = None,
+		filepath_tuple = None,
+		group_dict = None,
+		meta_dict = None,
+		storage_dict = None
 		):
 
-		self.f_dict = {} # File information
-		self.f_ch_dict = {} # Updated file information
-		self.m_dict = {} # meta information
-
-		self.id = None # Unique ID
+		self.id = None # Unique entry ID
 		self.type = None # One in {KEY_FILE, KEY_GROUP}
 		self.report = None # Detailes on status
 		self.status = None # Changed, moved, ...
 
+		self.f_dict = {} # File information
+		self.f_ch_dict = {} # Updated file information
+		self.g_dict = {} # Group information
+		self.m_dict = {} # meta information
+
 		if file_dict is not None and type(file_dict) == dict:
 			self.f_dict.update(file_dict)
-
-		if meta_dict is not None and type(meta_dict) == dict:
-			self.m_dict.update(meta_dict)
+			self.type = KEY_FILE
 
 		if filepath_tuple is not None and type(filepath_tuple) == tuple:
 			self.f_dict.update({
 				KEY_PATH: filepath_tuple[0],
 				KEY_NAME: filepath_tuple[1]
 				})
+			self.type = KEY_FILE
+
+		if group_dict is not None and type(group_dict) == dict:
+			self.g_dict.update(group_dict)
+			self.type = KEY_GROUP
+
+		if meta_dict is not None and type(meta_dict) == dict:
+			self.m_dict.update(meta_dict)
+
+		if storage_dict is not None and type(storage_dict) == dict:
+			self.import_storage_dict(storage_dict)
 
 
 	def __repr__(self):
@@ -132,6 +147,35 @@ class entry_class():
 		if os.path.isfile(os.path.join(self.get_full_path(), self.f_dict[KEY_NAME])):
 			return True
 		return False
+
+
+	def export_storage_dict(self):
+
+		export_dict = {}
+
+		if self.id is not None:
+			export_dict.update({KEY_ID: self.id})
+		if self.type is not None:
+			export_dict.update({KEY_TYPE: self.type})
+			if self.type == KEY_FILE:
+				export_dict.update({KEY_FILE: entry.f_dict})
+			elif self.type == KEY_GROUP:
+				export_dict.update({KEY_GROUP: entry.g_dict})
+			else:
+				raise # TODO
+		else: # TODO remove else section
+			if len(entry.f_dict.keys()) > 0:
+				export_dict.update({
+					KEY_TYPE: KEY_FILE,
+					KEY_FILE: entry.f_dict
+					})
+			elif len(entry.g_dict.keys()) > 0:
+				export_dict.update({
+					KEY_TYPE: KEY_GROUP,
+					KEY_GROUP: entry.g_dict
+					})
+
+		return export_dict
 
 
 	def generate_report(self):
@@ -185,9 +229,24 @@ class entry_class():
 		return self.f_dict[KEY_PATH]
 
 
-	def get_storage_dict(self):
+	def import_storage_dict(self, import_dict):
 
-		return {}
+		if KEY_ID in import_dict.keys():
+			self.id = import_dict[KEY_ID]
+		if KEY_TYPE in import_dict.keys():
+			self.type = import_dict[KEY_TYPE]
+
+		if KEY_FILE in import_dict.keys():
+			self.f_dict.update(import_dict[KEY_FILE])
+			self.type = KEY_FILE
+		elif KEY_GROUP in import_dict.keys():
+			self.g_dict.update(import_dict[KEY_GROUP])
+			self.type = KEY_GROUP
+		else:
+			raise # TODO
+
+		if KEY_META in import_dict.keys():
+			self.m_dict.update(import_dict[KEY_META])
 
 
 	def merge_file_dict(self):

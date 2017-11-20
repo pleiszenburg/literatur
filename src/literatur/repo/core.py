@@ -393,8 +393,7 @@ class repository_class():
 			if self.index_loaded_bool:
 
 				self.index_list = [entry_class(
-					file_dict = entry_dict[KEY_FILE],
-					meta_dict = entry_dict[KEY_META]
+					storage_dict = entry_dict
 					) for entry_dict in import_list]
 
 		else:
@@ -404,10 +403,7 @@ class repository_class():
 
 	def __store_index__(self, mode = KEY_MP, force_store = False):
 
-		export_list = [{
-			KEY_FILE: entry.f_dict,
-			KEY_META: entry.m_dict
-			} for entry in self.index_list]
+		export_list = [entry.export_storage_dict() for entry in self.index_list]
 
 		if self.index_loaded_bool or force_store:
 
