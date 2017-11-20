@@ -74,13 +74,16 @@ from ..filetypes import (
 class entry_class():
 
 
+	# Root path of repository, identical accross all entries
+	root_path = None
+
+
 	def __init__(self,
 		file_dict = None, meta_dict = None, filepath_tuple = None,
 		root_path = None
 		):
 
 		# Set defaults
-		self.root_path = None # Root path of repository
 		self.f_dict = {} # file information
 			# KEY_EXISTS_BOOL: None,
 			# KEY_HASH: None,
