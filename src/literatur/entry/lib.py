@@ -96,7 +96,7 @@ def find_duplicates_in_entry_list(entry_list):
 	entry_by_hash_dict = {}
 
 	for entry in entry_list:
-		hash_str = entry.f_dict[KEY_HASH]
+		hash_str = entry.p_dict[KEY_HASH]
 		if hash_str not in entry_by_hash_dict.keys():
 			entry_by_hash_dict.update({hash_str: [entry]})
 		else:
@@ -114,11 +114,11 @@ def find_duplicates_in_entry_list(entry_list):
 def __find_process_diff__(a_entry_list, b_entry_list, key_tuple, status_code):
 
 	def list_to_dict(entry_list, key_tuple):
-		return {tuple(entry.f_dict[key] for key in key_tuple): entry for entry in entry_list}
+		return {tuple(entry.p_dict[key] for key in key_tuple): entry for entry in entry_list}
 
 	def update_entry(a_entry, b_entry, status_code):
 		a_entry.status = status_code
-		a_entry.f_ch_dict.update(b_entry.f_dict)
+		a_entry.p_ch_dict.update(b_entry.p_dict)
 		a_entry.generate_report()
 		return a_entry
 
