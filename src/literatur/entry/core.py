@@ -149,6 +149,11 @@ class __entry_class__():
 
 	def export_storage_dict(self):
 
+		if KEY_ID not in self.p_dict.keys():
+			raise # TODO
+		if self.p_dict[KEY_ID] in [None, 0, '']:
+			raise # TODO
+
 		return {KEY_PARAM: self.p_dict}
 
 

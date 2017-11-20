@@ -101,9 +101,6 @@ class repository_class():
 			self.root_path = self.current_path
 			self.initialized_bool = False
 
-		# Tell entry class about root_path
-		entry_class.root_path = self.root_path
-
 		self.current_relative_path = os.path.relpath(self.root_path, self.current_path)
 
 
@@ -173,13 +170,13 @@ class repository_class():
 		# TODO check if it is already in DB etc ...
 		# TODO move code into entry class (as type "temp entry" if it is not in repo yet)
 
-		entry = entry_class(
-			filepath_tuple = (self.current_path, filename)
+		entry = generate_entry(
+			self, filepath_tuple = (self.current_path, filename)
 			)
 		for routine_name in [
 			'update_file_existence',
 			'update_file_info',
-			'update_file_id',
+			'update_id',
 			'update_file_hash',
 			'update_file_magic',
 			'update_file_type'
@@ -196,8 +193,8 @@ class repository_class():
 			if not self.index_loaded_bool:
 				self.__load_index__()
 
-			magic_list = [entry.f_dict[KEY_MAGIC] for entry in self.index_list]
-			mime_list = [entry.f_dict[KEY_MIME] for entry in self.index_list]
+			magic_list = [entry.p_dict[KEY_MAGIC] for entry in self.index_list]
+			mime_list = [entry.p_dict[KEY_MIME] for entry in self.index_list]
 
 			magic_dict = Counter(magic_list)
 			mime_dict = Counter(mime_list)
@@ -355,13 +352,13 @@ class repository_class():
 		self.__get_recursive_inventory_list__(self.root_path, files_dict_list)
 
 		# Convert index into list of entries
-		entries_list = [entry_class(
-			file_dict = item
+		entries_list = [generate_entry(
+			self, file_dict = item
 			) for item in files_dict_list]
 
 		# Run index helper
 		for entry in entries_list:
-			entry.update_file_id()
+			entry.update_id()
 
 		# Restore old CWD
 		os.chdir(self.current_path)
@@ -392,8 +389,8 @@ class repository_class():
 
 			if self.index_loaded_bool:
 
-				self.index_list = [entry_class(
-					storage_dict = entry_dict
+				self.index_list = [generate_entry(
+					self, storage_dict = entry_dict
 					) for entry_dict in import_list]
 
 		else:
@@ -438,7 +435,7 @@ class repository_class():
 		# Update file information on new entries
 		updated_entries_list = run_routines_on_objects_in_parallel_and_return(
 			uc_list + rw_list + nw_list + ch_list + mv_list,
-			['merge_file_dict']
+			['merge_p_dict']
 			)
 
 		# Restore old CWD
