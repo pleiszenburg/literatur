@@ -158,21 +158,21 @@ class entry_class():
 		if self.type is not None:
 			export_dict.update({KEY_TYPE: self.type})
 			if self.type == KEY_FILE:
-				export_dict.update({KEY_FILE: entry.f_dict})
+				export_dict.update({KEY_FILE: self.f_dict})
 			elif self.type == KEY_GROUP:
-				export_dict.update({KEY_GROUP: entry.g_dict})
+				export_dict.update({KEY_GROUP: self.g_dict})
 			else:
 				raise # TODO
 		else: # TODO remove else section
-			if len(entry.f_dict.keys()) > 0:
+			if len(self.f_dict.keys()) > 0:
 				export_dict.update({
 					KEY_TYPE: KEY_FILE,
-					KEY_FILE: entry.f_dict
+					KEY_FILE: self.f_dict
 					})
-			elif len(entry.g_dict.keys()) > 0:
+			elif len(self.g_dict.keys()) > 0:
 				export_dict.update({
 					KEY_TYPE: KEY_GROUP,
-					KEY_GROUP: entry.g_dict
+					KEY_GROUP: self.g_dict
 					})
 
 		return export_dict
