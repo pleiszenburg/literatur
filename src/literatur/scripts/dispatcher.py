@@ -201,7 +201,7 @@ def __print_diff__(uc_list, rw_list, rm_list, nw_list, ch_list, mv_list):
 		]:
 		if len(rp_list) <= REPORT_MAX_LINES:
 			for entry in rp_list:
-				print('%s: "%s"' % (rp_message, os.path.join(entry.f_dict[KEY_PATH], entry.f_dict[KEY_NAME])))
+				print('%s: "%s"' % (rp_message, os.path.join(entry.p_dict[KEY_PATH], entry.p_dict[KEY_NAME])))
 		else:
 			print('%s: [%d %s]' % (rp_message, len(rp_list), KEY_FILES))
 
