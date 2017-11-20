@@ -109,16 +109,20 @@ class entry_class():
 		if self.status is None:
 			return pf({
 				KEY_FILE: self.f_dict,
-				KEY_META: self.m_dict
+				KEY_ID: self.id,
+				KEY_META: self.m_dict,
+				KEY_TYPE: self.type
 				})
 		else:
 			merged_f_dict = {key: self.f_dict[key] for key in self.f_dict.keys()}
 			merged_f_dict.update(self.f_ch_dict)
 			return pf({
 				KEY_FILE: merged_f_dict,
+				KEY_ID: self.id,
 				KEY_META: self.m_dict,
 				KEY_REPORT: self.report,
-				KEY_STATUS: self.status
+				KEY_STATUS: self.status,
+				KEY_TYPE: self.type
 				})
 
 
