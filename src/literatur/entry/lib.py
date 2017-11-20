@@ -119,7 +119,7 @@ def __find_process_diff__(a_entry_list, b_entry_list, key_tuple, status_code):
 	def update_entry(a_entry, b_entry, status_code):
 		a_entry.status = status_code
 		a_entry.p_ch_dict.update(b_entry.p_dict)
-		a_entry.generate_report()
+		a_entry.update_report()
 		return a_entry
 
 	a_entry_dict = list_to_dict(a_entry_list, key_tuple)

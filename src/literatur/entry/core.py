@@ -210,7 +210,7 @@ class entry_file_class(__entry_class__):
 
 	def get_file_existence(self):
 
-		if os.path.isfile(os.path.join(self.get_full_path(), self.p_dict[KEY_NAME])):
+		if os.path.isfile(os.path.join(self.get_file_fullpath(), self.p_dict[KEY_NAME])):
 			return True
 		return False
 
@@ -231,7 +231,7 @@ class entry_file_class(__entry_class__):
 
 		if self.p_dict[KEY_EXISTS_BOOL]:
 
-			in_path = os.path.join(self.get_full_path(), self.p_dict[KEY_NAME])
+			in_path = os.path.join(self.get_file_fullpath(), self.p_dict[KEY_NAME])
 			blocksize = 8 * 1024 * 1024 # 65536
 			hasher = hashlib.sha256()
 
@@ -253,7 +253,7 @@ class entry_file_class(__entry_class__):
 
 		if self.p_dict[KEY_EXISTS_BOOL]:
 
-			stat_info = os.stat(os.path.join(self.get_full_path(), self.p_dict[KEY_NAME]))
+			stat_info = os.stat(os.path.join(self.get_file_fullpath(), self.p_dict[KEY_NAME]))
 			self.p_dict.update({
 				KEY_MODE: stat_info.st_mode,
 				KEY_INODE: stat_info.st_ino,
@@ -270,7 +270,7 @@ class entry_file_class(__entry_class__):
 
 		if self.p_dict[KEY_EXISTS_BOOL]:
 
-			path = self.get_full_path()
+			path = self.get_file_fullpath()
 			self.p_dict.update({
 				KEY_MAGIC: get_magicinfo((path, self.p_dict[KEY_NAME])),
 				KEY_MIME: get_mimetype((path, self.p_dict[KEY_NAME]))

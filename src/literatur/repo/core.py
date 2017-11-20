@@ -176,7 +176,7 @@ class repository_class():
 		for routine_name in [
 			'update_file_existence',
 			'update_file_info',
-			'update_id',
+			'generate_id',
 			'update_file_hash',
 			'update_file_magic',
 			'update_file_type'
@@ -358,7 +358,7 @@ class repository_class():
 
 		# Run index helper
 		for entry in entries_list:
-			entry.update_id()
+			entry.generate_id()
 
 		# Restore old CWD
 		os.chdir(self.current_path)
