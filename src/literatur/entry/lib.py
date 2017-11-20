@@ -65,7 +65,7 @@ def compare_entry_lists(a_entry_list, b_entry_light_list):
 	# Fetch missing information on b-list entries (hash, magic, mime, type)
 	b_entry_list = run_routines_on_objects_in_parallel_and_return(
 		b_entry_light_list,
-		['update_hash', 'update_magic', 'update_type']
+		['update_file_hash', 'update_file_magic', 'update_file_type']
 		)
 
 	# Find files, which have likely been written to a new inode

@@ -122,6 +122,7 @@ def file(repo, file):
 	"""Get meta information on file(s)
 	"""
 
+	# TODO look for file in repo first, then generate new (temp) entry
 	for filename in file:
 		__print_file_metainfo__(repo.get_file_metainfo(filename))
 

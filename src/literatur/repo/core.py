@@ -168,18 +168,19 @@ class repository_class():
 	def get_file_metainfo(self, filename):
 
 		# TODO check if it is already in DB etc ...
+		# TODO move code into entry class (as type "temp entry" if it is not in repo yet)
 
 		entry = entry_class(
 			filepath_tuple = (self.current_path, filename),
 			root_path = self.root_path
 			)
 		for routine_name in [
-			'update_existence',
-			'update_fileinfo',
-			'update_id',
-			'update_hash',
-			'update_magic',
-			'update_type'
+			'update_file_existence',
+			'update_file_info',
+			'update_file_id',
+			'update_file_hash',
+			'update_file_magic',
+			'update_file_type'
 			]:
 			getattr(entry, routine_name)()
 
@@ -357,9 +358,9 @@ class repository_class():
 			root_path = self.root_path
 			) for item in files_dict_list]
 
-		# Run index helper in parallel
+		# Run index helper
 		for entry in entries_list:
-			entry.update_id()
+			entry.update_file_id()
 
 		# Restore old CWD
 		os.chdir(self.current_path)
@@ -441,7 +442,7 @@ class repository_class():
 		# Update file information on new entries
 		updated_entries_list = run_routines_on_objects_in_parallel_and_return(
 			uc_list + rw_list + nw_list + ch_list + mv_list,
-			['merge_f_dict']
+			['merge_file_dict']
 			)
 
 		# Restore old CWD

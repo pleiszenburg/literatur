@@ -191,21 +191,21 @@ class entry_class():
 		return self.f_dict[KEY_PATH]
 
 
-	def merge_f_dict(self):
+	def merge_file_dict(self):
 
 		self.f_dict.update(self.f_ch_dict)
 		self.f_ch_dict = {}
 		self.report = None
 		self.status = None
-		# self.update_existence()
+		# self.update_file_existence()
 
 
-	def update_existence(self):
+	def update_file_existence(self):
 
 		self.f_dict[KEY_EXISTS_BOOL] = self.check_existence_and_return()
 
 
-	def update_id(self):
+	def update_file_id(self):
 
 		if self.f_dict[KEY_EXISTS_BOOL]:
 
@@ -224,7 +224,7 @@ class entry_class():
 			raise # TODO
 
 
-	def update_hash(self):
+	def update_file_hash(self):
 
 		if self.f_dict[KEY_EXISTS_BOOL]:
 
@@ -246,7 +246,7 @@ class entry_class():
 			raise # TODO
 
 
-	def update_magic(self):
+	def update_file_magic(self):
 
 		if self.f_dict[KEY_EXISTS_BOOL]:
 
@@ -261,7 +261,7 @@ class entry_class():
 			raise # TODO
 
 
-	def update_fileinfo(self):
+	def update_file_info(self):
 
 		if self.f_dict[KEY_EXISTS_BOOL]:
 
@@ -278,6 +278,6 @@ class entry_class():
 			raise # TODO
 
 
-	def update_type(self):
+	def update_file_type(self):
 
 		self.f_dict[KEY_TYPE] = get_literatur_type_from_magicinfo(self.f_dict[KEY_MAGIC])
