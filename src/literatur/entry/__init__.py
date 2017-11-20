@@ -28,7 +28,11 @@ specific language governing rights and limitations under the License.
 # IMPORT
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-from .core import entry_class
+from .core import (
+	entry_file_class,
+	entry_group_class,
+	generate_entry
+	)
 from .lib import (
 	compare_entry_lists,
 	find_duplicates_in_entry_list

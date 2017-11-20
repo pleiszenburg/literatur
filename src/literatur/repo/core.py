@@ -69,8 +69,8 @@ from ..const import (
 	)
 from ..entry import (
 	compare_entry_lists,
-	entry_class,
-	find_duplicates_in_entry_list
+	find_duplicates_in_entry_list,
+	generate_entry
 	)
 from ..parallel import run_routines_on_objects_in_parallel_and_return
 from ..parser import ctime_to_datestring
