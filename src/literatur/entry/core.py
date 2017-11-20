@@ -79,8 +79,7 @@ class entry_class():
 
 
 	def __init__(self,
-		file_dict = None, meta_dict = None, filepath_tuple = None, storage_dict = None,
-		root_path = None
+		file_dict = None, meta_dict = None, filepath_tuple = None, storage_dict = None
 		):
 
 		self.f_dict = {} # File information
@@ -103,9 +102,6 @@ class entry_class():
 				KEY_PATH: filepath_tuple[0],
 				KEY_NAME: filepath_tuple[1]
 				})
-
-		if root_path is not None and type(root_path) == str:
-			self.root_path = root_path
 
 
 	def __repr__(self):

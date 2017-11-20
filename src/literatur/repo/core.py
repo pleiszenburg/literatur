@@ -101,6 +101,9 @@ class repository_class():
 			self.root_path = self.current_path
 			self.initialized_bool = False
 
+		# Tell entry class about root_path
+		entry_class.root_path = self.root_path
+
 		self.current_relative_path = os.path.relpath(self.root_path, self.current_path)
 
 
@@ -171,8 +174,7 @@ class repository_class():
 		# TODO move code into entry class (as type "temp entry" if it is not in repo yet)
 
 		entry = entry_class(
-			filepath_tuple = (self.current_path, filename),
-			root_path = self.root_path
+			filepath_tuple = (self.current_path, filename)
 			)
 		for routine_name in [
 			'update_file_existence',
@@ -354,8 +356,7 @@ class repository_class():
 
 		# Convert index into list of entries
 		entries_list = [entry_class(
-			file_dict = item,
-			root_path = self.root_path
+			file_dict = item
 			) for item in files_dict_list]
 
 		# Run index helper
@@ -393,8 +394,7 @@ class repository_class():
 
 				self.index_list = [entry_class(
 					file_dict = entry_dict[KEY_FILE],
-					meta_dict = entry_dict[KEY_META],
-					root_path = self.root_path
+					meta_dict = entry_dict[KEY_META]
 					) for entry_dict in import_list]
 
 		else:
