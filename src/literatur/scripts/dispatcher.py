@@ -34,9 +34,6 @@ from pprint import pprint as pp
 
 import click
 
-# TODO reimplement with click
-# from .guis import script_ui_filerename
-
 from ..const import (
 	KEY_JOURNAL,
 	KEY_MASTER,
