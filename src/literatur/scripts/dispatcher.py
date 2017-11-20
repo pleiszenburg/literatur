@@ -57,7 +57,7 @@ pass_repository_decorator = click.make_pass_decorator(repository_class, ensure =
 
 @click.group()
 @click.pass_context
-def entry(click_context):
+def script_entry(click_context):
 	"""LITERATUR
 
 	Literature management with Python, Dropbox and MediaWiki
@@ -66,7 +66,7 @@ def entry(click_context):
 	click_context.obj = repository_class()
 
 
-@entry.command()
+@script_entry.command()
 @pass_repository_decorator
 def commit(repo):
 	"""Record changes to the repository
@@ -78,7 +78,7 @@ def commit(repo):
 		print(MSG_DEBUG_NOREPOSITORY)
 
 
-@entry.command()
+@script_entry.command()
 @pass_repository_decorator
 def diff(repo):
 	"""Show uncommited changes
@@ -90,7 +90,7 @@ def diff(repo):
 		print(MSG_DEBUG_NOREPOSITORY)
 
 
-@entry.command()
+@script_entry.command()
 @pass_repository_decorator
 def dump(repo):
 	"""Dump repository database
@@ -102,7 +102,7 @@ def dump(repo):
 		print(MSG_DEBUG_NOREPOSITORY)
 
 
-@entry.command()
+@script_entry.command()
 @pass_repository_decorator
 def duplicates(repo):
 	"""Find duplicate entries in repository
@@ -114,7 +114,7 @@ def duplicates(repo):
 		print(MSG_DEBUG_NOREPOSITORY)
 
 
-@entry.command()
+@script_entry.command()
 @click.argument(
 	'file',
 	nargs = -1,
@@ -129,7 +129,7 @@ def file(repo, file):
 		__print_file_metainfo__(repo.get_file_metainfo(filename))
 
 
-@entry.command()
+@script_entry.command()
 @click.argument(
 	'branch',
 	nargs = 1,
@@ -146,7 +146,7 @@ def merge(repo, branch):
 		print(MSG_DEBUG_NOREPOSITORY)
 
 
-@entry.command()
+@script_entry.command()
 @pass_repository_decorator
 def init(repo):
 	"""Create a literature repository
@@ -158,7 +158,7 @@ def init(repo):
 		print(MSG_DEBUG_INREPOSITORY % repo.root_path)
 
 
-@entry.command()
+@script_entry.command()
 @pass_repository_decorator
 def rename(repo):
 	"""Launch GUI for renaming files
@@ -168,7 +168,7 @@ def rename(repo):
 	guis.script_ui_filerename()
 
 
-@entry.command()
+@script_entry.command()
 @pass_repository_decorator
 def stats(repo):
 	"""Display repository statistics
