@@ -29,7 +29,6 @@ specific language governing rights and limitations under the License.
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 import os
-from pathlib import PurePath
 
 from ..const import IGNORE_FILE_LIST
 
