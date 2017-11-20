@@ -79,28 +79,18 @@ class entry_class():
 
 
 	def __init__(self,
-		file_dict = None, meta_dict = None, filepath_tuple = None,
+		file_dict = None, meta_dict = None, filepath_tuple = None, storage_dict = None,
 		root_path = None
 		):
 
-		# Set defaults
-		self.f_dict = {} # file information
-			# KEY_EXISTS_BOOL: None,
-			# KEY_HASH: None,
-			# KEY_ID: None,
-			# KEY_INODE: None,
-			# KEY_MAGIC: None,
-			# KEY_MIME: None,
-			# KEY_MODE: None,
-			# KEY_MTIME: None,
-			# KEY_NAME: None,
-			# KEY_PATH: None,
-			# KEY_SIZE: None,
-			# KEY_TYPE: None
-		self.f_ch_dict = {} # dict for updated file information
+		self.f_dict = {} # File information
+		self.f_ch_dict = {} # Updated file information
 		self.m_dict = {} # meta information
-		self.status = None # Changed, moved, ...
+
+		self.id = None # Unique ID
+		self.type = None # One in {KEY_FILE, KEY_GROUP}
 		self.report = None # Detailes on status
+		self.status = None # Changed, moved, ...
 
 		if file_dict is not None and type(file_dict) == dict:
 			self.f_dict.update(file_dict)
@@ -189,6 +179,11 @@ class entry_class():
 		if self.root_path is not None:
 			return os.path.join(self.root_path, self.f_dict[KEY_PATH])
 		return self.f_dict[KEY_PATH]
+
+
+	def get_storage_dict(self):
+
+		return {}
 
 
 	def merge_file_dict(self):
