@@ -139,9 +139,9 @@ class repository_class():
 
 
 	def diff(self):
-	""" Diff looks for files, which have been changed (changed, created, moved, deleted).
-	It does not care about tags and groups.
-	"""
+		""" Diff looks for files, which have been changed (changed, created, moved, deleted).
+		It does not care about tags and groups.
+		"""
 
 		if self.initialized_bool:
 
@@ -174,9 +174,9 @@ class repository_class():
 
 
 	def find_duplicates(self):
-	""" find_duplicates looks for identical files.
-	Multiples of tags and groups are not yet being looked for.
-	"""
+		""" find_duplicates looks for identical files.
+		Multiples of tags and groups are not yet being looked for.
+		"""
 
 		if self.initialized_bool:
 
