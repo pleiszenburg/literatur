@@ -31,6 +31,7 @@ specific language governing rights and limitations under the License.
 from .core import (
 	entry_file_class,
 	entry_group_class,
+	entry_tag_class,
 	generate_entry
 	)
 from .lib import (
