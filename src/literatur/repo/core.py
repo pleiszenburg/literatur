@@ -161,14 +161,14 @@ class repository_class():
 			raise # TODO
 
 
-	def dump(self):
+	def dump(self, path = None, mode = KEY_JSON):
 
 		if self.initialized_bool:
 
 			if not self.index_loaded_bool:
 				self.__load_index__()
 
-			self.__store_index__(mode = KEY_YAML) # KEY_JSON
+			self.__store_index__(path = path, mode = mode) #
 
 		else:
 
@@ -426,7 +426,7 @@ class repository_class():
 			raise # TODO
 
 
-	def __store_index__(self, mode = KEY_MP, force_store = False):
+	def __store_index__(self, path = None, mode = KEY_MP, force_store = False):
 
 		export_dict = {}
 		for index_key in INDEX_TYPES:
@@ -436,26 +436,27 @@ class repository_class():
 
 		if self.index_loaded_bool or force_store:
 
-			write_path = os.path.join(
-				self.root_path, PATH_REPO, PATH_SUB_DB, FILE_DB_CURRENT + '.' + mode
-				)
+			if path in [None, '']:
+				path = os.path.join(
+					self.root_path, PATH_REPO, PATH_SUB_DB, FILE_DB_CURRENT + '.' + mode
+					)
 
 			if mode == KEY_PKL:
-				f = open(write_path, 'wb+')
+				f = open(path, 'wb+')
 				pickle.dump(export_dict, f, -1)
 			elif mode == KEY_MP:
-				f = open(write_path, 'wb+')
+				f = open(path, 'wb+')
 				msg_pack = msgpack.packb(export_dict, use_bin_type = True)
 				f.write(msg_pack)
 			elif mode == KEY_JSON:
-				f = open(write_path, 'w+')
+				f = open(path, 'w+')
 				json.dump(export_dict, f, indent = '\t', sort_keys = True)
 			elif mode == KEY_YAML:
 				if hasattr(yaml, 'CDumper'):
 					dumper = yaml.CDumper
 				else:
 					dumper = yaml.Dumper
-				f = open(write_path, 'w+')
+				f = open(path, 'w+')
 				yaml.dump(export_dict, f, Dumper = dumper, default_flow_style = False)
 			else:
 				raise # TODO

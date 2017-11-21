@@ -37,9 +37,13 @@ import click
 from ..const import (
 	KEY_FILES,
 	KEY_JOURNAL,
+	KEY_JSON,
 	KEY_MASTER,
+	KEY_MP,
 	KEY_NAME,
 	KEY_PATH,
+	KEY_PKL,
+	KEY_YAML,
 	MSG_DEBUG_INREPOSITORY,
 	MSG_DEBUG_NOREPOSITORY,
 	MSG_DEBUG_STATUS,
@@ -96,13 +100,23 @@ def diff(repo):
 
 
 @script_entry.command()
+@click.option(
+	'--mode', '-m',
+	type = click.Choice([KEY_JSON, KEY_MP, KEY_PKL, KEY_YAML]),
+	default = KEY_JSON
+	)
+@click.argument(
+	'filename',
+	nargs = 1,
+	default = ''
+	)
 @pass_repository_decorator
-def dump(repo):
+def dump(repo, mode, filename):
 	"""Dump repository database
 	"""
 
 	if repo.initialized_bool:
-		repo.dump()
+		repo.dump(path = filename, mode = mode)
 	else:
 		print(MSG_DEBUG_NOREPOSITORY)
 
