@@ -456,7 +456,7 @@ class repository_class():
 				else:
 					dumper = yaml.Dumper
 				f = open(write_path, 'w+')
-				f.write(yaml.dump(export_dict, Dumper = dumper))
+				yaml.dump(export_dict, f, Dumper = dumper, default_flow_style = False)
 			else:
 				raise # TODO
 
