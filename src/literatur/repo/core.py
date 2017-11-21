@@ -421,31 +421,32 @@ class repository_class():
 
 	def __store_index__(self, mode = KEY_MP, force_store = False):
 
-		export_list = [entry.export_storage_dict() for entry in self.index_list]
+		export_dict = {}
+		for index_key in INDEX_TYPES:
+			export_dict.update({index_key: [
+				entry.export_storage_dict() for entry in self.index_list_dict[index_key]
+				]})
 
 		if self.index_loaded_bool or force_store:
 
+			write_path = os.path.join(
+				self.root_path, PATH_REPO, PATH_SUB_DB, FILE_DB_CURRENT + '.' + mode
+				)
+
 			if mode == KEY_PKL:
-				f = open(os.path.join(
-					self.root_path, PATH_REPO, PATH_SUB_DB, FILE_DB_CURRENT + '.' + mode
-					), 'wb+')
-				pickle.dump(export_list, f, -1)
-				f.close()
+				f = open(write_path, 'wb+')
+				pickle.dump(export_dict, f, -1)
 			elif mode == KEY_MP:
-				msg_pack = msgpack.packb(export_list, use_bin_type = True)
-				f = open(os.path.join(
-					self.root_path, PATH_REPO, PATH_SUB_DB, FILE_DB_CURRENT + '.' + mode
-					), 'wb+')
+				f = open(write_path, 'wb+')
+				msg_pack = msgpack.packb(export_dict, use_bin_type = True)
 				f.write(msg_pack)
-				f.close()
 			elif mode == KEY_JSON:
-				f = open(os.path.join(
-					self.root_path, PATH_REPO, PATH_SUB_REPORTS, FILE_DB_CURRENT + '.' + mode
-					), 'w+')
-				json.dump(export_list, f, indent = '\t', sort_keys = True)
-				f.close()
+				f = open(write_path, 'w+')
+				json.dump(export_dict, f, indent = '\t', sort_keys = True)
 			else:
 				raise # TODO
+
+			f.close()
 
 		else:
 
