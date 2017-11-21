@@ -140,10 +140,12 @@ KEY_SERIES_SECTION = 'series_section'
 KEY_SERIES_TYPE = 'series_type'
 KEY_SIZE = 'size'
 KEY_STATUS = 'status'
+KEY_TAG = 'tag'
 KEY_TAGS = 'tags'
 KEY_TITLE = 'title'
 KEY_TYPE = 'type'
 # KEY_URL = 'url'
+KEY_YAML = 'yaml'
 KEY_YEAR = 'year'
 
 

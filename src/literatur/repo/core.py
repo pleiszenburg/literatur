@@ -39,6 +39,7 @@ from pprint import pprint as pp
 import shutil
 
 import msgpack
+import yaml
 
 from ..const import (
 	FILE_DB_CURRENT,
@@ -67,6 +68,7 @@ from ..const import (
 	KEY_PKL,
 	KEY_SIZE,
 	KEY_TAGS,
+	KEY_YAML,
 	PATH_REPO,
 	PATH_SUB_DB,
 	PATH_SUB_DBBACKUP,
@@ -166,7 +168,7 @@ class repository_class():
 			if not self.index_loaded_bool:
 				self.__load_index__()
 
-			self.__store_index__(mode = KEY_JSON)
+			self.__store_index__(mode = KEY_YAML) # KEY_JSON
 
 		else:
 
@@ -448,6 +450,13 @@ class repository_class():
 			elif mode == KEY_JSON:
 				f = open(write_path, 'w+')
 				json.dump(export_dict, f, indent = '\t', sort_keys = True)
+			elif mode == KEY_YAML:
+				if hasattr(yaml, 'CDumper'):
+					dumper = yaml.CDumper
+				else:
+					dumper = yaml.Dumper
+				f = open(write_path, 'w+')
+				f.write(yaml.dump(export_dict, Dumper = dumper))
 			else:
 				raise # TODO
 
