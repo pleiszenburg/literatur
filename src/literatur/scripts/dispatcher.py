@@ -200,6 +200,69 @@ def stats(repo):
 		print(MSG_DEBUG_NOREPOSITORY)
 
 
+@script_entry.command()
+@click.option(
+	'--untag', '-u',
+	is_flag = True
+	)
+@click.option(
+	'--group', '-g',
+	nargs = 1,
+	type = str,
+	multiple = True
+	)
+@click.argument(
+	'tag',
+	nargs = 1,
+	type = str
+	)
+@click.argument(
+	'filename',
+	type = click.Path(exists = True),
+	nargs = -1
+	)
+@pass_repository_decorator
+def tag(repo, untag, group, tag, filename):
+	"""Tags files & groups or removes tags from them
+	"""
+
+	if repo.initialized_bool:
+		print(untag, group, tag, filename)
+	else:
+		print(MSG_DEBUG_NOREPOSITORY)
+
+
+@script_entry.command()
+@click.option(
+	'--create', '-c',
+	nargs = 1,
+	type = str,
+	multiple = True,
+	help = 'Creates a new tag'
+	)
+@click.option(
+	'--delete', '-d',
+	nargs = 1,
+	type = str,
+	multiple = True,
+	help = 'Deletes a tag'
+	)
+@click.option(
+	'--force-delete', '-f',
+	is_flag = True,
+	help = 'Forces delete of tags in use'
+	)
+@pass_repository_decorator
+def tagm(repo, create, delete, force_delete):
+	"""Manages tags
+	"""
+
+	if repo.initialized_bool:
+		print(create, delete, force_delete)
+	else:
+		print(MSG_DEBUG_NOREPOSITORY)
+
+
 def __print_diff__(uc_list, rw_list, rm_list, nw_list, ch_list, mv_list):
 
 	for rp_message, rp_list in [
