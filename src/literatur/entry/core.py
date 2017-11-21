@@ -139,8 +139,7 @@ class __entry_class__():
 		if self.status is None:
 			return pf({
 				KEY_META: self.m_dict,
-				KEY_PARAM: self.p_dict,
-				KEY_TYPE: self.type
+				KEY_PARAM: self.p_dict
 				})
 		else:
 			merged_p_dict = {key: self.p_dict[key] for key in self.p_dict.keys()}
@@ -149,8 +148,7 @@ class __entry_class__():
 				KEY_META: self.m_dict,
 				KEY_PARAM: merged_p_dict,
 				KEY_REPORT: self.report,
-				KEY_STATUS: '%s (%d)' % (MSG_DEBUG_STATUS[self.status], self.status),
-				KEY_TYPE: self.type
+				KEY_STATUS: '%s (%d)' % (MSG_DEBUG_STATUS[self.status], self.status)
 				})
 
 
