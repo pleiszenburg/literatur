@@ -98,18 +98,13 @@ class repository_class():
 		self.initialized_bool = False
 
 		# Index dicts ({ID: entry, ...})
-		self.index_dict_dict = {
-			KEY_FILES: {},
-			KEY_GROUPS: {},
-			KEY_TAGS: {}
-			}
-
+		self.index_dict_dict = {}
 		# Index lists ([entry, ...])
-		self.index_list_dict = {
-			KEY_FILES: [],
-			KEY_GROUPS: [],
-			KEY_TAGS: []
-			}
+		self.index_list_dict = {}
+		# Seting up index dicts and lists ...
+		for index_key in INDEX_TYPES:
+			self.index_dict_dict.update({index_key: {}})
+			self.index_list_dict.update({index_key: []})
 
 		# Have index dicts been loaded?
 		self.index_loaded_bool = False
