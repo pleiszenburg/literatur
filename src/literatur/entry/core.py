@@ -54,6 +54,7 @@ from ..const import (
 	KEY_REPORT,
 	KEY_SIZE,
 	KEY_STATUS,
+	KEY_TAG,
 	KEY_TYPE,
 	MSG_DEBUG_STATUS,
 	STATUS_CH,
@@ -79,7 +80,8 @@ def generate_entry(
 	file_dict = None,
 	filepath_tuple = None,
 	group_dict = None,
-	storage_dict = None
+	storage_dict = None,
+	tag_dict = None
 	):
 
 	if storage_dict is not None and type(storage_dict) == dict:
@@ -87,6 +89,8 @@ def generate_entry(
 			return entry_file_class(storage_dict, parent_repo)
 		elif storage_dict[KEY_PARAM][KEY_ENTRYTYPE] == KEY_GROUP:
 			return entry_group_class(storage_dict, parent_repo)
+		elif storage_dict[KEY_PARAM][KEY_ENTRYTYPE] == KEY_TAG:
+			return entry_tag_class(storage_dict, parent_repo)
 		else:
 			raise # TODO
 
@@ -101,6 +105,9 @@ def generate_entry(
 
 	if group_dict is not None and type(group_dict) == dict:
 		return entry_group_class({KEY_PARAM: group_dict}, parent_repo)
+
+	if tag_dict is not None and type(tag_dict) == dict:
+		return entry_tag_class({KEY_PARAM: tag_dict}, parent_repo)
 
 	raise # TODO
 
@@ -335,6 +342,25 @@ class entry_group_class(__entry_class__):
 
 		super().__init__(import_dict, parent_repo)
 		self.p_dict.update({KEY_ENTRYTYPE: KEY_GROUP})
+
+
+	def generate_id(self):
+
+		raise NotImplementedError
+
+
+	def update_report(self):
+
+		raise NotImplementedError
+
+
+class entry_tag_class(__entry_class__):
+
+
+	def __init__(self, import_dict, parent_repo):
+
+		super().__init__(import_dict, parent_repo)
+		self.p_dict.update({KEY_ENTRYTYPE: KEY_TAG})
 
 
 	def generate_id(self):
