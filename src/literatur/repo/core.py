@@ -390,12 +390,16 @@ class repository_class():
 		if not self.index_loaded_bool or force_reload:
 
 			if mode == KEY_PKL:
-				f = open(os.path.join(self.root_path, PATH_REPO, PATH_SUB_DB, FILE_DB_CURRENT + '.' + mode), 'rb')
+				f = open(os.path.join(
+					self.root_path, PATH_REPO, PATH_SUB_DB, FILE_DB_CURRENT + '.' + mode
+					), 'rb')
 				import_list = pickle.load(f)
 				f.close()
 				self.index_loaded_bool = True
 			elif mode == KEY_MP:
-				f = open(os.path.join(self.root_path, PATH_REPO, PATH_SUB_DB, FILE_DB_CURRENT + '.' + mode), 'rb')
+				f = open(os.path.join(
+					self.root_path, PATH_REPO, PATH_SUB_DB, FILE_DB_CURRENT + '.' + mode
+					), 'rb')
 				msg_pack = f.read()
 				f.close()
 				import_list = msgpack.unpackb(msg_pack, encoding = 'utf-8')
@@ -424,16 +428,22 @@ class repository_class():
 		if self.index_loaded_bool or force_store:
 
 			if mode == KEY_PKL:
-				f = open(os.path.join(self.root_path, PATH_REPO, PATH_SUB_DB, FILE_DB_CURRENT + '.' + mode), 'wb+')
+				f = open(os.path.join(
+					self.root_path, PATH_REPO, PATH_SUB_DB, FILE_DB_CURRENT + '.' + mode
+					), 'wb+')
 				pickle.dump(export_list, f, -1)
 				f.close()
 			elif mode == KEY_MP:
 				msg_pack = msgpack.packb(export_list, use_bin_type = True)
-				f = open(os.path.join(self.root_path, PATH_REPO, PATH_SUB_DB, FILE_DB_CURRENT + '.' + mode), 'wb+')
+				f = open(os.path.join(
+					self.root_path, PATH_REPO, PATH_SUB_DB, FILE_DB_CURRENT + '.' + mode
+					), 'wb+')
 				f.write(msg_pack)
 				f.close()
 			elif mode == KEY_JSON:
-				f = open(os.path.join(self.root_path, PATH_REPO, PATH_SUB_REPORTS, FILE_DB_CURRENT + '.' + mode), 'w+')
+				f = open(os.path.join(
+					self.root_path, PATH_REPO, PATH_SUB_REPORTS, FILE_DB_CURRENT + '.' + mode
+					), 'w+')
 				json.dump(export_list, f, indent = '\t', sort_keys = True)
 				f.close()
 			else:
