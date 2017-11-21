@@ -46,6 +46,7 @@ from ..const import (
 	FILE_DB_MASTER,
 	IGNORE_DIR_LIST,
 	IGNORE_FILE_LIST,
+	INDEX_TYPES,
 	KEY_EXISTS_BOOL,
 	KEY_FILE,
 	KEY_FILES,
@@ -389,32 +390,29 @@ class repository_class():
 
 		if not self.index_loaded_bool or force_reload:
 
+			f = open(os.path.join(
+				self.root_path, PATH_REPO, PATH_SUB_DB, FILE_DB_CURRENT + '.' + mode
+				), 'rb')
+
 			if mode == KEY_PKL:
-				f = open(os.path.join(
-					self.root_path, PATH_REPO, PATH_SUB_DB, FILE_DB_CURRENT + '.' + mode
-					), 'rb')
-				import_list = pickle.load(f)
-				f.close()
-				self.index_loaded_bool = True
+				import_dict = pickle.load(f)
 			elif mode == KEY_MP:
-				f = open(os.path.join(
-					self.root_path, PATH_REPO, PATH_SUB_DB, FILE_DB_CURRENT + '.' + mode
-					), 'rb')
-				msg_pack = f.read()
-				f.close()
-				import_list = msgpack.unpackb(msg_pack, encoding = 'utf-8')
-				self.index_loaded_bool = True
+				import_dict = msgpack.unpackb(f.read(), encoding = 'utf-8')
 			elif mode == KEY_JSON:
-				print('load_index from JSON not supported')
-				raise # TODO
+				import_dict = json.load(f)
 			else:
+				f.close()
 				raise # TODO
 
-			if self.index_loaded_bool:
+			self.index_loaded_bool = True
+			f.close()
 
-				self.index_list = [generate_entry(
+			for index_key in INDEX_TYPES:
+				self.index_list_dict[index_key].clear()
+				self.index_list_dict[index_key] += [generate_entry(
 					self, storage_dict = entry_dict
-					) for entry_dict in import_list]
+					) for entry_dict in import_dict[index_key]]
+			self.__update_index_dicts_from_lists__(index_key_list = INDEX_TYPES)
 
 		else:
 
