@@ -174,13 +174,16 @@ class repository_class():
 
 
 	def find_duplicates(self):
+	""" find_duplicates looks for identical files.
+	Multiples of tags and groups are not yet being looked for.
+	"""
 
 		if self.initialized_bool:
 
 			if not self.index_loaded_bool:
 				self.__load_index__()
 
-			return find_duplicates_in_entry_list(self.index_list)
+			return find_duplicates_in_entry_list(self.index_list_dict[KEY_FILES])
 
 		else:
 
