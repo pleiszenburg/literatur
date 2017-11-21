@@ -218,8 +218,8 @@ class repository_class():
 			if not self.index_loaded_bool:
 				self.__load_index__()
 
-			magic_list = [entry.p_dict[KEY_MAGIC] for entry in self.index_list]
-			mime_list = [entry.p_dict[KEY_MIME] for entry in self.index_list]
+			magic_list = [entry.p_dict[KEY_MAGIC] for entry in self.index_list_dict[KEY_FILES]]
+			mime_list = [entry.p_dict[KEY_MIME] for entry in self.index_list_dict[KEY_FILES]]
 
 			magic_dict = Counter(magic_list)
 			mime_dict = Counter(mime_list)
