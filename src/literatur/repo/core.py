@@ -417,22 +417,6 @@ class repository_class():
 			raise # TODO
 
 
-	def __update_index_dicts_from_lists__(self, index_key_list = []):
-
-		for index_key in index_key_list:
-			self.index_dict_dict[index_key].clear()
-			self.index_dict_dict[index_key].update({
-				entry.p_dict[KEY_ID]: entry for entry in self.index_list_dict[index_key]
-				})
-
-
-	def __update_index_lists_from_dicts__(self, index_key_list = []):
-
-		for index_key in index_key_list:
-			self.index_list_dict[index_key].clear()
-			self.index_list_dict[index_key] += list(index_dict_dict[index_key].items())
-
-
 	def __store_index__(self, mode = KEY_MP, force_store = False):
 
 		export_list = [entry.export_storage_dict() for entry in self.index_list]
@@ -477,3 +461,19 @@ class repository_class():
 		os.chdir(self.current_path)
 
 		return updated_entries_list
+
+
+	def __update_index_dicts_from_lists__(self, index_key_list = []):
+
+		for index_key in index_key_list:
+			self.index_dict_dict[index_key].clear()
+			self.index_dict_dict[index_key].update({
+				entry.p_dict[KEY_ID]: entry for entry in self.index_list_dict[index_key]
+				})
+
+
+	def __update_index_lists_from_dicts__(self, index_key_list = []):
+
+		for index_key in index_key_list:
+			self.index_list_dict[index_key].clear()
+			self.index_list_dict[index_key] += list(index_dict_dict[index_key].items())
