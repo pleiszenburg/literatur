@@ -51,6 +51,7 @@ from ..const import (
 	KEY_FILE,
 	KEY_FILES,
 	KEY_GROUPS,
+	KEY_ID,
 	KEY_INODE,
 	KEY_JSON,
 	KEY_JOURNAL,
@@ -126,7 +127,9 @@ class repository_class():
 			if not self.index_loaded_bool:
 				self.__load_index__()
 
-			self.index_list = self.__update_index_and_return__()
+			self.index_list_dict[KEY_FILES].clear()
+			self.index_list_dict[KEY_FILES] += self.__update_index_and_return__()
+			self.__update_index_dicts_from_lists__(index_key_list = [KEY_FILES])
 
 			self.__store_index__()
 
@@ -136,12 +139,16 @@ class repository_class():
 
 
 	def diff(self):
+	""" Diff looks for files, which have been changed (changed, created, moved, deleted).
+	It does not care about tags and groups.
+	"""
 
 		if self.initialized_bool:
 
 			if not self.index_loaded_bool:
 				self.__load_index__()
-			old_entries_list = self.index_list
+
+			old_entries_list = self.index_list_dict[KEY_FILES]
 			new_entries_light_list = self.__generate_light_index_and_return__()
 
 			# Compare old list vs new list and return result
