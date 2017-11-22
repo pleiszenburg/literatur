@@ -310,6 +310,15 @@ class repository_class():
 		self.__copy_index_file__(merge_a, merge_b)
 
 
+	def tag(self,
+		tag_name,
+		target_filename_list = [], target_group_list = [], target_tag_list = [],
+		remove_flag = False
+		):
+
+		pass
+
+
 	def tags_modify(self, create_tag_names_list = [], delete_tag_names_list = [], force_delete = False):
 		""" Creates and deletes lists of tags
 		"""

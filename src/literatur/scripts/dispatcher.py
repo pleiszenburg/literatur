@@ -240,7 +240,13 @@ def tag(repo, untag, group_target, tag_target, tag, filename):
 	"""
 
 	if repo.initialized_bool:
-		click.echo(str((untag, group_target, tag_target, tag, filename)))
+		repo.tag(
+			tag,
+			target_filename_list = list(filename),
+			target_group_list = list(group_target),
+			target_tag_list = list(tag_target),
+			remove_flag = untag
+			)
 	else:
 		click.echo(MSG_DEBUG_NOREPOSITORY)
 
