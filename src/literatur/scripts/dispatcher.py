@@ -30,7 +30,7 @@ specific language governing rights and limitations under the License.
 
 from importlib import import_module
 import os
-from pprint import pprint as pp
+from pprint import pformat as pf
 
 import click
 
@@ -88,7 +88,7 @@ def commit(repo):
 	if repo.initialized_bool:
 		repo.commit()
 	else:
-		print(MSG_DEBUG_NOREPOSITORY)
+		click.echo(MSG_DEBUG_NOREPOSITORY)
 
 
 @script_entry.command()
@@ -100,7 +100,7 @@ def diff(repo):
 	if repo.initialized_bool:
 		__print_diff__(*(repo.diff()))
 	else:
-		print(MSG_DEBUG_NOREPOSITORY)
+		click.echo(MSG_DEBUG_NOREPOSITORY)
 
 
 @script_entry.command()
@@ -123,7 +123,7 @@ def dump(repo, mode, filename):
 	if repo.initialized_bool:
 		repo.dump(path = filename, mode = mode)
 	else:
-		print(MSG_DEBUG_NOREPOSITORY)
+		click.echo(MSG_DEBUG_NOREPOSITORY)
 
 
 @script_entry.command()
@@ -135,7 +135,7 @@ def duplicates(repo):
 	if repo.initialized_bool:
 		__print_duplicates__(repo.find_duplicates())
 	else:
-		print(MSG_DEBUG_NOREPOSITORY)
+		click.echo(MSG_DEBUG_NOREPOSITORY)
 
 
 @script_entry.command()
@@ -167,7 +167,7 @@ def merge(repo, branch):
 	if repo.initialized_bool:
 		repo.merge(branch)
 	else:
-		print(MSG_DEBUG_NOREPOSITORY)
+		click.echo(MSG_DEBUG_NOREPOSITORY)
 
 
 @script_entry.command()
@@ -179,7 +179,7 @@ def init(repo):
 	if not repo.initialized_bool:
 		repo.init()
 	else:
-		print(MSG_DEBUG_INREPOSITORY % repo.root_path)
+		click.echo(MSG_DEBUG_INREPOSITORY % repo.root_path)
 
 
 @script_entry.command()
@@ -201,7 +201,7 @@ def stats(repo):
 	if repo.initialized_bool:
 		__print_stats__(repo.get_stats())
 	else:
-		print(MSG_DEBUG_NOREPOSITORY)
+		click.echo(MSG_DEBUG_NOREPOSITORY)
 
 
 @script_entry.command()
@@ -231,9 +231,9 @@ def tag(repo, untag, group, tag, filename):
 	"""
 
 	if repo.initialized_bool:
-		print(untag, group, tag, filename)
+		click.echo(untag, group, tag, filename)
 	else:
-		print(MSG_DEBUG_NOREPOSITORY)
+		click.echo(MSG_DEBUG_NOREPOSITORY)
 
 
 @script_entry.command()
@@ -268,13 +268,13 @@ def tagm(repo, create, delete, force_delete):
 			force_delete = force_delete
 			)
 		for tag_name in tags_exist_list:
-			print('"%s": %s', (tag_name, MSG_DEBUG_TAGEXISTS))
+			click.echo('"%s": %s', (tag_name, MSG_DEBUG_TAGEXISTS))
 		for tag_name in tags_donotexist_list:
-			print('"%s": %s', (tag_name, MSG_DEBUG_TAGDOESNOTEXIST))
+			click.echo('"%s": %s', (tag_name, MSG_DEBUG_TAGDOESNOTEXIST))
 		for tag_name in tags_inuse_list:
-			print('"%s": %s (%s)', (tag_name, MSG_DEBUG_TAGINUSE, MSG_DEBUG_CANFORCEDELETE))
+			click.echo('"%s": %s (%s)', (tag_name, MSG_DEBUG_TAGINUSE, MSG_DEBUG_CANFORCEDELETE))
 	else:
-		print(MSG_DEBUG_NOREPOSITORY)
+		click.echo(MSG_DEBUG_NOREPOSITORY)
 
 
 def __print_diff__(uc_list, rw_list, rm_list, nw_list, ch_list, mv_list):
@@ -284,7 +284,7 @@ def __print_diff__(uc_list, rw_list, rm_list, nw_list, ch_list, mv_list):
 		(MSG_DEBUG_STATUS[STATUS_RW], rw_list)
 		]:
 		if len(rp_list) > 0:
-			print('%s: [%d %s]' % (rp_message, len(rp_list), KEY_FILES))
+			click.echo('%s: [%d %s]' % (rp_message, len(rp_list), KEY_FILES))
 
 	for rp_message, rp_list in [
 		(MSG_DEBUG_STATUS[STATUS_NW], nw_list),
@@ -292,9 +292,9 @@ def __print_diff__(uc_list, rw_list, rm_list, nw_list, ch_list, mv_list):
 		]:
 		if len(rp_list) <= REPORT_MAX_LINES:
 			for entry in rp_list:
-				print('%s: "%s"' % (rp_message, os.path.join(entry.p_dict[KEY_PATH], entry.p_dict[KEY_NAME])))
+				click.echo('%s: "%s"' % (rp_message, os.path.join(entry.p_dict[KEY_PATH], entry.p_dict[KEY_NAME])))
 		else:
-			print('%s: [%d %s]' % (rp_message, len(rp_list), KEY_FILES))
+			click.echo('%s: [%d %s]' % (rp_message, len(rp_list), KEY_FILES))
 
 	for rp_message, rp_list in [
 		(MSG_DEBUG_STATUS[STATUS_MV], mv_list),
@@ -303,23 +303,23 @@ def __print_diff__(uc_list, rw_list, rm_list, nw_list, ch_list, mv_list):
 		if len(rp_list) <= REPORT_MAX_LINES:
 			for entry in rp_list:
 				for rp_line in entry.report:
-					print(rp_line)
+					click.echo(rp_line)
 		else:
-			print('%s: [%d %s]' % (rp_message, len(rp_list), KEY_FILES))
+			click.echo('%s: [%d %s]' % (rp_message, len(rp_list), KEY_FILES))
 
 
 def __print_duplicates__(duplicates_list):
 
-	pp(duplicates_list)
+	click.echo(pf(duplicates_list))
 
 
 def __print_file_metainfo__(metainfo_dict):
 
-	pp(metainfo_dict)
+	click.echo(pf(metainfo_dict))
 
 
 def __print_stats__(stats_dict):
 
 	for key in stats_dict.keys():
 		print(key)
-		pp(stats_dict[key])
+		click.echo(pf(stats_dict[key]))
