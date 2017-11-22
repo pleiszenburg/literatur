@@ -268,11 +268,11 @@ def tagm(repo, create, delete, force_delete):
 			force_delete = force_delete
 			)
 		for tag_name in tags_exist_list:
-			click.echo('"%s": %s', (tag_name, MSG_DEBUG_TAGEXISTS))
+			click.echo('"%s": %s' % (tag_name, MSG_DEBUG_TAGEXISTS))
 		for tag_name in tags_donotexist_list:
-			click.echo('"%s": %s', (tag_name, MSG_DEBUG_TAGDOESNOTEXIST))
+			click.echo('"%s": %s' % (tag_name, MSG_DEBUG_TAGDOESNOTEXIST))
 		for tag_name in tags_inuse_list:
-			click.echo('"%s": %s (%s)', (tag_name, MSG_DEBUG_TAGINUSE, MSG_DEBUG_CANFORCEDELETE))
+			click.echo('"%s": %s (%s)' % (tag_name, MSG_DEBUG_TAGINUSE, MSG_DEBUG_CANFORCEDELETE))
 	else:
 		click.echo(MSG_DEBUG_NOREPOSITORY)
 

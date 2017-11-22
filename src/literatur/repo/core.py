@@ -304,7 +304,7 @@ class repository_class():
 		""" Creates and deletes lists of tags
 		"""
 
-		if self.initialized_bool:
+		if not self.initialized_bool:
 			raise # TODO
 
 		if not self.index_loaded_bool:
@@ -547,7 +547,7 @@ class repository_class():
 			raise tagexists_error()
 
 		# Generate new tag entry
-		new_tag_entry = generate_entry(tag_dict = {KEY_NAME: tag_name})
+		new_tag_entry = generate_entry(self, tag_dict = {KEY_NAME: tag_name})
 		# Give the tag an ID
 		new_tag_entry.generate_id()
 		# Append tag to list of tags
@@ -607,7 +607,7 @@ class repository_class():
 	def __update_index_dicts_from_lists__(self, index_key_list = []):
 
 		tag_id_list = [
-			tag_entry.p_dict[KEY_NAME] for tag_entry in self.index_list_dict[KEY_TAGS]
+			tag_entry.p_dict[KEY_ID] for tag_entry in self.index_list_dict[KEY_TAGS]
 			]
 
 		for index_key in index_key_list:
