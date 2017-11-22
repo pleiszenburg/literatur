@@ -670,13 +670,6 @@ class repository_class():
 					self.index_dict_bytagid_dict[index_key][entry_tag_id][entry.p_dict[KEY_ID]] = entry
 
 
-	# def __update_index_lists_from_dicts__(self, index_key_list = []):
-    #
-	# 	for index_key in index_key_list:
-	# 		self.index_list_dict[index_key].clear()
-	# 		self.index_list_dict[index_key] += list(index_dict_byid_dict[index_key].items())
-
-
 	def __update_mirror_dicts__(self):
 
 		self.tagmirror_dict_bytagname = {
