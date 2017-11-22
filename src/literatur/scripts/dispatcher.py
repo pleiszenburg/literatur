@@ -103,7 +103,8 @@ def diff(repo):
 @click.option(
 	'--mode', '-m',
 	type = click.Choice([KEY_JSON, KEY_MP, KEY_PKL, KEY_YAML]),
-	default = KEY_JSON
+	default = KEY_JSON,
+	help = 'Export data format, defaults to JSON if not provided'
 	)
 @click.argument(
 	'filename',
@@ -135,17 +136,17 @@ def duplicates(repo):
 
 @script_entry.command()
 @click.argument(
-	'file',
+	'filenames',
 	nargs = -1,
 	type = click.Path(exists = True)
 	)
 @pass_repository_decorator
-def file(repo, file):
+def file(repo, filenames):
 	"""Get meta information on file(s)
 	"""
 
 	# TODO look for file in repo first, then generate new (temp) entry
-	for filename in file:
+	for filename in filenames:
 		__print_file_metainfo__(repo.get_file_metainfo(filename))
 
 
