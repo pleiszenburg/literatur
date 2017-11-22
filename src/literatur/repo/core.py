@@ -504,36 +504,33 @@ class repository_class():
 
 	def __load_index__(self, mode = KEY_MP, force_reload = False):
 
-		if not self.index_loaded_bool or force_reload:
-
-			f = open(os.path.join(
-				self.root_path, PATH_REPO, PATH_SUB_DB, FILE_DB_CURRENT + '.' + mode
-				), 'rb')
-
-			if mode == KEY_PKL:
-				import_dict = pickle.load(f)
-			elif mode == KEY_MP:
-				import_dict = msgpack.unpackb(f.read(), encoding = 'utf-8')
-			elif mode == KEY_JSON:
-				import_dict = json.load(f)
-			else:
-				f.close()
-				raise # TODO
-
-			self.index_loaded_bool = True
-			f.close()
-
-			for index_key in INDEX_TYPES:
-				self.index_list_dict[index_key].clear()
-				self.index_list_dict[index_key] += [generate_entry(
-					self, storage_dict = entry_dict
-					) for entry_dict in import_dict[index_key]]
-			self.__update_index_dicts_from_lists__(index_key_list = INDEX_TYPES)
-			self.__update_mirror_dicts__()
-
-		else:
-
+		if self.index_loaded_bool and not force_reload:
 			raise # TODO
+
+		f = open(os.path.join(
+			self.root_path, PATH_REPO, PATH_SUB_DB, FILE_DB_CURRENT + '.' + mode
+			), 'rb')
+
+		if mode == KEY_PKL:
+			import_dict = pickle.load(f)
+		elif mode == KEY_MP:
+			import_dict = msgpack.unpackb(f.read(), encoding = 'utf-8')
+		elif mode == KEY_JSON:
+			import_dict = json.load(f)
+		else:
+			f.close()
+			raise # TODO
+
+		self.index_loaded_bool = True
+		f.close()
+
+		for index_key in INDEX_TYPES:
+			self.index_list_dict[index_key].clear()
+			self.index_list_dict[index_key] += [generate_entry(
+				self, storage_dict = entry_dict
+				) for entry_dict in import_dict[index_key]]
+		self.__update_index_dicts_from_lists__(index_key_list = INDEX_TYPES)
+		self.__update_mirror_dicts__()
 
 
 	def __store_index__(self, path = None, mode = KEY_MP, force_store = False):
@@ -544,38 +541,35 @@ class repository_class():
 				entry.export_storage_dict() for entry in self.index_list_dict[index_key]
 				]})
 
-		if self.index_loaded_bool or force_store:
-
-			if path in [None, '']:
-				path = os.path.join(
-					self.root_path, PATH_REPO, PATH_SUB_DB, FILE_DB_CURRENT + '.' + mode
-					)
-
-			if mode == KEY_PKL:
-				f = open(path, 'wb+')
-				pickle.dump(export_dict, f, -1)
-			elif mode == KEY_MP:
-				f = open(path, 'wb+')
-				msg_pack = msgpack.packb(export_dict, use_bin_type = True)
-				f.write(msg_pack)
-			elif mode == KEY_JSON:
-				f = open(path, 'w+')
-				json.dump(export_dict, f, indent = '\t', sort_keys = True)
-			elif mode == KEY_YAML:
-				if hasattr(yaml, 'CDumper'):
-					dumper = yaml.CDumper
-				else:
-					dumper = yaml.Dumper
-				f = open(path, 'w+')
-				yaml.dump(export_dict, f, Dumper = dumper, default_flow_style = False)
-			else:
-				raise # TODO
-
-			f.close()
-
-		else:
-
+		if not (self.index_loaded_bool or force_store):
 			raise # TODO
+
+		if path in [None, '']:
+			path = os.path.join(
+				self.root_path, PATH_REPO, PATH_SUB_DB, FILE_DB_CURRENT + '.' + mode
+				)
+
+		if mode == KEY_PKL:
+			f = open(path, 'wb+')
+			pickle.dump(export_dict, f, -1)
+		elif mode == KEY_MP:
+			f = open(path, 'wb+')
+			msg_pack = msgpack.packb(export_dict, use_bin_type = True)
+			f.write(msg_pack)
+		elif mode == KEY_JSON:
+			f = open(path, 'w+')
+			json.dump(export_dict, f, indent = '\t', sort_keys = True)
+		elif mode == KEY_YAML:
+			if hasattr(yaml, 'CDumper'):
+				dumper = yaml.CDumper
+			else:
+				dumper = yaml.Dumper
+			f = open(path, 'w+')
+			yaml.dump(export_dict, f, Dumper = dumper, default_flow_style = False)
+		else:
+			raise # TODO
+
+		f.close()
 
 
 	def __tag_create__(self, tag_name):
