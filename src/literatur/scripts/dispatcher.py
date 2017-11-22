@@ -44,9 +44,13 @@ from ..const import (
 	KEY_PATH,
 	KEY_PKL,
 	KEY_YAML,
+	MSG_DEBUG_CANFORCEDELETE,
 	MSG_DEBUG_INREPOSITORY,
 	MSG_DEBUG_NOREPOSITORY,
 	MSG_DEBUG_STATUS,
+	MSG_DEBUG_TAGDOESNOTEXIST,
+	MSG_DEBUG_TAGEXISTS,
+	MSG_DEBUG_TAGINUSE,
 	REPORT_MAX_LINES,
 	STATUS_UC,
 	STATUS_RM,
@@ -258,11 +262,17 @@ def tagm(repo, create, delete, force_delete):
 	"""
 
 	if repo.initialized_bool:
-		repo.tags_modify(
+		tags_donotexist_list, tags_exist_list, tags_inuse_list = repo.tags_modify(
 			create_tag_names_list = list(create),
 			delete_tag_names_list = list(delete),
 			force_delete = force_delete
 			)
+		for tag_name in tags_exist_list:
+			print('"%s": %s', (tag_name, MSG_DEBUG_TAGEXISTS))
+		for tag_name in tags_donotexist_list:
+			print('"%s": %s', (tag_name, MSG_DEBUG_TAGDOESNOTEXIST))
+		for tag_name in tags_inuse_list:
+			print('"%s": %s (%s)', (tag_name, MSG_DEBUG_TAGINUSE, MSG_DEBUG_CANFORCEDELETE))
 	else:
 		print(MSG_DEBUG_NOREPOSITORY)
 

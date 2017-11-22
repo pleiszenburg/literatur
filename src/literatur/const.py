@@ -191,6 +191,7 @@ TITLE_LENGTH_MIN_INT = 12
 # MESSAGES
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+MSG_DEBUG_CANFORCEDELETE = 'Delete can be forced.'
 MSG_DEBUG_FILEALREADYEXISTS = "File already exists."
 MSG_DEBUG_FILENAMETOOLONG = 'Filename too long'
 MSG_DEBUG_INREPOSITORY = 'You already are in an existing literature repository at "%s".'
@@ -198,6 +199,9 @@ MSG_DEBUG_NOREPOSITORY = 'You are no in a literature repository.'
 MSG_DEBUG_NOTITLE = 'No title'
 MSG_DEBUG_RESERVEDTITLE = 'Reserved special title'
 MSG_DEBUG_SHORTTITLE = 'Short title'
+MSG_DEBUG_TAGDOESNOTEXIST = 'Tag does not exist.'
+MSG_DEBUG_TAGEXISTS = 'Tag exists.'
+MSG_DEBUG_TAGINUSE = 'Tag is in use.'
 MSG_DEBUG_UNEXPECTEDANNOTATION = 'Unexpected annotation'
 MSG_DEBUG_UNKNOWNCLASS = 'Unknown class'
 MSG_DEBUG_UNKNOWNEXTENSION = 'Unknown extension'

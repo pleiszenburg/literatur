@@ -84,6 +84,22 @@ from ..parser import ctime_to_datestring
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# ERRORS
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+class tagdoesnotexists_error(Exception):
+	pass
+
+
+class tagexists_error(Exception):
+	pass
+
+
+class taginsuse_error(Exception):
+	pass
+
+
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # CLASS
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -289,32 +305,37 @@ class repository_class():
 		"""
 
 		if self.initialized_bool:
-
-			if not self.index_loaded_bool:
-				self.__load_index__()
-
-			# Create path
-			for tag_name in create_tag_names_list:
-				try:
-					self.__tag_create__(tag_name)
-				except:
-					pass # Catch error because tag already exists
-
-			# Delete path
-			for tag_name in delete_tag_names_list:
-				try:
-					self.__tag_delete__(tag_name, force_delete = force_delete)
-				except:
-					pass # Catch error because tag can not be deleted
-
-			self.__update_index_dicts_from_lists__(index_key_list = INDEX_TYPES)
-			self.__update_mirror_dicts__()
-
-			self.__store_index__()
-
-		else:
-
 			raise # TODO
+
+		if not self.index_loaded_bool:
+			self.__load_index__()
+
+		tags_donotexist_list = []
+		tags_exist_list = []
+		tags_inuse_list = []
+
+		# Create path
+		for tag_name in create_tag_names_list:
+			try:
+				self.__tag_create__(tag_name)
+			except tagexists_error:
+				tags_exist_list.append(tag_name)
+
+		# Delete path
+		for tag_name in delete_tag_names_list:
+			try:
+				self.__tag_delete__(tag_name, force_delete = force_delete)
+			except tagdoesnotexists_error:
+				tags_donotexist_list.append(tag_name)
+			except taginsuse_error:
+				tags_inuse_list.append(tag_name)
+
+		self.__update_index_dicts_from_lists__(index_key_list = INDEX_TYPES)
+		self.__update_mirror_dicts__()
+
+		self.__store_index__()
+
+		return tags_donotexist_list, tags_exist_list, tags_inuse_list
 
 
 	def __copy_index_file__(self, merge_source, merge_target):
@@ -523,7 +544,7 @@ class repository_class():
 
 		# Raise an error if tag exists
 		if tag_name in self.tagmirror_dict_bytagname.keys():
-			raise # TODO
+			raise tagexists_error()
 
 		# Generate new tag entry
 		new_tag_entry = generate_entry(tag_dict = {KEY_NAME: tag_name})
@@ -537,7 +558,7 @@ class repository_class():
 
 		# Raise an error if the tag does not exist
 		if tag_name not in self.tagmirror_dict_bytagname.keys():
-			raise # TODO
+			raise tagdoesnotexists_error()
 
 		# Get tag entry
 		tag_entry = self.index_dict_byid_dict[KEY_TAGS][self.tagmirror_dict_bytagname[tag_name]]
@@ -551,12 +572,12 @@ class repository_class():
 
 		# Raise an error if the tag is in use and the delete is not forced
 		if tag_used_bool and not force_delete:
-			raise # TODO
+			raise taginsuse_error()
 
 		# Remove the tag from all entries if the tag is in use and delete forced
 		if tag_used_bool and force_delete:
 			for index_type in INDEX_TYPES:
-				for entry in self.index_dict_bytagid_dict[index_type][tag_id].values()
+				for entry in self.index_dict_bytagid_dict[index_type][tag_id].values():
 					entry.p_dict[KEY_TAGS].pop(tag_id)
 
 		# Actually delete tag
