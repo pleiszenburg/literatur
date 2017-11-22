@@ -205,6 +205,9 @@ class repository_class():
 
 		if self.initialized_bool:
 
+			# TODO look for changed or moved files, too (i.e. return change reports)
+			# Requires index dicts by hash
+
 			if not self.index_loaded_bool:
 				self.__load_index__()
 
