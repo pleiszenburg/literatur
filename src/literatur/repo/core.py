@@ -534,10 +534,10 @@ class repository_class():
 	def __update_mirror_dicts__(self):
 
 		self.tagmirror_dict_bytagname = {
-			entry.p_dict[KEY_NAME]: entry.p_dict[KEY_ID] for enty in self.index_list_dict[KEY_TAGS]
+			entry.p_dict[KEY_NAME]: entry.p_dict[KEY_ID] for entry in self.index_list_dict[KEY_TAGS]
 			}
 		self.filemirror_dict_byabspath = {
 			os.path.join(
 				self.root_path, entry.p_dict[KEY_PATH], entry.p_dict[KEY_NAME]
-				): entry.p_dict[KEY_ID] for enty in self.index_list_dict[KEY_FILES]
+				): entry.p_dict[KEY_ID] for entry in self.index_list_dict[KEY_FILES]
 			}

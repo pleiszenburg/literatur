@@ -134,8 +134,8 @@ class __entry_class__():
 
 		self.import_storage_dict(import_dict)
 
-		if KEY_TAGS not in self.m_dict.keys():
-			self.m_dict[KEY_TAGS] = {}
+		if KEY_TAGS not in self.p_dict.keys():
+			self.p_dict[KEY_TAGS] = {}
 
 
 	def __repr__(self):
