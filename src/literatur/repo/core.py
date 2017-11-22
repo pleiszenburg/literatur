@@ -116,42 +116,11 @@ class repository_class():
 
 	def __init__(self):
 
-		# Default folders
-		self.current_relative_path = ''
-		self.current_path = os.getcwd()
-		self.root_path = ''
+		# Init all index related lists and dicts
+		self.__init_index__()
 
-		# Is the directory we're in (or any above) initialized?
-		self.initialized_bool = False
-
-		# Index dicts by ID ({ID: entry, ...})
-		self.index_dict_byid_dict = {}
-		# Index dicts by tag ({TAG_ID: {ENTRY_ID: entry, ...}, ...}); tags to entries are tagged with!
-		self.index_dict_bytagid_dict = {}
-		# Index lists ([entry, ...])
-		self.index_list_dict = {}
-		# Seting up index dicts and lists ...
-		for index_key in INDEX_TYPES:
-			self.index_dict_byid_dict.update({index_key: {}})
-			self.index_dict_bytagid_dict.update({index_key: {}})
-			self.index_list_dict.update({index_key: []})
-
-		# Mirror of tags by name {TAG_NAME: tag_entry, ...}
-		self.tagmirror_dict_bytagname = {}
-		# Mirror of files by ABSPATH {FULLABSPATH: file_entry, ...}
-		self.filemirror_dict_byabspath = {}
-
-		# Have index dicts been loaded?
-		self.index_loaded_bool = False
-
-		try:
-			self.root_path = self.__find_root_path__(self.current_path)
-			self.initialized_bool = True
-		except: # TODO only on special error in find_root_path
-			self.root_path = self.current_path
-			self.initialized_bool = False
-
-		self.current_relative_path = os.path.relpath(self.root_path, self.current_path)
+		# Init paths and repo status
+		self.__init_paths__()
 
 
 	def commit(self):
@@ -481,6 +450,47 @@ class repository_class():
 		os.chdir(self.current_path)
 
 		return entries_list
+
+
+	def __init_index__(self):
+
+		# Index dicts by ID ({ID: entry, ...})
+		self.index_dict_byid_dict = {}
+		# Index dicts by tag ({TAG_ID: {ENTRY_ID: entry, ...}, ...}); tags to entries are tagged with!
+		self.index_dict_bytagid_dict = {}
+		# Index lists ([entry, ...])
+		self.index_list_dict = {}
+
+		# Seting up index dicts and lists ...
+		for index_key in INDEX_TYPES:
+			self.index_dict_byid_dict.update({index_key: {}})
+			self.index_dict_bytagid_dict.update({index_key: {}})
+			self.index_list_dict.update({index_key: []})
+
+		# Mirror of tags by name {TAG_NAME: tag_entry, ...}
+		self.tagmirror_dict_bytagname = {}
+		# Mirror of files by ABSPATH {FULLABSPATH: file_entry, ...}
+		self.filemirror_dict_byabspath = {}
+
+		# Have index dicts been loaded?
+		self.index_loaded_bool = False
+
+
+	def __init_paths__(self):
+
+		# Store CWD
+		self.current_path = os.getcwd()
+
+		# Find repo root
+		try:
+			self.root_path = self.__find_root_path__(self.current_path)
+			self.initialized_bool = True
+		except: # TODO only on special error in find_root_path
+			self.root_path = self.current_path
+			self.initialized_bool = False
+
+		# Relative path between CWD and repo root
+		self.current_relative_path = os.path.relpath(self.root_path, self.current_path)
 
 
 	def __is_tag_in_use__(self, tag_id):
