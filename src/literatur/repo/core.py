@@ -261,9 +261,25 @@ class repository_class():
 			}
 
 
-	def get_tag_name_list(self):
+	def get_tag_name_list(self, used_only = False, unused_only = False):
 
-		return list(self.tagmirror_dict_bytagname.keys())
+		if not used_only and not unused_only:
+			return list(self.tagmirror_dict_bytagname.keys())
+
+		tag_name_list = []
+
+		for tag_id in self.index_dict_byid_dict[KEY_TAGS].keys():
+
+			tag_use = self.__is_tag_in_use__(tag_id)
+			tag_name = self.index_dict_byid_dict[KEY_TAGS][tag_id].p_dict[KEY_NAME]
+
+			if tag_use and used_only:
+				tag_name_list.append(tag_name)
+
+			if not tag_use and unused_only:
+				tag_name_list.append(tag_name)
+
+		return tag_name_list
 
 
 	def init(self):
@@ -458,6 +474,15 @@ class repository_class():
 		return entries_list
 
 
+	def __is_tag_in_use__(self, tag_id):
+
+		tag_used_bool = False
+		for index_type in INDEX_TYPES:
+			tag_used_bool |= bool(self.index_dict_bytagid_dict[index_type][tag_id])
+
+		return tag_used_bool
+
+
 	def __load_index__(self, mode = KEY_MP, force_reload = False):
 
 		if not self.index_loaded_bool or force_reload:
@@ -560,9 +585,7 @@ class repository_class():
 		tag_id = tag_entry.p_dict[KEY_ID]
 
 		# Is tag in use?
-		tag_used_bool = False
-		for index_type in INDEX_TYPES:
-			tag_used_bool |= bool(self.index_dict_bytagid_dict[index_type][tag_id])
+		tag_used_bool = self.__is_tag_in_use__(tag_id)
 
 		# Raise an error if the tag is in use and the delete is not forced
 		if tag_used_bool and not force_delete:

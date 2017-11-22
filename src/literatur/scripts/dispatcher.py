@@ -257,12 +257,22 @@ def tag(repo, untag, group, tag, filename):
 	help = 'Forces delete of tags in use'
 	)
 @click.option(
-	'--list-all', '-l',
+	'--ls', '-l',
 	is_flag = True,
-	help = 'Lists all tags'
+	help = 'Lists tags'
+	)
+@click.option(
+	'--ls-used', '-u',
+	is_flag = True,
+	help = 'Lists used tags'
+	)
+@click.option(
+	'--ls-unused', '-x',
+	is_flag = True,
+	help = 'Lists unused tags'
 	)
 @pass_repository_decorator
-def tagm(repo, create, delete, force_delete, list_all):
+def tagm(repo, create, delete, force_delete, ls, ls_used, ls_unused):
 	"""Manages tags
 	"""
 
@@ -281,8 +291,8 @@ def tagm(repo, create, delete, force_delete, list_all):
 		for tag_name in tags_inuse_list:
 			click.echo('"%s": %s (%s)' % (tag_name, MSG_DEBUG_TAGINUSE, MSG_DEBUG_CANFORCEDELETE))
 
-		if list_all:
-			tag_list = repo.get_tag_name_list()
+		if ls or ls_used or ls_unused:
+			tag_list = repo.get_tag_name_list(used_only = ls_used, unused_only = ls_unused)
 			tag_list.sort()
 			for tag_name in tag_list:
 				click.echo(tag_name)
