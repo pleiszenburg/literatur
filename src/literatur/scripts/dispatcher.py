@@ -207,13 +207,22 @@ def stats(repo):
 @script_entry.command()
 @click.option(
 	'--untag', '-u',
-	is_flag = True
+	is_flag = True,
+	help = 'Removes tag from target(s)'
 	)
 @click.option(
-	'--group', '-g',
+	'--group-target', '-g',
 	nargs = 1,
 	type = str,
-	multiple = True
+	multiple = True,
+	help = 'Defines a group as a target'
+	)
+@click.option(
+	'--tag-target', '-t',
+	nargs = 1,
+	type = str,
+	multiple = True,
+	help = 'Defines a(nother) tag as a target'
 	)
 @click.argument(
 	'tag',
@@ -226,12 +235,12 @@ def stats(repo):
 	nargs = -1
 	)
 @pass_repository_decorator
-def tag(repo, untag, group, tag, filename):
+def tag(repo, untag, group_target, tag_target, tag, filename):
 	"""Tags files & groups or removes tags from them
 	"""
 
 	if repo.initialized_bool:
-		click.echo(untag, group, tag, filename)
+		click.echo(str((untag, group_target, tag_target, tag, filename)))
 	else:
 		click.echo(MSG_DEBUG_NOREPOSITORY)
 
