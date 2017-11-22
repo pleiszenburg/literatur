@@ -261,6 +261,11 @@ class repository_class():
 			}
 
 
+	def get_tag_name_list(self):
+
+		return list(self.tagmirror_dict_bytagname.keys())
+
+
 	def init(self):
 
 		if self.initialized_bool:
