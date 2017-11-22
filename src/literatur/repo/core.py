@@ -87,6 +87,14 @@ from ..parser import ctime_to_datestring
 # ERRORS
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+class repoinitialized_error(Exception):
+	pass
+
+
+class reponotinitialized_error(Exception):
+	pass
+
+
 class tagdoesnotexists_error(Exception):
 	pass
 
@@ -148,21 +156,18 @@ class repository_class():
 
 	def commit(self):
 
-		if self.initialized_bool:
+		if not self.initialized_bool:
+			raise reponotinitialized_error()
 
-			if not self.index_loaded_bool:
-				self.__load_index__()
+		if not self.index_loaded_bool:
+			self.__load_index__()
 
-			self.index_list_dict[KEY_FILES].clear()
-			self.index_list_dict[KEY_FILES] += self.__update_index_and_return__()
-			self.__update_index_dicts_from_lists__(index_key_list = [KEY_FILES])
-			self.__update_mirror_dicts__()
+		self.index_list_dict[KEY_FILES].clear()
+		self.index_list_dict[KEY_FILES] += self.__update_index_and_return__()
+		self.__update_index_dicts_from_lists__(index_key_list = [KEY_FILES])
+		self.__update_mirror_dicts__()
 
-			self.__store_index__()
-
-		else:
-
-			raise # TODO
+		self.__store_index__()
 
 
 	def diff(self):
@@ -170,34 +175,28 @@ class repository_class():
 		It does not care about tags and groups.
 		"""
 
-		if self.initialized_bool:
+		if not self.initialized_bool:
+			raise reponotinitialized_error()
 
-			if not self.index_loaded_bool:
-				self.__load_index__()
+		if not self.index_loaded_bool:
+			self.__load_index__()
 
-			old_entries_list = self.index_list_dict[KEY_FILES]
-			new_entries_light_list = self.__generate_light_index_and_return__()
+		old_entries_list = self.index_list_dict[KEY_FILES]
+		new_entries_light_list = self.__generate_light_index_and_return__()
 
-			# Compare old list vs new list and return result
-			return compare_entry_lists(old_entries_list, new_entries_light_list)
-
-		else:
-
-			raise # TODO
+		# Compare old list vs new list and return result
+		return compare_entry_lists(old_entries_list, new_entries_light_list)
 
 
 	def dump(self, path = None, mode = KEY_JSON):
 
-		if self.initialized_bool:
+		if not self.initialized_bool:
+			raise reponotinitialized_error()
 
-			if not self.index_loaded_bool:
-				self.__load_index__()
+		if not self.index_loaded_bool:
+			self.__load_index__()
 
-			self.__store_index__(path = path, mode = mode) #
-
-		else:
-
-			raise # TODO
+		self.__store_index__(path = path, mode = mode) #
 
 
 	def find_duplicates(self):
@@ -205,16 +204,13 @@ class repository_class():
 		Multiples of tags and groups are not yet being looked for.
 		"""
 
-		if self.initialized_bool:
+		if not self.initialized_bool:
+			raise reponotinitialized_error()
 
-			if not self.index_loaded_bool:
-				self.__load_index__()
+		if not self.index_loaded_bool:
+			self.__load_index__()
 
-			return find_duplicates_in_entry_list(self.index_list_dict[KEY_FILES])
-
-		else:
-
-			raise # TODO
+		return find_duplicates_in_entry_list(self.index_list_dict[KEY_FILES])
 
 
 	def get_file_metainfo(self, filename):
@@ -248,43 +244,37 @@ class repository_class():
 
 	def get_stats(self):
 
-		if self.initialized_bool:
+		if not self.initialized_bool:
+			raise reponotinitialized_error()
 
-			if not self.index_loaded_bool:
-				self.__load_index__()
+		if not self.index_loaded_bool:
+			self.__load_index__()
 
-			magic_list = [entry.p_dict[KEY_MAGIC] for entry in self.index_list_dict[KEY_FILES]]
-			mime_list = [entry.p_dict[KEY_MIME] for entry in self.index_list_dict[KEY_FILES]]
+		magic_list = [entry.p_dict[KEY_MAGIC] for entry in self.index_list_dict[KEY_FILES]]
+		mime_list = [entry.p_dict[KEY_MIME] for entry in self.index_list_dict[KEY_FILES]]
 
-			magic_dict = Counter(magic_list)
-			mime_dict = Counter(mime_list)
+		magic_dict = Counter(magic_list)
+		mime_dict = Counter(mime_list)
 
-			return {
-				KEY_MAGIC: OrderedDict(sorted(magic_dict.items(), key = lambda t: t[1])),
-				KEY_MIME: OrderedDict(sorted(mime_dict.items(), key = lambda t: t[1]))
-				}
-
-		else:
-
-			raise # TODO
+		return {
+			KEY_MAGIC: OrderedDict(sorted(magic_dict.items(), key = lambda t: t[1])),
+			KEY_MIME: OrderedDict(sorted(mime_dict.items(), key = lambda t: t[1]))
+			}
 
 
 	def init(self):
 
-		if not self.initialized_bool:
+		if self.initialized_bool:
+			raise repoinitialized_error()
 
-			current_repository = os.path.join(self.root_path, PATH_REPO)
-			os.makedirs(current_repository)
-			for fld in [PATH_SUB_DB, PATH_SUB_DBBACKUP, PATH_SUB_REPORTS]:
-				os.makedirs(os.path.join(current_repository, fld))
-			self.initialized_bool = True
+		current_repository = os.path.join(self.root_path, PATH_REPO)
+		os.makedirs(current_repository)
+		for fld in [PATH_SUB_DB, PATH_SUB_DBBACKUP, PATH_SUB_REPORTS]:
+			os.makedirs(os.path.join(current_repository, fld))
+		self.initialized_bool = True
 
-			self.index_loaded_bool = True
-			self.__store_index__()
-
-		else:
-
-			raise # TODO
+		self.index_loaded_bool = True
+		self.__store_index__()
 
 
 	def merge(self, branch_name, mode = KEY_MP):
@@ -305,7 +295,7 @@ class repository_class():
 		"""
 
 		if not self.initialized_bool:
-			raise # TODO
+			raise reponotinitialized_error()
 
 		if not self.index_loaded_bool:
 			self.__load_index__()
