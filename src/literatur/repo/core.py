@@ -203,8 +203,14 @@ class repository_class():
 
 	def get_file_metainfo(self, filename):
 
-		# TODO check if it is already in DB etc ...
-		# TODO move code into entry class (as type "temp entry" if it is not in repo yet)
+		if self.initialized_bool:
+
+			if not self.index_loaded_bool:
+				self.__load_index__()
+
+			abs_path = os.path.abspath(os.path.join(self.current_path, filename))
+			if abs_path in self.filemirror_dict_byabspath.keys():
+				return self.index_dict_byid_dict[KEY_FILES][self.filemirror_dict_byabspath[abs_path]]
 
 		entry = generate_entry(
 			self, filepath_tuple = (self.current_path, filename)
@@ -212,7 +218,6 @@ class repository_class():
 		for routine_name in [
 			'update_file_existence',
 			'update_file_info',
-			'generate_id',
 			'update_file_hash',
 			'update_file_magic',
 			'update_file_type'
@@ -537,7 +542,7 @@ class repository_class():
 			entry.p_dict[KEY_NAME]: entry.p_dict[KEY_ID] for entry in self.index_list_dict[KEY_TAGS]
 			}
 		self.filemirror_dict_byabspath = {
-			os.path.join(
+			os.path.abspath(os.path.join(
 				self.root_path, entry.p_dict[KEY_PATH], entry.p_dict[KEY_NAME]
-				): entry.p_dict[KEY_ID] for entry in self.index_list_dict[KEY_FILES]
+				)): entry.p_dict[KEY_ID] for entry in self.index_list_dict[KEY_FILES]
 			}
