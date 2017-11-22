@@ -162,8 +162,7 @@ class repository_class():
 		if not self.index_loaded_bool:
 			self.__load_index__()
 
-		self.index_list_dict[KEY_FILES].clear()
-		self.index_list_dict[KEY_FILES] += self.__update_index_and_return__()
+		self.__update_index_on_files__()
 		self.__update_index_dicts_from_lists__(index_key_list = [KEY_FILES])
 		self.__update_mirror_dicts__()
 
@@ -575,7 +574,7 @@ class repository_class():
 		del self.index_list_dict[KEY_TAGS][tag_entry_index]
 
 
-	def __update_index_and_return__(self):
+	def __update_index_on_files__(self):
 
 		uc_list, rw_list, _, nw_list, ch_list, mv_list = self.diff()
 
@@ -584,14 +583,17 @@ class repository_class():
 
 		# Update file information on new entries
 		updated_entries_list = run_routines_on_objects_in_parallel_and_return(
-			uc_list + rw_list + nw_list + ch_list + mv_list,
+			rw_list + ch_list + mv_list,
 			['merge_p_dict']
 			)
 
+		# Clear the index
+		self.index_list_dict[KEY_FILES].clear()
+		# Rebuild index
+		self.index_list_dict[KEY_FILES] += uc_list + nw_list + updated_entries_list
+
 		# Restore old CWD
 		os.chdir(self.current_path)
-
-		return updated_entries_list
 
 
 	def __update_index_dicts_from_lists__(self, index_key_list = []):
