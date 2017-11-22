@@ -114,8 +114,8 @@ class repository_class():
 
 		# Mirror of tags by name {TAG_NAME: tag_entry, ...}
 		self.tagmirror_dict_bytagname = {}
-		# Mirror of files by tuple(path, name) {TUPLE: file_entry, ...}
-		self.filemirror_dict_bypathnametuple = {}
+		# Mirror of files by ABSPATH {FULLABSPATH: file_entry, ...}
+		self.filemirror_dict_byabspath = {}
 
 		# Have index dicts been loaded?
 		self.index_loaded_bool = False
@@ -140,6 +140,7 @@ class repository_class():
 			self.index_list_dict[KEY_FILES].clear()
 			self.index_list_dict[KEY_FILES] += self.__update_index_and_return__()
 			self.__update_index_dicts_from_lists__(index_key_list = [KEY_FILES])
+			self.__update_mirror_dicts__()
 
 			self.__store_index__()
 
@@ -428,6 +429,7 @@ class repository_class():
 					self, storage_dict = entry_dict
 					) for entry_dict in import_dict[index_key]]
 			self.__update_index_dicts_from_lists__(index_key_list = INDEX_TYPES)
+			self.__update_mirror_dicts__()
 
 		else:
 
@@ -527,3 +529,15 @@ class repository_class():
 	# 	for index_key in index_key_list:
 	# 		self.index_list_dict[index_key].clear()
 	# 		self.index_list_dict[index_key] += list(index_dict_byid_dict[index_key].items())
+
+
+	def __update_mirror_dicts__(self):
+
+		self.tagmirror_dict_bytagname = {
+			entry.p_dict[KEY_NAME]: entry.p_dict[KEY_ID] for enty in self.index_list_dict[KEY_TAGS]
+			}
+		self.filemirror_dict_byabspath = {
+			os.path.join(
+				self.root_path, entry.p_dict[KEY_PATH], entry.p_dict[KEY_NAME]
+				): entry.p_dict[KEY_ID] for enty in self.index_list_dict[KEY_FILES]
+			}
