@@ -100,14 +100,22 @@ class repository_class():
 		# Is the directory we're in (or any above) initialized?
 		self.initialized_bool = False
 
-		# Index dicts ({ID: entry, ...})
-		self.index_dict_dict = {}
+		# Index dicts by ID ({ID: entry, ...})
+		self.index_dict_byid_dict = {}
+		# Index dicts by tag ({TAG_ID: {ENTRY_ID: entry, ...}, ...}); tags to entries are tagged with!
+		self.index_dict_bytagid_dict = {}
 		# Index lists ([entry, ...])
 		self.index_list_dict = {}
 		# Seting up index dicts and lists ...
 		for index_key in INDEX_TYPES:
-			self.index_dict_dict.update({index_key: {}})
+			self.index_dict_byid_dict.update({index_key: {}})
+			self.index_dict_bytagid_dict.update({index_key: {}})
 			self.index_list_dict.update({index_key: []})
+
+		# Mirror of tags by name {TAG_NAME: tag_entry, ...}
+		self.tagmirror_dict_bytagname = {}
+		# Mirror of files by tuple(path, name) {TUPLE: file_entry, ...}
+		self.filemirror_dict_bypathnametuple = {}
 
 		# Have index dicts been loaded?
 		self.index_loaded_bool = False
@@ -489,15 +497,33 @@ class repository_class():
 
 	def __update_index_dicts_from_lists__(self, index_key_list = []):
 
+		tag_id_list = [
+			tag_entry.p_dict[KEY_NAME] for tag_entry in self.index_list_dict[KEY_TAGS]
+			]
+
 		for index_key in index_key_list:
-			self.index_dict_dict[index_key].clear()
-			self.index_dict_dict[index_key].update({
+
+			# Clear [file, group, tag] by ID index
+			self.index_dict_byid_dict[index_key].clear()
+			# Rebuild the index dict
+			self.index_dict_byid_dict[index_key].update({
 				entry.p_dict[KEY_ID]: entry for entry in self.index_list_dict[index_key]
 				})
 
+			# Clear [file, group, tag] by TAG_NAME index
+			self.index_dict_bytagid_dict[index_key].clear()
+			# First, generate a dict of empty dicts
+			self.index_dict_bytagid_dict[index_key].update(
+				{tag_id: {} for tag_id in tag_id_list}
+				)
+			# Build tag dicts
+			for entry in self.index_list_dict[index_key]:
+				for entry_tag_id in entry.p_dict[KEY_TAGS].keys():
+					self.index_dict_bytagid_dict[index_key][entry_tag_id][entry.p_dict[KEY_ID]] = entry
 
-	def __update_index_lists_from_dicts__(self, index_key_list = []):
 
-		for index_key in index_key_list:
-			self.index_list_dict[index_key].clear()
-			self.index_list_dict[index_key] += list(index_dict_dict[index_key].items())
+	# def __update_index_lists_from_dicts__(self, index_key_list = []):
+    #
+	# 	for index_key in index_key_list:
+	# 		self.index_list_dict[index_key].clear()
+	# 		self.index_list_dict[index_key] += list(index_dict_byid_dict[index_key].items())

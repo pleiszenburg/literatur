@@ -55,6 +55,7 @@ from ..const import (
 	KEY_SIZE,
 	KEY_STATUS,
 	KEY_TAG,
+	KEY_TAGS,
 	KEY_TYPE,
 	MSG_DEBUG_STATUS,
 	STATUS_CH,
@@ -132,6 +133,9 @@ class __entry_class__():
 		self.parent_repo = parent_repo
 
 		self.import_storage_dict(import_dict)
+
+		if KEY_TAGS not in self.m_dict.keys():
+			self.m_dict[KEY_TAGS] = {}
 
 
 	def __repr__(self):
