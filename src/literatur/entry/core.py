@@ -367,7 +367,10 @@ class entry_tag_class(__entry_class__):
 
 	def generate_id(self):
 
-		raise NotImplementedError
+		# "Random" element is required, because tags can be renamed ...
+		hash_str = self.p_dict[KEY_NAME] + str(datetime.datetime.now())
+		hash_object = hashlib.sha256(hash_str.encode())
+		self.p_dict[KEY_ID] = hash_object.hexdigest()
 
 
 	def update_report(self):
