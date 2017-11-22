@@ -284,6 +284,39 @@ class repository_class():
 		self.__copy_index_file__(merge_a, merge_b)
 
 
+	def tags_modify(self, create_tag_names_list = [], delete_tag_names_list = [], force_delete = False):
+		""" Creates and deletes lists of tags
+		"""
+
+		if self.initialized_bool:
+
+			if not self.index_loaded_bool:
+				self.__load_index__()
+
+			# Create path
+			for tag_name in create_tag_names_list:
+				try:
+					self.__tag_create__(tag_name)
+				except:
+					pass # Catch error because tag already exists
+
+			# Delete path
+			for tag_name in delete_tag_names_list:
+				try:
+					self.__tag_delete__(tag_name, force_delete = force_delete)
+				except:
+					pass # Catch error because tag can not be deleted
+
+			self.__update_index_dicts_from_lists__(index_key_list = INDEX_TYPES)
+			self.__update_mirror_dicts__()
+
+			self.__store_index__()
+
+		else:
+
+			raise # TODO
+
+
 	def __copy_index_file__(self, merge_source, merge_target):
 
 		# Get full paths
@@ -484,6 +517,51 @@ class repository_class():
 		else:
 
 			raise # TODO
+
+
+	def __tag_create__(self, tag_name):
+
+		# Raise an error if tag exists
+		if tag_name in self.tagmirror_dict_bytagname.keys():
+			raise # TODO
+
+		# Generate new tag entry
+		new_tag_entry = generate_entry(tag_dict = {KEY_NAME: tag_name})
+		# Give the tag an ID
+		new_tag_entry.generate_id()
+		# Append tag to list of tags
+		self.index_list_dict[KEY_TAGS].append(new_tag_entry)
+
+
+	def __tag_delete__(self, tag_name, force_delete = False):
+
+		# Raise an error if the tag does not exist
+		if tag_name not in self.tagmirror_dict_bytagname.keys():
+			raise # TODO
+
+		# Get tag entry
+		tag_entry = self.index_dict_byid_dict[KEY_TAGS][self.tagmirror_dict_bytagname[tag_name]]
+		# Get tag id
+		tag_id = tag_entry.p_dict[KEY_ID]
+
+		# Is tag in use?
+		tag_used_bool = False
+		for index_type in INDEX_TYPES:
+			tag_used_bool |= bool(self.index_dict_bytagid_dict[index_type][tag_id])
+
+		# Raise an error if the tag is in use and the delete is not forced
+		if tag_used_bool and not force_delete:
+			raise # TODO
+
+		# Remove the tag from all entries if the tag is in use and delete forced
+		if tag_used_bool and force_delete:
+			for index_type in INDEX_TYPES:
+				for entry in self.index_dict_bytagid_dict[index_type][tag_id].values()
+					entry.p_dict[KEY_TAGS].pop(tag_id)
+
+		# Actually delete tag
+		tag_entry_index = self.index_list_dict[KEY_TAGS].index(tag_entry)
+		del self.index_list_dict[KEY_TAGS][tag_entry_index]
 
 
 	def __update_index_and_return__(self):

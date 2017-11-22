@@ -258,7 +258,11 @@ def tagm(repo, create, delete, force_delete):
 	"""
 
 	if repo.initialized_bool:
-		print(create, delete, force_delete)
+		repo.tags_modify(
+			create_tag_names_list = list(create),
+			delete_tag_names_list = list(delete),
+			force_delete = force_delete
+			)
 	else:
 		print(MSG_DEBUG_NOREPOSITORY)
 
