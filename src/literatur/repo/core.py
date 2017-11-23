@@ -87,23 +87,17 @@ from ..parser import ctime_to_datestring
 # ERRORS
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-class repoinitialized_error(Exception):
+class filename_unrecognized_by_repo_error(Exception):
 	pass
-
-
-class reponotinitialized_error(Exception):
+class repo_initialized_error(Exception):
 	pass
-
-
-class tagdoesnotexists_error(Exception):
+class repo_not_initialized_error(Exception):
 	pass
-
-
-class tagexists_error(Exception):
+class tag_does_not_exists_error(Exception):
 	pass
-
-
-class taginsuse_error(Exception):
+class tag_exists_error(Exception):
+	pass
+class tag_in_use_error(Exception):
 	pass
 
 
@@ -126,7 +120,7 @@ class repository_class():
 	def commit(self):
 
 		if not self.initialized_bool:
-			raise reponotinitialized_error()
+			raise repo_not_initialized_error()
 
 		if not self.index_loaded_bool:
 			self.__load_index__()
@@ -144,7 +138,7 @@ class repository_class():
 		"""
 
 		if not self.initialized_bool:
-			raise reponotinitialized_error()
+			raise repo_not_initialized_error()
 
 		if not self.index_loaded_bool:
 			self.__load_index__()
@@ -159,7 +153,7 @@ class repository_class():
 	def dump(self, path = None, mode = KEY_JSON):
 
 		if not self.initialized_bool:
-			raise reponotinitialized_error()
+			raise repo_not_initialized_error()
 
 		if not self.index_loaded_bool:
 			self.__load_index__()
@@ -173,7 +167,7 @@ class repository_class():
 		"""
 
 		if not self.initialized_bool:
-			raise reponotinitialized_error()
+			raise repo_not_initialized_error()
 
 		if not self.index_loaded_bool:
 			self.__load_index__()
@@ -191,9 +185,10 @@ class repository_class():
 			if not self.index_loaded_bool:
 				self.__load_index__()
 
-			abs_path = os.path.abspath(os.path.join(self.current_path, filename))
-			if abs_path in self.filemirror_dict_byabspath.keys():
-				return self.index_dict_byid_dict[KEY_FILES][self.filemirror_dict_byabspath[abs_path]]
+			try:
+				return self.__get_file_entry_by_filename__(filename)
+		except filename_unrecognized_by_repo_error:
+				pass
 
 		entry = generate_entry(
 			self, filepath_tuple = (self.current_path, filename)
@@ -213,7 +208,7 @@ class repository_class():
 	def get_stats(self):
 
 		if not self.initialized_bool:
-			raise reponotinitialized_error()
+			raise repo_not_initialized_error()
 
 		if not self.index_loaded_bool:
 			self.__load_index__()
@@ -254,7 +249,7 @@ class repository_class():
 	def init(self):
 
 		if self.initialized_bool:
-			raise repoinitialized_error()
+			raise repo_initialized_error()
 
 		current_repository = os.path.join(self.root_path, PATH_REPO)
 		os.makedirs(current_repository)
@@ -293,7 +288,7 @@ class repository_class():
 		"""
 
 		if not self.initialized_bool:
-			raise reponotinitialized_error()
+			raise repo_not_initialized_error()
 
 		if not self.index_loaded_bool:
 			self.__load_index__()
@@ -306,16 +301,16 @@ class repository_class():
 		for tag_name in create_tag_names_list:
 			try:
 				self.__tag_create__(tag_name)
-			except tagexists_error:
+			except tag_exists_error:
 				tags_exist_list.append(tag_name)
 
 		# Delete path
 		for tag_name in delete_tag_names_list:
 			try:
 				self.__tag_delete__(tag_name, force_delete = force_delete)
-			except tagdoesnotexists_error:
+			except tag_does_not_exists_error:
 				tags_donotexist_list.append(tag_name)
-			except taginsuse_error:
+			except tag_in_use_error:
 				tags_inuse_list.append(tag_name)
 
 		self.__update_index_dicts_from_lists__(index_key_list = INDEX_TYPES)
@@ -389,6 +384,16 @@ class repository_class():
 
 		# Nothing found
 		raise # TODO
+
+
+	def __get_file_entry_by_filename__(self, filename):
+
+		abs_path = os.path.abspath(os.path.join(self.current_path, filename))
+
+		if not (abs_path in self.filemirror_dict_byabspath.keys()):
+			raise filenameunrecognizedbyrepo_error()
+
+		return self.index_dict_byid_dict[KEY_FILES][self.filemirror_dict_byabspath[abs_path]]
 
 
 	def __get_recursive_inventory_list__(self, scan_root_path, files_dict_list):
@@ -576,7 +581,7 @@ class repository_class():
 
 		# Raise an error if tag exists
 		if tag_name in self.tagmirror_dict_bytagname.keys():
-			raise tagexists_error()
+			raise tag_exists_error()
 
 		# Generate new tag entry
 		new_tag_entry = generate_entry(self, tag_dict = {KEY_NAME: tag_name})
@@ -590,7 +595,7 @@ class repository_class():
 
 		# Raise an error if the tag does not exist
 		if tag_name not in self.tagmirror_dict_bytagname.keys():
-			raise tagdoesnotexists_error()
+			raise tag_does_not_exists_error()
 
 		# Get tag entry
 		tag_entry = self.index_dict_byid_dict[KEY_TAGS][self.tagmirror_dict_bytagname[tag_name]]
@@ -602,7 +607,7 @@ class repository_class():
 
 		# Raise an error if the tag is in use and the delete is not forced
 		if tag_used_bool and not force_delete:
-			raise taginsuse_error()
+			raise tag_in_use_error()
 
 		# Remove the tag from all entries if the tag is in use and delete forced
 		if tag_used_bool and force_delete:
