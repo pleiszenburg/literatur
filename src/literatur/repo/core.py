@@ -271,7 +271,40 @@ class repository_class():
 		remove_flag = False
 		):
 
-		pass
+		if tag_name not in self.tagmirror_dict_bytagname.keys():
+			self.__tag_create__(tag_name)
+			self.__update_mirror_dicts__(only_tags = True)
+
+		tag_id = self.tagmirror_dict_bytagname[tag_name]
+
+		file_not_found_list = []
+		group_not_found_list = []
+		tag_not_found_list = []
+
+		for target_filename in target_filename_list:
+
+			try:
+				target_entry = self.__get_file_entry_by_filename__(filename)
+			except filename_unrecognized_by_repo_error:
+				file_not_found_list.append(target_filename)
+				continue
+
+			if remove_flag:
+				if tag_id in target_entry.p_dict[KEY_TAGS].keys():
+					target_entry.p_dict[KEY_TAGS].pop(tag_id)
+			else:
+				if tag_id not in target_entry.p_dict[KEY_TAGS].keys():
+					target_entry.p_dict[KEY_TAGS].update({tag_id: tag_name})
+
+		# TODO add tagging for groups and tags
+		# HACK tell user about untagged groups and tags
+		group_not_found_list = target_group_list
+		tag_not_found_list = target_tag_list
+
+		self.__update_index_dicts_from_lists__(index_key_list = INDEX_TYPES)
+		self.__store_index__()
+
+		return file_not_found_list, group_not_found_list, tag_not_found_list
 
 
 	def tags_modify(self, create_tag_names_list = [], delete_tag_names_list = [], force_delete = False):
@@ -305,7 +338,7 @@ class repository_class():
 				tags_inuse_list.append(tag_name)
 
 		self.__update_index_dicts_from_lists__(index_key_list = INDEX_TYPES)
-		self.__update_mirror_dicts__()
+		self.__update_mirror_dicts__(only_tags = True)
 
 		self.__store_index__()
 
@@ -660,13 +693,16 @@ class repository_class():
 					self.index_dict_bytagid_dict[index_key][entry_tag_id][entry.p_dict[KEY_ID]] = entry
 
 
-	def __update_mirror_dicts__(self):
+	def __update_mirror_dicts__(self, only_tags = False, only_filenames = False):
 
-		self.tagmirror_dict_bytagname = {
-			entry.p_dict[KEY_NAME]: entry.p_dict[KEY_ID] for entry in self.index_list_dict[KEY_TAGS]
-			}
-		self.filemirror_dict_byabspath = {
-			os.path.abspath(os.path.join(
-				self.root_path, entry.p_dict[KEY_PATH], entry.p_dict[KEY_NAME]
-				)): entry.p_dict[KEY_ID] for entry in self.index_list_dict[KEY_FILES]
-			}
+		if not only_filenames:
+			self.tagmirror_dict_bytagname = {
+				entry.p_dict[KEY_NAME]: entry.p_dict[KEY_ID] for entry in self.index_list_dict[KEY_TAGS]
+				}
+
+		if not only_tags:
+			self.filemirror_dict_byabspath = {
+				os.path.abspath(os.path.join(
+					self.root_path, entry.p_dict[KEY_PATH], entry.p_dict[KEY_NAME]
+					)): entry.p_dict[KEY_ID] for entry in self.index_list_dict[KEY_FILES]
+				}
