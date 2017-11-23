@@ -108,6 +108,21 @@ class repository_class():
 		self.__init_paths__()
 
 
+	def backup(self, branch_name, mode = KEY_MP):
+
+		# TODO error handling!
+
+		if branch_name == KEY_JOURNAL:
+			merge_a, merge_b = FILE_DB_CURRENT + '.' + mode, FILE_DB_JOURNAL + '.' + mode
+		elif branch_name == KEY_MASTER:
+			merge_a, merge_b = FILE_DB_JOURNAL + '.' + mode, FILE_DB_MASTER + '.' + mode
+		else:
+			raise #
+
+		self.__backup_index_file__(merge_b)
+		self.__copy_index_file__(merge_a, merge_b)
+
+
 	def diff(self):
 		""" Diff looks for files, which have been changed (changed, created, moved, deleted).
 		It does not care about tags and groups.
@@ -235,19 +250,6 @@ class repository_class():
 
 		self.index_loaded_bool = True
 		self.__store_index__()
-
-
-	def merge(self, branch_name, mode = KEY_MP):
-
-		if branch_name == KEY_JOURNAL:
-			merge_a, merge_b = FILE_DB_CURRENT + '.' + mode, FILE_DB_JOURNAL + '.' + mode
-		elif branch_name == KEY_MASTER:
-			merge_a, merge_b = FILE_DB_JOURNAL + '.' + mode, FILE_DB_MASTER + '.' + mode
-		else:
-			raise #
-
-		self.__backup_index_file__(merge_b)
-		self.__copy_index_file__(merge_a, merge_b)
 
 
 	def tag(self,

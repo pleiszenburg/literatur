@@ -82,6 +82,24 @@ def script_entry(click_context):
 
 
 @script_entry.command()
+@click.argument(
+	'branch',
+	nargs = 1,
+	type = click.Choice([KEY_JOURNAL, KEY_MASTER])
+	)
+@pass_repository_decorator
+def backup(repo, branch):
+	"""Backup repository index to journal or master target branches
+	"""
+
+	if not repo.initialized_bool:
+		click.echo(MSG_DEBUG_NOREPOSITORY)
+		return
+
+	repo.backup(branch)
+
+
+@script_entry.command()
 @pass_repository_decorator
 def diff(repo):
 	"""Show changes to the filesystem currently not captured by the index
@@ -142,23 +160,6 @@ def file(repo, filenames):
 
 	for filename in filenames:
 		__print_file_metainfo__(repo.get_file_metainfo(filename))
-
-
-@script_entry.command()
-@click.argument(
-	'branch',
-	nargs = 1,
-	type = click.Choice([KEY_JOURNAL, KEY_MASTER])
-	)
-@pass_repository_decorator
-def merge(repo, branch):
-	"""Merge repository changes from current to journal or journal to master
-	"""
-
-	if repo.initialized_bool:
-		repo.merge(branch)
-	else:
-		click.echo(MSG_DEBUG_NOREPOSITORY)
 
 
 @script_entry.command()
