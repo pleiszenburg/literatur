@@ -108,21 +108,6 @@ class repository_class():
 		self.__init_paths__()
 
 
-	def commit(self):
-
-		if not self.initialized_bool:
-			raise repo_not_initialized_error()
-
-		if not self.index_loaded_bool:
-			self.__load_index__()
-
-		self.__update_index_on_files__()
-		self.__update_index_dicts_from_lists__(index_key_list = [KEY_FILES])
-		self.__update_mirror_dicts__()
-
-		self.__store_index__()
-
-
 	def diff(self):
 		""" Diff looks for files, which have been changed (changed, created, moved, deleted).
 		It does not care about tags and groups.
@@ -351,6 +336,21 @@ class repository_class():
 		self.__store_index__()
 
 		return tags_donotexist_list, tags_exist_list, tags_inuse_list
+
+
+	def update(self):
+
+		if not self.initialized_bool:
+			raise repo_not_initialized_error()
+
+		if not self.index_loaded_bool:
+			self.__load_index__()
+
+		self.__update_index_on_files__()
+		self.__update_index_dicts_from_lists__(index_key_list = [KEY_FILES])
+		self.__update_mirror_dicts__()
+
+		self.__store_index__()
 
 
 	def __copy_index_file__(self, merge_source, merge_target):

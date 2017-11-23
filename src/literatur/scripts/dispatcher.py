@@ -83,26 +83,15 @@ def script_entry(click_context):
 
 @script_entry.command()
 @pass_repository_decorator
-def commit(repo):
-	"""Record changes to the repository
-	"""
-
-	if repo.initialized_bool:
-		repo.commit()
-	else:
-		click.echo(MSG_DEBUG_NOREPOSITORY)
-
-
-@script_entry.command()
-@pass_repository_decorator
 def diff(repo):
-	"""Show uncommited changes
+	"""Show changes to the filesystem currently not captured by the index
 	"""
 
-	if repo.initialized_bool:
-		__print_diff__(*(repo.diff()))
-	else:
+	if not repo.initialized_bool:
 		click.echo(MSG_DEBUG_NOREPOSITORY)
+		return
+
+	__print_diff__(*(repo.diff()))
 
 
 @script_entry.command()
@@ -324,6 +313,19 @@ def tagm(repo, create, delete, force_delete, ls, ls_used, ls_unused):
 
 	else:
 		click.echo(MSG_DEBUG_NOREPOSITORY)
+
+
+@script_entry.command()
+@pass_repository_decorator
+def update(repo):
+	"""Updates repository index reflecting changes to the filesystem
+	"""
+
+	if not repo.initialized_bool:
+		click.echo(MSG_DEBUG_NOREPOSITORY)
+		return
+
+	repo.update()
 
 
 def __print_diff__(uc_list, rw_list, rm_list, nw_list, ch_list, mv_list):
