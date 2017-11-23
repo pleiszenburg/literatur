@@ -100,7 +100,7 @@ setup(
 		]},
 	entry_points = '''
 		[console_scripts]
-		lit = literatur.scripts:script_entry
+		lit = literatur.scripts:script_client
 		''',
 	zip_safe = False,
 	classifiers = [

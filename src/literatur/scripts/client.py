@@ -61,8 +61,8 @@ from ..const import (
 	STATUS_MV,
 	STATUS_RW
 	)
-from ..repo import repository_class
-pass_repository_decorator = click.make_pass_decorator(repository_class, ensure = True)
+from ..repo import repository_client_class
+pass_repository_decorator = click.make_pass_decorator(repository_client_class, ensure = True)
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -72,13 +72,13 @@ pass_repository_decorator = click.make_pass_decorator(repository_class, ensure =
 
 @click.group()
 @click.pass_context
-def script_entry(click_context):
+def script_client(click_context):
 	"""LITERATUR
 
 	Literature management with Python, Dropbox and MediaWiki
 	"""
 
-	click_context.obj = repository_class()
+	click_context.obj = repository_client_class()
 
 
 @script_entry.command()

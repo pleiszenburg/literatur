@@ -28,5 +28,6 @@ specific language governing rights and limitations under the License.
 # IMPORT
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-from .core import repository_class
+from .client import repository_client_class
+from .server import repository_server_class
 from .fs import get_file_list
