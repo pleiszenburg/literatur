@@ -288,24 +288,26 @@ class repository_class():
 		tag_not_found_list = []
 
 		for target_filename in target_filename_list:
-
 			try:
 				target_entry = self.__get_file_entry_by_filename__(target_filename)
 			except filename_unrecognized_by_repo_error:
 				file_not_found_list.append(target_filename)
 				continue
+			self.__tag_entry__(target_entry, tag_id, remove_flag = remove_flag)
 
-			if remove_flag:
-				if tag_id in target_entry.p_dict[KEY_TAGS].keys():
-					target_entry.p_dict[KEY_TAGS].pop(tag_id)
-			else:
-				if tag_id not in target_entry.p_dict[KEY_TAGS].keys():
-					target_entry.p_dict[KEY_TAGS].update({tag_id: tag_name})
+		for target_tag_name in target_tag_list:
+			if target_tag_name not in self.tagmirror_dict_bytagname.keys():
+				tag_not_found_list.append(target_tag_name)
+				continue
+			target_tag_id = self.tagmirror_dict_bytagname[target_tag_name]
+			if tag_id == target_tag_id:
+				continue
+			target_entry = self.index_dict_byid_dict[KEY_TAGS][target_tag_id]
+			self.__tag_entry__(target_entry, tag_id, remove_flag = remove_flag)
 
-		# TODO add tagging for groups and tags
-		# HACK tell user about untagged groups and tags
+		# TODO add tagging for groups
+		# HACK tell user about untagged groups
 		group_not_found_list = target_group_list
-		tag_not_found_list = target_tag_list
 
 		self.__update_index_dicts_from_lists__(index_key_list = INDEX_TYPES)
 		self.__store_index__()
@@ -648,6 +650,18 @@ class repository_class():
 		# Actually delete tag
 		tag_entry_index = self.index_list_dict[KEY_TAGS].index(tag_entry)
 		del self.index_list_dict[KEY_TAGS][tag_entry_index]
+
+
+	def __tag_entry__(self, target_entry, tag_id, remove_flag = False):
+
+		if remove_flag:
+			if tag_id in target_entry.p_dict[KEY_TAGS].keys():
+				target_entry.p_dict[KEY_TAGS].pop(tag_id)
+		else:
+			if tag_id not in target_entry.p_dict[KEY_TAGS].keys():
+				target_entry.p_dict[KEY_TAGS].update({
+					tag_id: self.index_dict_byid_dict[KEY_TAGS][tag_id].p_dict[KEY_NAME]
+					})
 
 
 	def __update_index_on_files__(self):
