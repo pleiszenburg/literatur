@@ -382,7 +382,7 @@ class repository_class():
 		abs_path = os.path.abspath(os.path.join(self.current_path, filename))
 
 		if not (abs_path in self.filemirror_dict_byabspath.keys()):
-			raise filenameunrecognizedbyrepo_error()
+			raise filename_unrecognized_by_repo_error()
 
 		return self.index_dict_byid_dict[KEY_FILES][self.filemirror_dict_byabspath[abs_path]]
 
