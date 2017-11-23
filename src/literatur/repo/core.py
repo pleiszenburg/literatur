@@ -149,7 +149,7 @@ class repository_class():
 		if not self.index_loaded_bool:
 			self.__load_index__()
 
-		self.__store_index__(path = path, mode = mode) #
+		self.__store_index__(path = path, mode = mode)
 
 
 	def find_duplicates(self):
