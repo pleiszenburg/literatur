@@ -98,7 +98,7 @@ from ..parser import ctime_to_datestring
 # CLASS
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-class repository_class():
+class repository_server_class():
 
 
 	def __init__(self):
