@@ -109,11 +109,13 @@ KEY_AUTHOR_FIRST = 'author_first'
 KEY_AUTHORS_DICT = 'authors_dict'
 KEY_CLASS = 'class'
 KEY_EDITORS_DICT = 'editors_dict'
+KEY_ENTRYTYPE = 'entry_type'
 KEY_ETAL_BOOL = 'etal'
 KEY_EXISTS_BOOL = 'exists'
 KEY_FILE = 'file'
 KEY_FILES = 'files'
 KEY_GROUP = 'group'
+KEY_GROUPS = 'groups'
 KEY_HASH = 'hash'
 KEY_ID = 'id'
 KEY_INFO = 'info'
@@ -129,6 +131,7 @@ KEY_MP = 'mp'
 KEY_MTIME = 'mtime'
 KEY_NAME = 'name'
 KEY_PATH = 'path'
+KEY_PARAM = 'param'
 KEY_PKL = 'pkl'
 KEY_REPORT = 'report'
 KEY_SERIES_ID = 'series_id'
@@ -137,10 +140,20 @@ KEY_SERIES_SECTION = 'series_section'
 KEY_SERIES_TYPE = 'series_type'
 KEY_SIZE = 'size'
 KEY_STATUS = 'status'
+KEY_TAG = 'tag'
+KEY_TAGS = 'tags'
 KEY_TITLE = 'title'
 KEY_TYPE = 'type'
 # KEY_URL = 'url'
+KEY_YAML = 'yaml'
 KEY_YEAR = 'year'
+
+
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# INDEX TYPES
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+INDEX_TYPES = [KEY_FILES, KEY_GROUPS, KEY_TAGS]
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -178,13 +191,19 @@ TITLE_LENGTH_MIN_INT = 12
 # MESSAGES
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+MSG_DEBUG_CANFORCEDELETE = 'Delete can be forced.'
 MSG_DEBUG_FILEALREADYEXISTS = "File already exists."
 MSG_DEBUG_FILENAMETOOLONG = 'Filename too long'
+MSG_DEBUG_FILEUNKNOWN = 'File is unknown to repository.'
+MSG_DEBUG_GROUPDOESNOTEXIST = 'Group does not exist.'
 MSG_DEBUG_INREPOSITORY = 'You already are in an existing literature repository at "%s".'
 MSG_DEBUG_NOREPOSITORY = 'You are no in a literature repository.'
 MSG_DEBUG_NOTITLE = 'No title'
 MSG_DEBUG_RESERVEDTITLE = 'Reserved special title'
 MSG_DEBUG_SHORTTITLE = 'Short title'
+MSG_DEBUG_TAGDOESNOTEXIST = 'Tag does not exist.'
+MSG_DEBUG_TAGEXISTS = 'Tag exists.'
+MSG_DEBUG_TAGINUSE = 'Tag is in use.'
 MSG_DEBUG_UNEXPECTEDANNOTATION = 'Unexpected annotation'
 MSG_DEBUG_UNKNOWNCLASS = 'Unknown class'
 MSG_DEBUG_UNKNOWNEXTENSION = 'Unknown extension'

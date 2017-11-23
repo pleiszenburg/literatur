@@ -39,6 +39,7 @@ from pprint import pprint as pp
 import shutil
 
 import msgpack
+import yaml
 
 from ..const import (
 	FILE_DB_CURRENT,
@@ -46,8 +47,12 @@ from ..const import (
 	FILE_DB_MASTER,
 	IGNORE_DIR_LIST,
 	IGNORE_FILE_LIST,
+	INDEX_TYPES,
 	KEY_EXISTS_BOOL,
 	KEY_FILE,
+	KEY_FILES,
+	KEY_GROUPS,
+	KEY_ID,
 	KEY_INODE,
 	KEY_JSON,
 	KEY_JOURNAL,
@@ -62,6 +67,8 @@ from ..const import (
 	KEY_PATH,
 	KEY_PKL,
 	KEY_SIZE,
+	KEY_TAGS,
+	KEY_YAML,
 	PATH_REPO,
 	PATH_SUB_DB,
 	PATH_SUB_DBBACKUP,
@@ -69,9 +76,18 @@ from ..const import (
 	)
 from ..entry import (
 	compare_entry_lists,
-	entry_class,
-	find_duplicates_in_entry_list
+	find_duplicates_in_entry_list,
+	generate_entry
 	)
+from ..errors import (
+	filename_unrecognized_by_repo_error,
+	repo_initialized_error,
+	repo_not_initialized_error,
+	tag_does_not_exists_error,
+	tag_exists_error,
+	tag_in_use_error
+	)
+
 from ..parallel import run_routines_on_objects_in_parallel_and_return
 from ..parser import ctime_to_datestring
 
@@ -85,101 +101,92 @@ class repository_class():
 
 	def __init__(self):
 
-		# Set defauls
-		self.current_relative_path = ''
-		self.root_path = ''
-		self.initialized_bool = False
-		self.index_list = []
-		self.index_loaded_bool = False
+		# Init all index related lists and dicts
+		self.__init_index__()
 
-		self.current_path = os.getcwd()
-
-		try:
-			self.root_path = self.__find_root_path__(self.current_path)
-			self.initialized_bool = True
-		except: # TODO only on special error in find_root_path
-			self.root_path = self.current_path
-			self.initialized_bool = False
-
-		# Tell entry class about root_path
-		entry_class.root_path = self.root_path
-
-		self.current_relative_path = os.path.relpath(self.root_path, self.current_path)
+		# Init paths and repo status
+		self.__init_paths__()
 
 
-	def commit(self):
+	def backup(self, branch_name, mode = KEY_MP):
 
-		if self.initialized_bool:
+		# TODO error handling!
 
-			if not self.index_loaded_bool:
-				self.__load_index__()
-
-			self.index_list = self.__update_index_and_return__()
-
-			self.__store_index__()
-
+		if branch_name == KEY_JOURNAL:
+			merge_a, merge_b = FILE_DB_CURRENT + '.' + mode, FILE_DB_JOURNAL + '.' + mode
+		elif branch_name == KEY_MASTER:
+			merge_a, merge_b = FILE_DB_JOURNAL + '.' + mode, FILE_DB_MASTER + '.' + mode
 		else:
+			raise #
 
-			raise # TODO
+		self.__backup_index_file__(merge_b)
+		self.__copy_index_file__(merge_a, merge_b)
 
 
 	def diff(self):
+		""" Diff looks for files, which have been changed (changed, created, moved, deleted).
+		It does not care about tags and groups.
+		"""
 
-		if self.initialized_bool:
+		if not self.initialized_bool:
+			raise repo_not_initialized_error()
 
-			if not self.index_loaded_bool:
-				self.__load_index__()
-			old_entries_list = self.index_list
-			new_entries_light_list = self.__generate_light_index_and_return__()
+		if not self.index_loaded_bool:
+			self.__load_index__()
 
-			# Compare old list vs new list and return result
-			return compare_entry_lists(old_entries_list, new_entries_light_list)
+		old_entries_list = self.index_list_dict[KEY_FILES]
+		new_entries_light_list = self.__generate_light_index_and_return__()
 
-		else:
-
-			raise # TODO
+		# Compare old list vs new list and return result
+		return compare_entry_lists(old_entries_list, new_entries_light_list)
 
 
-	def dump(self):
+	def dump(self, path = None, mode = KEY_JSON):
 
-		if self.initialized_bool:
+		if not self.initialized_bool:
+			raise repo_not_initialized_error()
 
-			if not self.index_loaded_bool:
-				self.__load_index__()
+		if not self.index_loaded_bool:
+			self.__load_index__()
 
-			self.__store_index__(mode = KEY_JSON)
-
-		else:
-
-			raise # TODO
+		self.__store_index__(path = path, mode = mode)
 
 
 	def find_duplicates(self):
+		""" find_duplicates looks for identical files.
+		Multiples of tags and groups are not yet being looked for.
+		"""
 
-		if self.initialized_bool:
+		if not self.initialized_bool:
+			raise repo_not_initialized_error()
 
-			if not self.index_loaded_bool:
-				self.__load_index__()
+		if not self.index_loaded_bool:
+			self.__load_index__()
 
-			return find_duplicates_in_entry_list(self.index_list)
-
-		else:
-
-			raise # TODO
+		return find_duplicates_in_entry_list(self.index_list_dict[KEY_FILES])
 
 
 	def get_file_metainfo(self, filename):
 
-		# TODO check if it is already in DB etc ...
-		# TODO move code into entry class (as type "temp entry" if it is not in repo yet)
+		if self.initialized_bool:
 
-		entry = entry_class(
-			filepath_tuple = (self.current_path, filename)
+			# TODO look for changed or moved files, too (i.e. return change reports)
+			# Requires index dicts by hash
+
+			if not self.index_loaded_bool:
+				self.__load_index__()
+
+			try:
+				return self.__get_file_entry_by_filename__(filename)
+			except filename_unrecognized_by_repo_error:
+				pass
+
+		entry = generate_entry(
+			self, filepath_tuple = (self.current_path, filename)
 			)
 		for routine_name in [
 			'update_file_existence',
 			'update_file_info',
-			'update_file_id',
 			'update_file_hash',
 			'update_file_magic',
 			'update_file_type'
@@ -191,56 +198,161 @@ class repository_class():
 
 	def get_stats(self):
 
-		if self.initialized_bool:
+		if not self.initialized_bool:
+			raise repo_not_initialized_error()
 
-			if not self.index_loaded_bool:
-				self.__load_index__()
+		if not self.index_loaded_bool:
+			self.__load_index__()
 
-			magic_list = [entry.f_dict[KEY_MAGIC] for entry in self.index_list]
-			mime_list = [entry.f_dict[KEY_MIME] for entry in self.index_list]
+		magic_list = [entry.p_dict[KEY_MAGIC] for entry in self.index_list_dict[KEY_FILES]]
+		mime_list = [entry.p_dict[KEY_MIME] for entry in self.index_list_dict[KEY_FILES]]
 
-			magic_dict = Counter(magic_list)
-			mime_dict = Counter(mime_list)
+		magic_dict = Counter(magic_list)
+		mime_dict = Counter(mime_list)
 
-			return {
-				KEY_MAGIC: OrderedDict(sorted(magic_dict.items(), key = lambda t: t[1])),
-				KEY_MIME: OrderedDict(sorted(mime_dict.items(), key = lambda t: t[1]))
-				}
+		return {
+			KEY_MAGIC: OrderedDict(sorted(magic_dict.items(), key = lambda t: t[1])),
+			KEY_MIME: OrderedDict(sorted(mime_dict.items(), key = lambda t: t[1]))
+			}
 
-		else:
 
-			raise # TODO
+	def get_tag_name_list(self, used_only = False, unused_only = False):
+
+		if not used_only and not unused_only:
+			return list(self.tagmirror_dict_bytagname.keys())
+
+		tag_name_list = []
+
+		for tag_id in self.index_dict_byid_dict[KEY_TAGS].keys():
+
+			tag_use = self.__is_tag_in_use__(tag_id)
+			tag_name = self.index_dict_byid_dict[KEY_TAGS][tag_id].p_dict[KEY_NAME]
+
+			if tag_use and used_only:
+				tag_name_list.append(tag_name)
+
+			if not tag_use and unused_only:
+				tag_name_list.append(tag_name)
+
+		return tag_name_list
 
 
 	def init(self):
 
+		if self.initialized_bool:
+			raise repo_initialized_error()
+
+		current_repository = os.path.join(self.root_path, PATH_REPO)
+		os.makedirs(current_repository)
+		for fld in [PATH_SUB_DB, PATH_SUB_DBBACKUP, PATH_SUB_REPORTS]:
+			os.makedirs(os.path.join(current_repository, fld))
+		self.initialized_bool = True
+
+		self.index_loaded_bool = True
+		self.__store_index__()
+
+
+	def tag(self,
+		tag_name,
+		target_filename_list = [], target_group_list = [], target_tag_list = [],
+		remove_flag = False
+		):
+
 		if not self.initialized_bool:
+			raise repo_not_initialized_error()
 
-			current_repository = os.path.join(self.root_path, PATH_REPO)
-			os.makedirs(current_repository)
-			for fld in [PATH_SUB_DB, PATH_SUB_DBBACKUP, PATH_SUB_REPORTS]:
-				os.makedirs(os.path.join(current_repository, fld))
-			self.initialized_bool = True
+		if not self.index_loaded_bool:
+			self.__load_index__()
 
-			self.index_loaded_bool = True
-			self.__store_index__()
+		if tag_name not in self.tagmirror_dict_bytagname.keys():
+			self.__tag_create__(tag_name)
+			self.__update_mirror_dicts__(only_tags = True)
 
-		else:
+		tag_id = self.tagmirror_dict_bytagname[tag_name]
 
-			raise # TODO
+		file_not_found_list = []
+		group_not_found_list = []
+		tag_not_found_list = []
+
+		for target_filename in target_filename_list:
+			try:
+				target_entry = self.__get_file_entry_by_filename__(target_filename)
+			except filename_unrecognized_by_repo_error:
+				file_not_found_list.append(target_filename)
+				continue
+			self.__tag_entry__(target_entry, tag_id, remove_flag = remove_flag)
+
+		for target_tag_name in target_tag_list:
+			if target_tag_name not in self.tagmirror_dict_bytagname.keys():
+				tag_not_found_list.append(target_tag_name)
+				continue
+			target_tag_id = self.tagmirror_dict_bytagname[target_tag_name]
+			if tag_id == target_tag_id:
+				continue
+			target_entry = self.index_dict_byid_dict[KEY_TAGS][target_tag_id]
+			self.__tag_entry__(target_entry, tag_id, remove_flag = remove_flag)
+
+		# TODO add tagging for groups
+		# HACK tell user about untagged groups
+		group_not_found_list = target_group_list
+
+		self.__update_index_dicts_from_lists__(index_key_list = INDEX_TYPES)
+		self.__store_index__()
+
+		return file_not_found_list, group_not_found_list, tag_not_found_list
 
 
-	def merge(self, branch_name, mode = KEY_MP):
+	def tags_modify(self, create_tag_names_list = [], delete_tag_names_list = [], force_delete = False):
+		""" Creates and deletes lists of tags
+		"""
 
-		if branch_name == KEY_JOURNAL:
-			merge_a, merge_b = FILE_DB_CURRENT + '.' + mode, FILE_DB_JOURNAL + '.' + mode
-		elif branch_name == KEY_MASTER:
-			merge_a, merge_b = FILE_DB_JOURNAL + '.' + mode, FILE_DB_MASTER + '.' + mode
-		else:
-			raise #
+		if not self.initialized_bool:
+			raise repo_not_initialized_error()
 
-		self.__backup_index_file__(merge_b)
-		self.__copy_index_file__(merge_a, merge_b)
+		if not self.index_loaded_bool:
+			self.__load_index__()
+
+		tags_donotexist_list = []
+		tags_exist_list = []
+		tags_inuse_list = []
+
+		# Create path
+		for tag_name in create_tag_names_list:
+			try:
+				self.__tag_create__(tag_name)
+			except tag_exists_error:
+				tags_exist_list.append(tag_name)
+
+		# Delete path
+		for tag_name in delete_tag_names_list:
+			try:
+				self.__tag_delete__(tag_name, force_delete = force_delete)
+			except tag_does_not_exists_error:
+				tags_donotexist_list.append(tag_name)
+			except tag_in_use_error:
+				tags_inuse_list.append(tag_name)
+
+		self.__update_index_dicts_from_lists__(index_key_list = INDEX_TYPES)
+		self.__update_mirror_dicts__(only_tags = True)
+
+		self.__store_index__()
+
+		return tags_donotexist_list, tags_exist_list, tags_inuse_list
+
+
+	def update(self):
+
+		if not self.initialized_bool:
+			raise repo_not_initialized_error()
+
+		if not self.index_loaded_bool:
+			self.__load_index__()
+
+		self.__update_index_on_files__()
+		self.__update_index_dicts_from_lists__(index_key_list = [KEY_FILES])
+		self.__update_mirror_dicts__()
+
+		self.__store_index__()
 
 
 	def __copy_index_file__(self, merge_source, merge_target):
@@ -308,6 +420,16 @@ class repository_class():
 		raise # TODO
 
 
+	def __get_file_entry_by_filename__(self, filename):
+
+		abs_path = os.path.abspath(os.path.join(self.current_path, filename))
+
+		if not (abs_path in self.filemirror_dict_byabspath.keys()):
+			raise filename_unrecognized_by_repo_error()
+
+		return self.index_dict_byid_dict[KEY_FILES][self.filemirror_dict_byabspath[abs_path]]
+
+
 	def __get_recursive_inventory_list__(self, scan_root_path, files_dict_list):
 
 		relative_path = os.path.relpath(scan_root_path, self.root_path)
@@ -355,13 +477,13 @@ class repository_class():
 		self.__get_recursive_inventory_list__(self.root_path, files_dict_list)
 
 		# Convert index into list of entries
-		entries_list = [entry_class(
-			file_dict = item
+		entries_list = [generate_entry(
+			self, file_dict = item
 			) for item in files_dict_list]
 
 		# Run index helper
 		for entry in entries_list:
-			entry.update_file_id()
+			entry.generate_id()
 
 		# Restore old CWD
 		os.chdir(self.current_path)
@@ -369,66 +491,182 @@ class repository_class():
 		return entries_list
 
 
+	def __init_index__(self):
+
+		# Index dicts by ID ({ID: entry, ...})
+		self.index_dict_byid_dict = {}
+		# Index dicts by tag ({TAG_ID: {ENTRY_ID: entry, ...}, ...}); tags to entries are tagged with!
+		self.index_dict_bytagid_dict = {}
+		# Index lists ([entry, ...])
+		self.index_list_dict = {}
+
+		# Seting up index dicts and lists ...
+		for index_key in INDEX_TYPES:
+			self.index_dict_byid_dict.update({index_key: {}})
+			self.index_dict_bytagid_dict.update({index_key: {}})
+			self.index_list_dict.update({index_key: []})
+
+		# Mirror of tags by name {TAG_NAME: tag_entry, ...}
+		self.tagmirror_dict_bytagname = {}
+		# Mirror of files by ABSPATH {FULLABSPATH: file_entry, ...}
+		self.filemirror_dict_byabspath = {}
+
+		# Have index dicts been loaded?
+		self.index_loaded_bool = False
+
+
+	def __init_paths__(self):
+
+		# Store CWD
+		self.current_path = os.getcwd()
+
+		# Find repo root
+		try:
+			self.root_path = self.__find_root_path__(self.current_path)
+			self.initialized_bool = True
+		except: # TODO only on special error in find_root_path
+			self.root_path = self.current_path
+			self.initialized_bool = False
+
+		# Relative path between CWD and repo root
+		self.current_relative_path = os.path.relpath(self.root_path, self.current_path)
+
+
+	def __is_tag_in_use__(self, tag_id):
+
+		tag_used_bool = False
+		for index_type in INDEX_TYPES:
+			tag_used_bool |= bool(self.index_dict_bytagid_dict[index_type][tag_id])
+
+		return tag_used_bool
+
+
 	def __load_index__(self, mode = KEY_MP, force_reload = False):
 
-		if not self.index_loaded_bool or force_reload:
-
-			if mode == KEY_PKL:
-				f = open(os.path.join(self.root_path, PATH_REPO, PATH_SUB_DB, FILE_DB_CURRENT + '.' + mode), 'rb')
-				import_list = pickle.load(f)
-				f.close()
-				self.index_loaded_bool = True
-			elif mode == KEY_MP:
-				f = open(os.path.join(self.root_path, PATH_REPO, PATH_SUB_DB, FILE_DB_CURRENT + '.' + mode), 'rb')
-				msg_pack = f.read()
-				f.close()
-				import_list = msgpack.unpackb(msg_pack, encoding = 'utf-8')
-				self.index_loaded_bool = True
-			elif mode == KEY_JSON:
-				print('load_index from JSON not supported')
-				raise # TODO
-			else:
-				raise # TODO
-
-			if self.index_loaded_bool:
-
-				self.index_list = [entry_class(
-					storage_dict = entry_dict
-					) for entry_dict in import_list]
-
-		else:
-
+		if self.index_loaded_bool and not force_reload:
 			raise # TODO
 
+		f = open(os.path.join(
+			self.root_path, PATH_REPO, PATH_SUB_DB, FILE_DB_CURRENT + '.' + mode
+			), 'rb')
 
-	def __store_index__(self, mode = KEY_MP, force_store = False):
-
-		export_list = [entry.export_storage_dict() for entry in self.index_list]
-
-		if self.index_loaded_bool or force_store:
-
-			if mode == KEY_PKL:
-				f = open(os.path.join(self.root_path, PATH_REPO, PATH_SUB_DB, FILE_DB_CURRENT + '.' + mode), 'wb+')
-				pickle.dump(export_list, f, -1)
-				f.close()
-			elif mode == KEY_MP:
-				msg_pack = msgpack.packb(export_list, use_bin_type = True)
-				f = open(os.path.join(self.root_path, PATH_REPO, PATH_SUB_DB, FILE_DB_CURRENT + '.' + mode), 'wb+')
-				f.write(msg_pack)
-				f.close()
-			elif mode == KEY_JSON:
-				f = open(os.path.join(self.root_path, PATH_REPO, PATH_SUB_REPORTS, FILE_DB_CURRENT + '.' + mode), 'w+')
-				json.dump(export_list, f, indent = '\t', sort_keys = True)
-				f.close()
-			else:
-				raise # TODO
-
+		if mode == KEY_PKL:
+			import_dict = pickle.load(f)
+		elif mode == KEY_MP:
+			import_dict = msgpack.unpackb(f.read(), encoding = 'utf-8')
+		elif mode == KEY_JSON:
+			import_dict = json.load(f)
 		else:
-
+			f.close()
 			raise # TODO
 
+		self.index_loaded_bool = True
+		f.close()
 
-	def __update_index_and_return__(self):
+		for index_key in INDEX_TYPES:
+			self.index_list_dict[index_key].clear()
+			self.index_list_dict[index_key] += [generate_entry(
+				self, storage_dict = entry_dict
+				) for entry_dict in import_dict[index_key]]
+		self.__update_index_dicts_from_lists__(index_key_list = INDEX_TYPES)
+		self.__update_mirror_dicts__()
+
+
+	def __store_index__(self, path = None, mode = KEY_MP, force_store = False):
+
+		export_dict = {}
+		for index_key in INDEX_TYPES:
+			export_dict.update({index_key: [
+				entry.export_storage_dict() for entry in self.index_list_dict[index_key]
+				]})
+
+		if not (self.index_loaded_bool or force_store):
+			raise # TODO
+
+		if path in [None, '']:
+			path = os.path.join(
+				self.root_path, PATH_REPO, PATH_SUB_DB, FILE_DB_CURRENT + '.' + mode
+				)
+
+		if mode == KEY_PKL:
+			f = open(path, 'wb+')
+			pickle.dump(export_dict, f, -1)
+		elif mode == KEY_MP:
+			f = open(path, 'wb+')
+			msg_pack = msgpack.packb(export_dict, use_bin_type = True)
+			f.write(msg_pack)
+		elif mode == KEY_JSON:
+			f = open(path, 'w+')
+			json.dump(export_dict, f, indent = '\t', sort_keys = True)
+		elif mode == KEY_YAML:
+			if hasattr(yaml, 'CDumper'):
+				dumper = yaml.CDumper
+			else:
+				dumper = yaml.Dumper
+			f = open(path, 'w+')
+			yaml.dump(export_dict, f, Dumper = dumper, default_flow_style = False)
+		else:
+			raise # TODO
+
+		f.close()
+
+
+	def __tag_create__(self, tag_name):
+
+		# Raise an error if tag exists
+		if tag_name in self.tagmirror_dict_bytagname.keys():
+			raise tag_exists_error()
+
+		# Generate new tag entry
+		new_tag_entry = generate_entry(self, tag_dict = {KEY_NAME: tag_name})
+		# Give the tag an ID
+		new_tag_entry.generate_id()
+		# Append tag to list of tags
+		self.index_list_dict[KEY_TAGS].append(new_tag_entry)
+
+
+	def __tag_delete__(self, tag_name, force_delete = False):
+
+		# Raise an error if the tag does not exist
+		if tag_name not in self.tagmirror_dict_bytagname.keys():
+			raise tag_does_not_exists_error()
+
+		# Get tag entry
+		tag_entry = self.index_dict_byid_dict[KEY_TAGS][self.tagmirror_dict_bytagname[tag_name]]
+		# Get tag id
+		tag_id = tag_entry.p_dict[KEY_ID]
+
+		# Is tag in use?
+		tag_used_bool = self.__is_tag_in_use__(tag_id)
+
+		# Raise an error if the tag is in use and the delete is not forced
+		if tag_used_bool and not force_delete:
+			raise tag_in_use_error()
+
+		# Remove the tag from all entries if the tag is in use and delete forced
+		if tag_used_bool and force_delete:
+			for index_type in INDEX_TYPES:
+				for entry in self.index_dict_bytagid_dict[index_type][tag_id].values():
+					entry.p_dict[KEY_TAGS].pop(tag_id)
+
+		# Actually delete tag
+		tag_entry_index = self.index_list_dict[KEY_TAGS].index(tag_entry)
+		del self.index_list_dict[KEY_TAGS][tag_entry_index]
+
+
+	def __tag_entry__(self, target_entry, tag_id, remove_flag = False):
+
+		if remove_flag:
+			if tag_id in target_entry.p_dict[KEY_TAGS].keys():
+				target_entry.p_dict[KEY_TAGS].pop(tag_id)
+		else:
+			if tag_id not in target_entry.p_dict[KEY_TAGS].keys():
+				target_entry.p_dict[KEY_TAGS].update({
+					tag_id: self.index_dict_byid_dict[KEY_TAGS][tag_id].p_dict[KEY_NAME]
+					})
+
+
+	def __update_index_on_files__(self):
 
 		uc_list, rw_list, _, nw_list, ch_list, mv_list = self.diff()
 
@@ -437,11 +675,56 @@ class repository_class():
 
 		# Update file information on new entries
 		updated_entries_list = run_routines_on_objects_in_parallel_and_return(
-			uc_list + rw_list + nw_list + ch_list + mv_list,
-			['merge_file_dict']
+			rw_list + ch_list + mv_list,
+			['merge_p_dict']
 			)
+
+		# Clear the index
+		self.index_list_dict[KEY_FILES].clear()
+		# Rebuild index
+		self.index_list_dict[KEY_FILES] += uc_list + nw_list + updated_entries_list
 
 		# Restore old CWD
 		os.chdir(self.current_path)
 
-		return updated_entries_list
+
+	def __update_index_dicts_from_lists__(self, index_key_list = []):
+
+		tag_id_list = [
+			tag_entry.p_dict[KEY_ID] for tag_entry in self.index_list_dict[KEY_TAGS]
+			]
+
+		for index_key in index_key_list:
+
+			# Clear [file, group, tag] by ID index
+			self.index_dict_byid_dict[index_key].clear()
+			# Rebuild the index dict
+			self.index_dict_byid_dict[index_key].update({
+				entry.p_dict[KEY_ID]: entry for entry in self.index_list_dict[index_key]
+				})
+
+			# Clear [file, group, tag] by TAG_NAME index
+			self.index_dict_bytagid_dict[index_key].clear()
+			# First, generate a dict of empty dicts
+			self.index_dict_bytagid_dict[index_key].update(
+				{tag_id: {} for tag_id in tag_id_list}
+				)
+			# Build tag dicts
+			for entry in self.index_list_dict[index_key]:
+				for entry_tag_id in entry.p_dict[KEY_TAGS].keys():
+					self.index_dict_bytagid_dict[index_key][entry_tag_id][entry.p_dict[KEY_ID]] = entry
+
+
+	def __update_mirror_dicts__(self, only_tags = False, only_filenames = False):
+
+		if not only_filenames:
+			self.tagmirror_dict_bytagname = {
+				entry.p_dict[KEY_NAME]: entry.p_dict[KEY_ID] for entry in self.index_list_dict[KEY_TAGS]
+				}
+
+		if not only_tags:
+			self.filemirror_dict_byabspath = {
+				os.path.abspath(os.path.join(
+					self.root_path, entry.p_dict[KEY_PATH], entry.p_dict[KEY_NAME]
+					)): entry.p_dict[KEY_ID] for entry in self.index_list_dict[KEY_FILES]
+				}

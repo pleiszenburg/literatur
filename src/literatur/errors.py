@@ -6,7 +6,7 @@ LITERATUR
 Literature management with Python, Dropbox and MediaWiki
 https://github.com/pleiszenburg/literatur
 
-	src/literatur/entry/__init__.py: Entry management
+	src/literatur/errors.py: Defines custom error types
 
 	Copyright (C) 2017 Sebastian M. Ernst <ernst@pleiszenburg.de>
 
@@ -25,16 +25,18 @@ specific language governing rights and limitations under the License.
 """
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-# IMPORT
+# ERRORS
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-from .core import (
-	entry_file_class,
-	entry_group_class,
-	entry_tag_class,
-	generate_entry
-	)
-from .lib import (
-	compare_entry_lists,
-	find_duplicates_in_entry_list
-	)
+class filename_unrecognized_by_repo_error(Exception):
+	pass
+class repo_initialized_error(Exception):
+	pass
+class repo_not_initialized_error(Exception):
+	pass
+class tag_does_not_exists_error(Exception):
+	pass
+class tag_exists_error(Exception):
+	pass
+class tag_in_use_error(Exception):
+	pass
