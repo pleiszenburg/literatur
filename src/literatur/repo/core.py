@@ -79,26 +79,17 @@ from ..entry import (
 	find_duplicates_in_entry_list,
 	generate_entry
 	)
+from ..errors import (
+	filename_unrecognized_by_repo_error,
+	repo_initialized_error,
+	repo_not_initialized_error,
+	tag_does_not_exists_error,
+	tag_exists_error,
+	tag_in_use_error
+	)
+
 from ..parallel import run_routines_on_objects_in_parallel_and_return
 from ..parser import ctime_to_datestring
-
-
-# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-# ERRORS
-# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-class filename_unrecognized_by_repo_error(Exception):
-	pass
-class repo_initialized_error(Exception):
-	pass
-class repo_not_initialized_error(Exception):
-	pass
-class tag_does_not_exists_error(Exception):
-	pass
-class tag_exists_error(Exception):
-	pass
-class tag_in_use_error(Exception):
-	pass
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -187,7 +178,7 @@ class repository_class():
 
 			try:
 				return self.__get_file_entry_by_filename__(filename)
-		except filename_unrecognized_by_repo_error:
+			except filename_unrecognized_by_repo_error:
 				pass
 
 		entry = generate_entry(
