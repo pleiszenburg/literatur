@@ -29,9 +29,9 @@ specific language governing rights and limitations under the License.
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 from ..const import (
-	KEY_ID,
 	KEY_INODE,
 	KEY_HASH,
+	KEY_MODE,
 	KEY_MTIME,
 	KEY_NAME,
 	KEY_PATH,
@@ -54,10 +54,10 @@ def compare_entry_lists(a_entry_list, b_entry_light_list):
 
 	# Find unchanged files
 	diff_uc_list, a_entry_list, b_entry_light_list = __find_process_diff__(
-		a_entry_list, b_entry_light_list, (KEY_ID,), STATUS_UC
+		a_entry_list, b_entry_light_list, (KEY_NAME, KEY_PATH, KEY_MTIME, KEY_SIZE, KEY_INODE, KEY_MODE), STATUS_UC
 		)
 
-	# Find moved and renamed files
+	# Find moved and renamed files - also finds files with changed mode
 	diff_mv_list, a_entry_list, b_entry_light_list = __find_process_diff__(
 		a_entry_list, b_entry_light_list, (KEY_INODE, KEY_MTIME, KEY_SIZE), STATUS_MV
 		)
