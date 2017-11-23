@@ -36,6 +36,7 @@ import json
 import os
 import pickle
 from pprint import pprint as pp
+import random
 import shutil
 
 import msgpack
@@ -45,6 +46,7 @@ from ..const import (
 	FILE_DB_CURRENT,
 	FILE_DB_JOURNAL,
 	FILE_DB_MASTER,
+	ID_HASH_LENGTH,
 	IGNORE_DIR_LIST,
 	IGNORE_FILE_LIST,
 	INDEX_TYPES,
@@ -194,6 +196,17 @@ class repository_class():
 			getattr(entry, routine_name)()
 
 		return entry
+
+
+	def get_free_id(self):
+
+		while True:
+			new_id = ('%0' + str(ID_HASH_LENGTH) + 'x') % random.randrange(16**ID_HASH_LENGTH)
+			if new_id not in self.index_id_set:
+				self.index_id_set.update(new_id)
+				break
+
+		return new_id
 
 
 	def get_stats(self):
@@ -511,6 +524,9 @@ class repository_class():
 		# Mirror of files by ABSPATH {FULLABSPATH: file_entry, ...}
 		self.filemirror_dict_byabspath = {}
 
+		# A set of all currently known IDs
+		self.index_id_set = set()
+
 		# Have index dicts been loaded?
 		self.index_loaded_bool = False
 
@@ -713,6 +729,11 @@ class repository_class():
 			for entry in self.index_list_dict[index_key]:
 				for entry_tag_id in entry.p_dict[KEY_TAGS].keys():
 					self.index_dict_bytagid_dict[index_key][entry_tag_id][entry.p_dict[KEY_ID]] = entry
+
+		# Keep a list of used indexes
+		self.index_id_set.clear()
+		for index_key in INDEX_TYPES:
+			self.index_id_set.update(self.index_dict_byid_dict[index_key].keys())
 
 
 	def __update_mirror_dicts__(self, only_tags = False, only_filenames = False):

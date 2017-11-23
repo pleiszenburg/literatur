@@ -168,7 +168,7 @@ class __entry_class__():
 
 	def generate_id(self):
 
-		raise NotImplementedError
+		self.p_dict[KEY_ID] = self.parent_repo.get_free_id()
 
 
 	def import_storage_dict(self, import_dict):
@@ -200,21 +200,10 @@ class entry_file_class(__entry_class__):
 
 	def generate_id(self):
 
-		if self.p_dict[KEY_EXISTS_BOOL]:
-
-			field_key_list = [KEY_NAME, KEY_PATH, KEY_MODE, KEY_INODE, KEY_SIZE, KEY_MTIME]
-			field_value_list = [
-				str(self.p_dict[key]) for key in field_key_list
-				]
-			field_value_str = ' '.join(field_value_list)
-
-			hash_object = hashlib.sha256(field_value_str.encode())
-
-			self.p_dict[KEY_ID] = hash_object.hexdigest()
-
-		else:
-
+		if not self.p_dict[KEY_EXISTS_BOOL]:
 			raise # TODO
+
+		super().generate_id()
 
 
 	def get_file_existence(self):
@@ -346,11 +335,6 @@ class entry_group_class(__entry_class__):
 		self.p_dict.update({KEY_ENTRYTYPE: KEY_GROUP})
 
 
-	def generate_id(self):
-
-		raise NotImplementedError
-
-
 	def update_report(self):
 
 		raise NotImplementedError
@@ -363,14 +347,6 @@ class entry_tag_class(__entry_class__):
 
 		super().__init__(import_dict, parent_repo)
 		self.p_dict.update({KEY_ENTRYTYPE: KEY_TAG})
-
-
-	def generate_id(self):
-
-		# "Random" element is required, because tags can be renamed ...
-		hash_str = self.p_dict[KEY_NAME] + str(datetime.datetime.now())
-		hash_object = hashlib.sha256(hash_str.encode())
-		self.p_dict[KEY_ID] = hash_object.hexdigest()
 
 
 	def update_report(self):

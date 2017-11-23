@@ -186,6 +186,8 @@ ANNOTATION_LIST = ['OCR', 'WATERMARKED-DO-NOT-DISTRIBUTE', 'PREPRINT', 'SM', 'SM
 
 TITLE_LENGTH_MIN_INT = 12
 
+ID_HASH_LENGTH = 8
+
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # MESSAGES
