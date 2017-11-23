@@ -136,11 +136,7 @@ class repository_class():
 		if not self.index_loaded_bool:
 			self.__load_index__()
 
-		old_entries_list = self.index_list_dict[KEY_FILES]
-		new_entries_light_list = self.__generate_light_index_and_return__()
-
-		# Compare old list vs new list and return result
-		return compare_entry_lists(old_entries_list, new_entries_light_list)
+		return self.__diff__()
 
 
 	def dump(self, path = None, mode = KEY_JSON):
@@ -407,6 +403,15 @@ class repository_class():
 
 			# Copy file for backup
 			shutil.copyfile(merge_source_path, merge_target_path)
+
+
+	def __diff__(self):
+
+		old_entries_list = self.index_list_dict[KEY_FILES]
+		new_entries_light_list = self.__generate_light_index_and_return__()
+
+		# Compare old list vs new list and return result
+		return compare_entry_lists(old_entries_list, new_entries_light_list)
 
 
 	def __find_root_path__(self, current_path):
@@ -684,7 +689,7 @@ class repository_class():
 
 	def __update_index_on_files__(self):
 
-		uc_list, rw_list, _, nw_list, ch_list, mv_list = self.diff()
+		uc_list, rw_list, _, nw_list, ch_list, mv_list = self.__diff__()
 
 		# Set CWD to root
 		os.chdir(self.root_path)
