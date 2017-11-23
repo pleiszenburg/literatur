@@ -271,6 +271,12 @@ class repository_class():
 		remove_flag = False
 		):
 
+		if not self.initialized_bool:
+			raise repo_not_initialized_error()
+
+		if not self.index_loaded_bool:
+			self.__load_index__()
+
 		if tag_name not in self.tagmirror_dict_bytagname.keys():
 			self.__tag_create__(tag_name)
 			self.__update_mirror_dicts__(only_tags = True)
@@ -284,7 +290,7 @@ class repository_class():
 		for target_filename in target_filename_list:
 
 			try:
-				target_entry = self.__get_file_entry_by_filename__(filename)
+				target_entry = self.__get_file_entry_by_filename__(target_filename)
 			except filename_unrecognized_by_repo_error:
 				file_not_found_list.append(target_filename)
 				continue
