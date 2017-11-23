@@ -45,6 +45,8 @@ from ..const import (
 	KEY_PKL,
 	KEY_YAML,
 	MSG_DEBUG_CANFORCEDELETE,
+	MSG_DEBUG_FILEUNKNOWN,
+	MSG_DEBUG_GROUPDOESNOTEXIST,
 	MSG_DEBUG_INREPOSITORY,
 	MSG_DEBUG_NOREPOSITORY,
 	MSG_DEBUG_STATUS,
@@ -239,16 +241,24 @@ def tag(repo, untag, group_target, tag_target, tag, filename):
 	"""Tags files & groups or removes tags from them
 	"""
 
-	if repo.initialized_bool:
-		repo.tag(
-			tag,
-			target_filename_list = list(filename),
-			target_group_list = list(group_target),
-			target_tag_list = list(tag_target),
-			remove_flag = untag
-			)
-	else:
+	if not repo.initialized_bool:
 		click.echo(MSG_DEBUG_NOREPOSITORY)
+		return
+
+	file_not_found_list, group_not_found_list, tag_not_found_list = repo.tag(
+		tag,
+		target_filename_list = list(filename),
+		target_group_list = list(group_target),
+		target_tag_list = list(tag_target),
+		remove_flag = untag
+		)
+
+	for file_not_found in file_not_found_list:
+		click.echo('"%s": %s' % (file_not_found, MSG_DEBUG_FILEUNKNOWN))
+	for group_not_found in group_not_found_list:
+		click.echo('"%s": %s' % (group_not_found, MSG_DEBUG_GROUPDOESNOTEXIST))
+	for tag_not_found in tag_not_found_list:
+		click.echo('"%s": %s' % (tag_not_found, MSG_DEBUG_TAGDOESNOTEXIST))
 
 
 @script_entry.command()
