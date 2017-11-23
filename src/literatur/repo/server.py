@@ -42,6 +42,8 @@ import shutil
 import msgpack
 import yaml
 
+from .fs import find_root_path
+
 from ..const import (
 	FILE_DB_CURRENT,
 	FILE_DB_JOURNAL,
@@ -83,6 +85,7 @@ from ..entry import (
 	)
 from ..errors import (
 	filename_unrecognized_by_repo_error,
+	not_in_repo_error,
 	repo_initialized_error,
 	repo_not_initialized_error,
 	tag_does_not_exists_error,
@@ -420,30 +423,6 @@ class repository_server_class():
 		return compare_entry_lists(old_entries_list, new_entries_light_list)
 
 
-	def __find_root_path__(self, current_path):
-
-		# Landed directly in root?
-		if os.path.isdir(os.path.join(current_path, PATH_REPO)):
-			return current_path
-
-		while True:
-
-			# Go one up
-			new_path = os.path.abspath(os.path.join(current_path, '..'))
-			# Can't go futher up
-			if new_path == current_path:
-				break
-			# Set path
-			current_path = new_path
-
-			# Check for repo folder
-			if os.path.isdir(os.path.join(current_path, PATH_REPO)):
-				return current_path
-
-		# Nothing found
-		raise # TODO
-
-
 	def __get_file_entry_by_filename__(self, filename):
 
 		abs_path = os.path.abspath(os.path.join(self.current_path, filename))
@@ -549,9 +528,9 @@ class repository_server_class():
 
 		# Find repo root
 		try:
-			self.root_path = self.__find_root_path__(self.current_path)
+			self.root_path = find_root_path(self.current_path)
 			self.initialized_bool = True
-		except: # TODO only on special error in find_root_path
+		except not_in_repo_error:
 			self.root_path = self.current_path
 			self.initialized_bool = False
 

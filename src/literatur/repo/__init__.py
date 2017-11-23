@@ -30,4 +30,7 @@ specific language governing rights and limitations under the License.
 
 from .client import repository_client_class
 from .server import repository_server_class
-from .fs import get_file_list
+from .fs import (
+	find_root_path,
+	get_file_list
+	)

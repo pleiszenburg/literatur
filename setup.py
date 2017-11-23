@@ -77,6 +77,7 @@ setup(
 		],
 	install_requires = [
 		'click',
+		'daemonocle',
 		'dropbox',
 		'humanize',
 		'msgpack-python',

@@ -30,12 +30,40 @@ specific language governing rights and limitations under the License.
 
 import os
 
-from ..const import IGNORE_FILE_LIST
+from ..const import (
+	IGNORE_FILE_LIST,
+	PATH_REPO
+	)
+from ..error import not_in_repo_error
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # ROUTINES
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+def find_root_path(in_path):
+
+	# Landed directly in root?
+	if os.path.isdir(os.path.join(in_path, PATH_REPO)):
+		return in_path
+
+	while True:
+
+		# Go one up
+		new_path = os.path.abspath(os.path.join(in_path, '..'))
+		# Can't go futher up
+		if new_path == in_path:
+			break
+		# Set path
+		in_path = new_path
+
+		# Check for repo folder
+		if os.path.isdir(os.path.join(in_path, PATH_REPO)):
+			return in_path
+
+	# Nothing found
+	raise not_in_repo_error()
+
 
 def get_file_list(in_path):
 
