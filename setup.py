@@ -84,7 +84,7 @@ setup(
 		'pdfminer.six',
 		'PyQt5',
 		'python-magic',
-		'PyYAML --global-option="--with-libyaml"',
+		'PyYAML', # --global-option="--with-libyaml"
 		'tqdm',
 		'wikitools==1.99',
 		'xmltodict'

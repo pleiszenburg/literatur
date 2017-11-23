@@ -81,7 +81,7 @@ def script_client(click_context):
 	click_context.obj = repository_client_class()
 
 
-@script_entry.command()
+@script_client.command()
 @click.argument(
 	'branch',
 	nargs = 1,
@@ -99,7 +99,7 @@ def backup(repo, branch):
 	repo.backup(branch)
 
 
-@script_entry.command()
+@script_client.command()
 @pass_repository_decorator
 def diff(repo):
 	"""Show changes to the filesystem currently not captured by the index
@@ -112,7 +112,7 @@ def diff(repo):
 	__print_diff__(*(repo.diff()))
 
 
-@script_entry.command()
+@script_client.command()
 @click.option(
 	'--mode', '-m',
 	type = click.Choice([KEY_JSON, KEY_MP, KEY_PKL, KEY_YAML]),
@@ -135,7 +135,7 @@ def dump(repo, mode, filename):
 		click.echo(MSG_DEBUG_NOREPOSITORY)
 
 
-@script_entry.command()
+@script_client.command()
 @pass_repository_decorator
 def duplicates(repo):
 	"""Find duplicate entries in repository
@@ -147,7 +147,7 @@ def duplicates(repo):
 		click.echo(MSG_DEBUG_NOREPOSITORY)
 
 
-@script_entry.command()
+@script_client.command()
 @click.argument(
 	'filenames',
 	nargs = -1,
@@ -162,7 +162,7 @@ def file(repo, filenames):
 		__print_file_metainfo__(repo.get_file_metainfo(filename))
 
 
-@script_entry.command()
+@script_client.command()
 @pass_repository_decorator
 def init(repo):
 	"""Create a literature repository
@@ -174,7 +174,7 @@ def init(repo):
 		click.echo(MSG_DEBUG_INREPOSITORY % repo.root_path)
 
 
-@script_entry.command()
+@script_client.command()
 @pass_repository_decorator
 def rename(repo):
 	"""Launch GUI for renaming files
@@ -184,7 +184,43 @@ def rename(repo):
 	guis.script_ui_filerename()
 
 
-@script_entry.command()
+@script_client.group()
+@pass_repository_decorator
+def server(repo):
+	"""Controls literatur repository server deamon
+	"""
+
+	pass
+
+
+@server.command()
+@pass_repository_decorator
+def start(repo):
+	"""Starts a literatur repository server deamon
+	"""
+
+	pass
+
+
+@server.command()
+@pass_repository_decorator
+def status(repo):
+	"""Checks the status of literatur repository server deamon
+	"""
+
+	pass
+
+
+@server.command()
+@pass_repository_decorator
+def stop(repo):
+	"""Stops a literatur repository server deamon
+	"""
+
+	pass
+
+
+@script_client.command()
 @pass_repository_decorator
 def stats(repo):
 	"""Display repository statistics
@@ -196,7 +232,7 @@ def stats(repo):
 		click.echo(MSG_DEBUG_NOREPOSITORY)
 
 
-@script_entry.command()
+@script_client.command()
 @click.option(
 	'--untag', '-u',
 	is_flag = True,
@@ -251,7 +287,7 @@ def tag(repo, untag, group_target, tag_target, tag, filename):
 		click.echo('"%s": %s' % (tag_not_found, MSG_DEBUG_TAGDOESNOTEXIST))
 
 
-@script_entry.command()
+@script_client.command()
 @click.option(
 	'--create', '-c',
 	nargs = 1,
@@ -316,7 +352,7 @@ def tagm(repo, create, delete, force_delete, ls, ls_used, ls_unused):
 		click.echo(MSG_DEBUG_NOREPOSITORY)
 
 
-@script_entry.command()
+@script_client.command()
 @pass_repository_decorator
 def update(repo):
 	"""Updates repository index reflecting changes to the filesystem
