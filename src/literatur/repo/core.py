@@ -196,6 +196,12 @@ class repository_class():
 
 	def get_free_id(self):
 
+		if not self.initialized_bool:
+			raise repo_not_initialized_error()
+
+		if not self.index_loaded_bool:
+			self.__load_index__()
+
 		while True:
 			new_id = ('%0' + str(ID_HASH_LENGTH) + 'x') % random.randrange(16**ID_HASH_LENGTH)
 			if new_id not in self.index_id_set:
