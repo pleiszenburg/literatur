@@ -34,7 +34,7 @@ from ..const import (
 	IGNORE_FILE_LIST,
 	PATH_REPO
 	)
-from ..error import not_in_repo_error
+from ..errors import not_in_repo_error
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

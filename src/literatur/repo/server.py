@@ -52,6 +52,7 @@ from ..const import (
 	IGNORE_DIR_LIST,
 	IGNORE_FILE_LIST,
 	INDEX_TYPES,
+	KEY_ADDRESS,
 	KEY_EXISTS_BOOL,
 	KEY_FILE,
 	KEY_FILES,
@@ -69,9 +70,12 @@ from ..const import (
 	KEY_MTIME,
 	KEY_NAME,
 	KEY_PATH,
+	KEY_PORT,
 	KEY_PKL,
+	KEY_SECRET,
 	KEY_SIZE,
 	KEY_TAGS,
+	KEY_TERMINATE,
 	KEY_YAML,
 	PATH_REPO,
 	PATH_SUB_DB,
@@ -92,7 +96,7 @@ from ..errors import (
 	tag_exists_error,
 	tag_in_use_error
 	)
-
+from ..rpc import mp_server_class
 from ..parallel import run_routines_on_objects_in_parallel_and_return
 from ..parser import ctime_to_datestring
 
@@ -104,13 +108,25 @@ from ..parser import ctime_to_datestring
 class repository_server_class():
 
 
-	def __init__(self):
+	def __init__(self, server_p_dict, daemon = None):
 
 		# Init all index related lists and dicts
 		self.__init_index__()
 
 		# Init paths and repo status
 		self.__init_paths__()
+
+		# Store reference to daemon object
+		self.daemon = daemon
+
+		# Start MP server
+		self.server = mp_server_class(
+			(server_p_dict[KEY_ADDRESS], server_p_dict[KEY_PORT]),
+			server_p_dict[KEY_SECRET],
+			server_p_dict[KEY_TERMINATE]
+			)
+
+		# TODO register functions on server
 
 
 	def backup(self, branch_name, mode = KEY_MP):
@@ -268,6 +284,14 @@ class repository_server_class():
 
 		self.index_loaded_bool = True
 		self.__store_index__()
+
+
+	def run_server(blocking = True):
+
+		if blocking:
+			self.server.server_forever()
+		else:
+			self.server.server_forever_in_thread()
 
 
 	def tag(self,

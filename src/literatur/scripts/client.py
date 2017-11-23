@@ -34,6 +34,8 @@ from pprint import pformat as pf
 
 import click
 
+from .server import script_server
+
 from ..const import (
 	KEY_FILES,
 	KEY_JOURNAL,
@@ -43,6 +45,9 @@ from ..const import (
 	KEY_NAME,
 	KEY_PATH,
 	KEY_PKL,
+	KEY_START,
+	KEY_STATUS,
+	KEY_STOP,
 	KEY_YAML,
 	MSG_DEBUG_CANFORCEDELETE,
 	MSG_DEBUG_FILEUNKNOWN,
@@ -61,6 +66,7 @@ from ..const import (
 	STATUS_MV,
 	STATUS_RW
 	)
+from ..errors import not_in_repo_error
 from ..repo import repository_client_class
 pass_repository_decorator = click.make_pass_decorator(repository_client_class, ensure = True)
 
@@ -198,7 +204,10 @@ def start(repo):
 	"""Starts a literatur repository server deamon
 	"""
 
-	pass
+	try:
+		script_server(KEY_START)
+	except not_in_repo_error:
+		click.echo(MSG_DEBUG_NOREPOSITORY)
 
 
 @server.command()
@@ -207,7 +216,10 @@ def status(repo):
 	"""Checks the status of literatur repository server deamon
 	"""
 
-	pass
+	try:
+		script_server(KEY_STATUS)
+	except not_in_repo_error:
+		click.echo(MSG_DEBUG_NOREPOSITORY)
 
 
 @server.command()
@@ -216,7 +228,10 @@ def stop(repo):
 	"""Stops a literatur repository server deamon
 	"""
 
-	pass
+	try:
+		script_server(KEY_STOP)
+	except not_in_repo_error:
+		click.echo(MSG_DEBUG_NOREPOSITORY)
 
 
 @script_client.command()

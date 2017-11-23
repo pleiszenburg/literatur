@@ -52,8 +52,13 @@ FILE_DB_CURRENT = 'index_%s' % KEY_CURRENT # stage 1
 FILE_DB_JOURNAL = 'index_%s' % KEY_JOURNAL # stage 2
 FILE_DB_MASTER = 'index_%s' % KEY_MASTER # stage 3
 
+FILE_DAEMON_PID = 'daemon.pid'
+FILE_DAEMON_SECRET = 'daemon.secret'
+
 FIMENAME_MAXLENGTH_INT = 255 # EXT4 & NTFS
 FILENAME_SHORTLENGTH_INT = 80 # For logging ...
+
+SECRET_HASH_LENGTH = 8
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -104,6 +109,7 @@ DEFAULT_YEAR = DEFAULT_YEAR_MIN
 # KEYS
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+KEY_ADDRESS = 'address'
 KEY_ANNOTATION = 'annotation'
 KEY_AUTHOR_FIRST = 'author_first'
 KEY_AUTHORS_DICT = 'authors_dict'
@@ -132,16 +138,21 @@ KEY_MTIME = 'mtime'
 KEY_NAME = 'name'
 KEY_PATH = 'path'
 KEY_PARAM = 'param'
+KEY_PORT = 'port'
 KEY_PKL = 'pkl'
 KEY_REPORT = 'report'
+KEY_SECRET = 'secret'
 KEY_SERIES_ID = 'series_id'
 KEY_SERIES_NAME = 'series_name'
 KEY_SERIES_SECTION = 'series_section'
 KEY_SERIES_TYPE = 'series_type'
 KEY_SIZE = 'size'
+KEY_START = 'start'
 KEY_STATUS = 'status'
+KEY_STOP = 'stop'
 KEY_TAG = 'tag'
 KEY_TAGS = 'tags'
+KEY_TERMINATE = 'terminate'
 KEY_TITLE = 'title'
 KEY_TYPE = 'type'
 # KEY_URL = 'url'

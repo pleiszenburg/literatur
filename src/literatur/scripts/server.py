@@ -28,13 +28,59 @@ specific language governing rights and limitations under the License.
 # IMPORT
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+import os
 
+import daemonocle
+
+from ..const import (
+	FILE_DAEMON_PID,
+	PATH_REPO,
+	SECRET_HASH_LENGTH
+	)
+from ..repo import (
+	find_root_path,
+	repository_server_class
+	)
+from ..rpc import get_free_port
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # ROUTINES
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-def script_server_worker(command):
+def script_server(deamon_command):
 
-	pass
+	# Find root path: Raises an error if CWD is not in a repo
+	repo_root_path = find_root_path(os.getcwd())
+
+	# Fire up daemon
+	lit_daemon = daemonocle.Daemon(
+		pidfile = os.path.join(repo_root_path, PATH_REPO, FILE_DAEMON_PID),
+		workdir = repo_root_path
+		)
+
+	server_p_dict = {
+		KEY_ADDRESS: 'localhost',
+		KEY_PORT: get_free_port(),
+		KEY_SECRET: __generate_secret__(),
+		KEY_TERMINATE: ''
+		}
+
+	__store_secret__(repo_root_path, FILE_DAEMON_SECRET, server_p_dict[KEY_SECRET])
+
+	repo_server = repository_server_class(server_p_dict = server_p_dict, daemon = lit_daemon)
+	lit_daemon.worker = repo_server.run_server
+
+	lit_daemon.do_action(deamon_command)
+
+
+def __generate_secret__():
+
+	return ('%0' + str(SECRET_HASH_LENGTH) + 'x') % random.randrange(16**SECRET_HASH_LENGTH)
+
+
+def __store_secret__(repo_root_path, file_name, secret):
+
+	f = open(os.path.join(repo_root_path, PATH_REPO, file_name), 'w+')
+	f.write(secret)
+	f.close()

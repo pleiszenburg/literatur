@@ -6,7 +6,7 @@ LITERATUR
 Literature management with Python, Dropbox and MediaWiki
 https://github.com/pleiszenburg/literatur
 
-	src/literatur/scripts/__init__.py: Command line scripts
+	src/literatur/rpc/__init__.py: RPC sub-module
 
 	Copyright (C) 2017 Sebastian M. Ernst <ernst@pleiszenburg.de>
 
@@ -28,5 +28,8 @@ specific language governing rights and limitations under the License.
 # IMPORT
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-from .client import script_client
-from .server import script_server
+from .core import (
+	mp_client_class,
+	mp_server_class
+	)
+from .lib import get_free_port
