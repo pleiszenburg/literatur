@@ -36,8 +36,6 @@ class not_in_repo_error(Exception):
 	pass
 class repo_initialized_error(Exception):
 	pass
-class repo_not_initialized_error(Exception):
-	pass
 class tag_does_not_exists_error(Exception):
 	pass
 class tag_exists_error(Exception):

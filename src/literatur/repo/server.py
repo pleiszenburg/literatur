@@ -39,7 +39,6 @@ from pprint import pprint as pp
 import random
 import shutil
 
-from .fs import find_root_path
 from .storage import (
 	load_data,
 	store_data
@@ -93,7 +92,6 @@ from ..errors import (
 	filename_unrecognized_by_repo_error,
 	not_in_repo_error,
 	repo_initialized_error,
-	repo_not_initialized_error,
 	tag_does_not_exists_error,
 	tag_exists_error,
 	tag_in_use_error
@@ -110,13 +108,16 @@ from ..parser import ctime_to_datestring
 class repository_server_class():
 
 
-	def __init__(self, server_p_dict = None, daemon = None):
+	def __init__(self, root_path, server_p_dict = None, daemon = None):
+
+		# Store root
+		self.root_path = root_path
+
+		# Update CWD
+		self.set_cwd(self.root_path)
 
 		# Init all index related lists and dicts
 		self.__init_index__()
-
-		# Init paths and repo status
-		self.__init_paths__()
 
 		# Store reference to daemon object
 		self.daemon = daemon
@@ -130,7 +131,25 @@ class repository_server_class():
 				server_p_dict[KEY_TERMINATE]
 				)
 
-			# TODO register functions on server
+			# Register functions on server
+			for func_name in [
+				'backup',
+				'diff',
+				'dump',
+				'find_duplicates',
+				'get_file_metainfo',
+				'get_free_id',
+				'get_stats',
+				'get_tag_name_list',
+				'run_server',
+				'set_cwd',
+				'tag',
+				'tags_modify',
+				'update'
+				]:
+				self.server.register_function(
+					getattr(self, func_name), func_name
+					)
 
 
 	def backup(self, branch_name, mode = KEY_MP):
@@ -153,9 +172,6 @@ class repository_server_class():
 		It does not care about tags and groups.
 		"""
 
-		if not self.initialized_bool:
-			raise repo_not_initialized_error()
-
 		if not self.index_loaded_bool:
 			self.__load_index__()
 
@@ -163,9 +179,6 @@ class repository_server_class():
 
 
 	def dump(self, path = None, mode = KEY_JSON):
-
-		if not self.initialized_bool:
-			raise repo_not_initialized_error()
 
 		if not self.index_loaded_bool:
 			self.__load_index__()
@@ -178,9 +191,6 @@ class repository_server_class():
 		Multiples of tags and groups are not yet being looked for.
 		"""
 
-		if not self.initialized_bool:
-			raise repo_not_initialized_error()
-
 		if not self.index_loaded_bool:
 			self.__load_index__()
 
@@ -189,18 +199,13 @@ class repository_server_class():
 
 	def get_file_metainfo(self, filename):
 
-		if self.initialized_bool:
+		if not self.index_loaded_bool:
+			self.__load_index__()
 
-			# TODO look for changed or moved files, too (i.e. return change reports)
-			# Requires index dicts by hash
-
-			if not self.index_loaded_bool:
-				self.__load_index__()
-
-			try:
-				return self.__get_file_entry_by_filename__(filename)
-			except filename_unrecognized_by_repo_error:
-				pass
+		try:
+			return self.__get_file_entry_by_filename__(filename)
+		except filename_unrecognized_by_repo_error:
+			pass
 
 		entry = generate_entry(
 			self, filepath_tuple = (self.current_path, filename)
@@ -213,14 +218,10 @@ class repository_server_class():
 			'update_file_type'
 			]:
 			getattr(entry, routine_name)()
-
 		return entry
 
 
 	def get_free_id(self):
-
-		if not self.initialized_bool:
-			raise repo_not_initialized_error()
 
 		if not self.index_loaded_bool:
 			self.__load_index__()
@@ -235,9 +236,6 @@ class repository_server_class():
 
 
 	def get_stats(self):
-
-		if not self.initialized_bool:
-			raise repo_not_initialized_error()
 
 		if not self.index_loaded_bool:
 			self.__load_index__()
@@ -283,14 +281,20 @@ class repository_server_class():
 			self.server.server_forever_in_thread()
 
 
+	def set_cwd(self, target_path):
+
+		# Store CWD
+		self.current_path = target_path
+
+		# Relative path between CWD and repo root
+		self.current_relative_path = os.path.relpath(self.root_path, self.current_path)
+
+
 	def tag(self,
 		tag_name,
 		target_filename_list = [], target_group_list = [], target_tag_list = [],
 		remove_flag = False
 		):
-
-		if not self.initialized_bool:
-			raise repo_not_initialized_error()
 
 		if not self.index_loaded_bool:
 			self.__load_index__()
@@ -337,9 +341,6 @@ class repository_server_class():
 		""" Creates and deletes lists of tags
 		"""
 
-		if not self.initialized_bool:
-			raise repo_not_initialized_error()
-
 		if not self.index_loaded_bool:
 			self.__load_index__()
 
@@ -372,9 +373,6 @@ class repository_server_class():
 
 
 	def update(self):
-
-		if not self.initialized_bool:
-			raise repo_not_initialized_error()
 
 		if not self.index_loaded_bool:
 			self.__load_index__()
@@ -532,23 +530,6 @@ class repository_server_class():
 
 		# Have index dicts been loaded?
 		self.index_loaded_bool = False
-
-
-	def __init_paths__(self):
-
-		# Store CWD
-		self.current_path = os.getcwd()
-
-		# Find repo root
-		try:
-			self.root_path = find_root_path(self.current_path)
-			self.initialized_bool = True
-		except not_in_repo_error:
-			self.root_path = self.current_path
-			self.initialized_bool = False
-
-		# Relative path between CWD and repo root
-		self.current_relative_path = os.path.relpath(self.root_path, self.current_path)
 
 
 	def __is_tag_in_use__(self, tag_id):

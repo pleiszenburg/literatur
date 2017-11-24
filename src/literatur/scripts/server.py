@@ -81,7 +81,7 @@ def get_repo_client():
 
 	else:
 
-		return repository_server_class()
+		return repository_server_class(repo_root_path)
 
 
 def get_server_status():
@@ -121,7 +121,11 @@ def script_server(deamon_command):
 	__store_repo_info__(repo_root_path, FILE_DAEMON_PORT, server_p_dict[KEY_PORT])
 	__store_repo_info__(repo_root_path, FILE_DAEMON_SECRET, server_p_dict[KEY_SECRET])
 
-	repo_server = repository_server_class(server_p_dict = server_p_dict, daemon = lit_daemon)
+	repo_server = repository_server_class(
+		repo_root_path,
+		server_p_dict = server_p_dict,
+		daemon = lit_daemon
+		)
 	lit_daemon.worker = repo_server.run_server
 
 	lit_daemon.do_action(deamon_command)
