@@ -337,34 +337,34 @@ def tag(untag, group_target, tag_target, tag, filename):
 	is_flag = True,
 	help = 'Lists unused tags'
 	)
-@pass_repository_decorator
-def tagm(repo, create, delete, force_delete, ls, ls_used, ls_unused):
+def tagm(create, delete, force_delete, ls, ls_used, ls_unused):
 	"""Manages tags
 	"""
 
-	if repo.initialized_bool:
-
-		tags_donotexist_list, tags_exist_list, tags_inuse_list = repo.tags_modify(
-			create_tag_names_list = list(create),
-			delete_tag_names_list = list(delete),
-			force_delete = force_delete
-			)
-
-		for tag_name in tags_exist_list:
-			click.echo('"%s": %s' % (tag_name, MSG_DEBUG_TAGEXISTS))
-		for tag_name in tags_donotexist_list:
-			click.echo('"%s": %s' % (tag_name, MSG_DEBUG_TAGDOESNOTEXIST))
-		for tag_name in tags_inuse_list:
-			click.echo('"%s": %s (%s)' % (tag_name, MSG_DEBUG_TAGINUSE, MSG_DEBUG_CANFORCEDELETE))
-
-		if ls or ls_used or ls_unused:
-			tag_list = repo.get_tag_name_list(used_only = ls_used, unused_only = ls_unused)
-			tag_list.sort()
-			for tag_name in tag_list:
-				click.echo(tag_name)
-
-	else:
+	try:
+		repo = get_repo_client()
+	except not_in_repo_error:
 		click.echo(MSG_DEBUG_NOREPOSITORY)
+		return
+
+	tags_donotexist_list, tags_exist_list, tags_inuse_list = repo.tags_modify(
+		create_tag_names_list = list(create),
+		delete_tag_names_list = list(delete),
+		force_delete = force_delete
+		)
+
+	for tag_name in tags_exist_list:
+		click.echo('"%s": %s' % (tag_name, MSG_DEBUG_TAGEXISTS))
+	for tag_name in tags_donotexist_list:
+		click.echo('"%s": %s' % (tag_name, MSG_DEBUG_TAGDOESNOTEXIST))
+	for tag_name in tags_inuse_list:
+		click.echo('"%s": %s (%s)' % (tag_name, MSG_DEBUG_TAGINUSE, MSG_DEBUG_CANFORCEDELETE))
+
+	if ls or ls_used or ls_unused:
+		tag_list = repo.get_tag_name_list(used_only = ls_used, unused_only = ls_unused)
+		tag_list.sort()
+		for tag_name in tag_list:
+			click.echo(tag_name)
 
 
 @script_client.command()
