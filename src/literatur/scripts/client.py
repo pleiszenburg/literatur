@@ -186,8 +186,7 @@ def init(repo):
 
 
 @script_client.command()
-@pass_repository_decorator
-def rename(repo):
+def rename():
 	"""Launch GUI for renaming files
 	"""
 
