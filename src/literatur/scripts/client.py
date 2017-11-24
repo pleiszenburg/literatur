@@ -70,6 +70,10 @@ from ..const import (
 	STATUS_RW
 	)
 from ..errors import not_in_repo_error
+from ..repo import (
+	init_root_path,
+	find_root_path
+	)
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -174,10 +178,11 @@ def init(repo):
 	"""Create a literature repository
 	"""
 
-	if not repo.initialized_bool:
-		repo.init()
-	else:
+	try:
+		root_path = find_root_path(os.getcwd())
 		click.echo(MSG_DEBUG_INREPOSITORY % repo.root_path)
+	except not_in_repo_error:
+		init_root_path(os.getcwd())
 
 
 @script_client.command()
