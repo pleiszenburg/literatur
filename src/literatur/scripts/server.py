@@ -36,6 +36,7 @@ import psutil
 from ..const import (
 	ADDRESS_LOCALHOST,
 	FILE_DAEMON_PID,
+	FILE_DAEMON_PORT,
 	PATH_REPO,
 	SECRET_HASH_LENGTH
 	)
@@ -85,7 +86,8 @@ def script_server(deamon_command):
 		KEY_TERMINATE: ''
 		}
 
-	__store_secret__(repo_root_path, FILE_DAEMON_SECRET, server_p_dict[KEY_SECRET])
+	__store_repo_info__(repo_root_path, FILE_DAEMON_PORT, server_p_dict[KEY_PORT])
+	__store_repo_info__(repo_root_path, FILE_DAEMON_SECRET, server_p_dict[KEY_SECRET])
 
 	repo_server = repository_server_class(server_p_dict = server_p_dict, daemon = lit_daemon)
 	lit_daemon.worker = repo_server.run_server
@@ -121,7 +123,7 @@ def __load_pid__(repo_root_path, file_name):
 		raise no_pid_error()
 
 
-def __store_secret__(repo_root_path, file_name, secret):
+def __store_repo_info__(repo_root_path, file_name, secret):
 
 	f = open(os.path.join(repo_root_path, PATH_REPO, file_name), 'w+')
 	f.write(secret)

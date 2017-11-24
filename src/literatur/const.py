@@ -53,6 +53,7 @@ FILE_DB_JOURNAL = 'index_%s' % KEY_JOURNAL # stage 2
 FILE_DB_MASTER = 'index_%s' % KEY_MASTER # stage 3
 
 FILE_DAEMON_PID = 'daemon.pid'
+FILE_DAEMON_PORT = 'daemon.port'
 FILE_DAEMON_SECRET = 'daemon.secret'
 
 FIMENAME_MAXLENGTH_INT = 255 # EXT4 & NTFS
