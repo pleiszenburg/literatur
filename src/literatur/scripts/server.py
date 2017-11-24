@@ -85,7 +85,7 @@ def get_repo_client():
 
 
 def get_server_status():
-	"""Returns pid is server is up and None if server is down
+	"""Returns pid if server is up and None if server is down
 	"""
 
 	# Find root path: Raises an error if CWD is not in a repo
