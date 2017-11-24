@@ -64,7 +64,7 @@ def get_repo_client():
 	repo_root_path = find_root_path(os.getcwd())
 
 	try:
-		pid = __load_pid__(repo_root_path, FILE_DAEMON_PID):
+		pid = __load_pid__(repo_root_path):
 		daemon_up = True
 	except no_pid_error:
 		daemon_up = False
@@ -93,7 +93,7 @@ def get_server_status():
 
 	# Get the pit and return status
 	try:
-		return __load_pid__(repo_root_path, FILE_DAEMON_PID)
+		return __load_pid__(repo_root_path)
 	except no_pid_error:
 		return None
 
@@ -132,16 +132,12 @@ def __generate_secret__():
 	return ('%0' + str(SECRET_HASH_LENGTH) + 'x') % random.randrange(16**SECRET_HASH_LENGTH)
 
 
-def __load_pid__(repo_root_path, file_name):
+def __load_pid__(repo_root_path):
 
-	pid_path = os.path.join(repo_root_path, PATH_REPO, file_name)
-
-	if not os.path.isfile(pid_path):
+	try:
+		pid_data = __load_repo_info__(repo_root_path, FILE_DAEMON_PID)
+	except FileNotFoundError:
 		raise no_pid_error()
-
-	f = open(pid_path, 'r')
-	pid_data = f.read()
-	f.close()
 
 	try:
 		pid = int(fp.read())
