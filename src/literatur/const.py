@@ -60,6 +60,8 @@ FILENAME_SHORTLENGTH_INT = 80 # For logging ...
 
 SECRET_HASH_LENGTH = 8
 
+ADDRESS_LOCALHOST = 'localhost'
+
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # ENTRY STATUS

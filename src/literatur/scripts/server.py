@@ -33,6 +33,7 @@ import os
 import daemonocle
 
 from ..const import (
+	ADDRESS_LOCALHOST,
 	FILE_DAEMON_PID,
 	PATH_REPO,
 	SECRET_HASH_LENGTH
@@ -60,7 +61,7 @@ def script_server(deamon_command):
 		)
 
 	server_p_dict = {
-		KEY_ADDRESS: 'localhost',
+		KEY_ADDRESS: ADDRESS_LOCALHOST,
 		KEY_PORT: get_free_port(),
 		KEY_SECRET: __generate_secret__(),
 		KEY_TERMINATE: ''
