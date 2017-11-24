@@ -276,12 +276,13 @@ def stats():
 	type = click.Path(exists = True),
 	nargs = -1
 	)
-@pass_repository_decorator
-def tag(repo, untag, group_target, tag_target, tag, filename):
+def tag(untag, group_target, tag_target, tag, filename):
 	"""Tags files & groups or removes tags from them
 	"""
 
-	if not repo.initialized_bool:
+	try:
+		repo = get_repo_client()
+	except not_in_repo_error:
 		click.echo(MSG_DEBUG_NOREPOSITORY)
 		return
 
