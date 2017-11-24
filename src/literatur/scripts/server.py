@@ -115,7 +115,7 @@ def script_server(deamon_command):
 		KEY_ADDRESS: ADDRESS_LOCALHOST,
 		KEY_PORT: get_free_port(),
 		KEY_SECRET: __generate_secret__(),
-		KEY_TERMINATE: ''
+		KEY_TERMINATE: None
 		}
 
 	__store_repo_info__(repo_root_path, FILE_DAEMON_PORT, server_p_dict[KEY_PORT])
