@@ -368,16 +368,15 @@ def tagm(create, delete, force_delete, ls, ls_used, ls_unused):
 
 
 @script_client.command()
-@pass_repository_decorator
-def update(repo):
+def update():
 	"""Updates repository index reflecting changes to the filesystem
 	"""
 
-	if not repo.initialized_bool:
+	try:
+		repo = get_repo_client()
+		repo.update()
+	except not_in_repo_error:
 		click.echo(MSG_DEBUG_NOREPOSITORY)
-		return
-
-	repo.update()
 
 
 def __print_diff__(uc_list, rw_list, rm_list, nw_list, ch_list, mv_list):
