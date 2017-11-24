@@ -83,6 +83,7 @@ setup(
 		'msgpack-python',
 		'networkx',
 		'pdfminer.six',
+		'psutil',
 		'PyQt5',
 		'python-magic',
 		'PyYAML', # --global-option="--with-libyaml"

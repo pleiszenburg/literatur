@@ -30,6 +30,8 @@ specific language governing rights and limitations under the License.
 
 class filename_unrecognized_by_repo_error(Exception):
 	pass
+class no_pid_error(Exception):
+	pass
 class not_in_repo_error(Exception):
 	pass
 class repo_initialized_error(Exception):
