@@ -145,15 +145,17 @@ def dump(mode, filename):
 
 
 @script_client.command()
-@pass_repository_decorator
-def duplicates(repo):
+def duplicates():
 	"""Find duplicate entries in repository
 	"""
 
-	if repo.initialized_bool:
-		__print_duplicates__(repo.find_duplicates())
-	else:
+	try:
+		repo = get_repo_client()
+	except not_in_repo_error:
 		click.echo(MSG_DEBUG_NOREPOSITORY)
+		return
+
+	__print_duplicates__(repo.find_duplicates())
 
 
 @script_client.command()
