@@ -33,19 +33,20 @@ from collections import (
 	Counter,
 	OrderedDict
 	)
-import json
 import os
 import pickle
 from pprint import pprint as pp
 import random
 import shutil
 
-import msgpack
-import yaml
-
 from .fs import find_root_path
+from .storage import (
+	load_data,
+	store_data
+	)
 
 from ..const import (
+	DEFAULT_INDEX_FORMAT,
 	FILE_DB_CURRENT,
 	FILE_DB_JOURNAL,
 	FILE_DB_MASTER,
@@ -272,21 +273,6 @@ class repository_server_class():
 				tag_name_list.append(tag_name)
 
 		return tag_name_list
-
-
-	def init(self):
-
-		if self.initialized_bool:
-			raise repo_initialized_error()
-
-		current_repository = os.path.join(self.root_path, PATH_REPO)
-		os.makedirs(current_repository)
-		for fld in [PATH_SUB_DB, PATH_SUB_DBBACKUP, PATH_SUB_REPORTS]:
-			os.makedirs(os.path.join(current_repository, fld))
-		self.initialized_bool = True
-
-		self.index_loaded_bool = True
-		self.__store_index__()
 
 
 	def run_server(blocking = True):
@@ -574,27 +560,14 @@ class repository_server_class():
 		return tag_used_bool
 
 
-	def __load_index__(self, mode = KEY_MP, force_reload = False):
+	def __load_index__(self, mode = DEFAULT_INDEX_FORMAT, force_reload = False):
 
 		if self.index_loaded_bool and not force_reload:
 			raise # TODO
 
-		f = open(os.path.join(
+		import_dict = load_data(os.path.join(
 			self.root_path, PATH_REPO, PATH_SUB_DB, FILE_DB_CURRENT + '.' + mode
-			), 'rb')
-
-		if mode == KEY_PKL:
-			import_dict = pickle.load(f)
-		elif mode == KEY_MP:
-			import_dict = msgpack.unpackb(f.read(), encoding = 'utf-8')
-		elif mode == KEY_JSON:
-			import_dict = json.load(f)
-		else:
-			f.close()
-			raise # TODO
-
-		self.index_loaded_bool = True
-		f.close()
+			), mode = mode)
 
 		for index_key in INDEX_TYPES:
 			self.index_list_dict[index_key].clear()
@@ -605,7 +578,7 @@ class repository_server_class():
 		self.__update_mirror_dicts__()
 
 
-	def __store_index__(self, path = None, mode = KEY_MP, force_store = False):
+	def __store_index__(self, path = None, mode = DEFAULT_INDEX_FORMAT, force_store = False):
 
 		export_dict = {}
 		for index_key in INDEX_TYPES:
@@ -621,27 +594,7 @@ class repository_server_class():
 				self.root_path, PATH_REPO, PATH_SUB_DB, FILE_DB_CURRENT + '.' + mode
 				)
 
-		if mode == KEY_PKL:
-			f = open(path, 'wb+')
-			pickle.dump(export_dict, f, -1)
-		elif mode == KEY_MP:
-			f = open(path, 'wb+')
-			msg_pack = msgpack.packb(export_dict, use_bin_type = True)
-			f.write(msg_pack)
-		elif mode == KEY_JSON:
-			f = open(path, 'w+')
-			json.dump(export_dict, f, indent = '\t', sort_keys = True)
-		elif mode == KEY_YAML:
-			if hasattr(yaml, 'CDumper'):
-				dumper = yaml.CDumper
-			else:
-				dumper = yaml.Dumper
-			f = open(path, 'w+')
-			yaml.dump(export_dict, f, Dumper = dumper, default_flow_style = False)
-		else:
-			raise # TODO
-
-		f.close()
+		store_data(path, export_dict, mode = mode)
 
 
 	def __tag_create__(self, tag_name):

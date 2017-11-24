@@ -169,6 +169,8 @@ KEY_YEAR = 'year'
 
 INDEX_TYPES = [KEY_FILES, KEY_GROUPS, KEY_TAGS]
 
+DEFAULT_INDEX_FORMAT = KEY_MP
+
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # ENTRY META: CLASSES, AUTHORS, ...

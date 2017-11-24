@@ -30,16 +30,44 @@ specific language governing rights and limitations under the License.
 
 import os
 
+from .storage import store_data
+
 from ..const import (
+	FILE_DB_CURRENT,
 	IGNORE_FILE_LIST,
-	PATH_REPO
+	DEFAULT_INDEX_FORMAT,
+	PATH_REPO,
+	PATH_SUB_DB,
+	PATH_SUB_DBBACKUP,
+	PATH_SUB_REPORTS
 	)
-from ..errors import not_in_repo_error
+from ..errors import (
+	not_in_repo_error,
+	repo_initialized_error
+	)
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # ROUTINES
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+def init_root_path(in_path):
+
+	try:
+		root_path = find_root_path(in_path)
+		raise repo_initialized_error()
+	except not_in_repo_error:
+		pass
+
+	current_repository = os.path.join(in_path, PATH_REPO)
+	os.makedirs(current_repository)
+	for fld in [PATH_SUB_DB, PATH_SUB_DBBACKUP, PATH_SUB_REPORTS]:
+		os.makedirs(os.path.join(current_repository, fld))
+
+	store_data(os.path.join(
+		in_path, PATH_REPO, PATH_SUB_DB, FILE_DB_CURRENT + '.' + DEFAULT_INDEX_FORMAT
+		), {indey_key: [] for index_key in INDEX_TYPES}, mode = DEFAULT_INDEX_FORMAT)
+
 
 def find_root_path(in_path):
 
