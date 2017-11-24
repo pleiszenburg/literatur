@@ -140,7 +140,7 @@ def __load_pid__(repo_root_path):
 		raise no_pid_error()
 
 	try:
-		pid = int(fp.read())
+		pid = int(pid_data)
 	except ValueError:
 		raise no_pid_error()
 
