@@ -173,8 +173,7 @@ def file(filenames):
 
 
 @script_client.command()
-@pass_repository_decorator
-def init(repo):
+def init():
 	"""Create a literature repository
 	"""
 
@@ -195,8 +194,7 @@ def rename():
 
 
 @script_client.group()
-@pass_repository_decorator
-def server(repo):
+def server():
 	"""Controls literatur repository server deamon
 	"""
 
@@ -204,8 +202,7 @@ def server(repo):
 
 
 @server.command()
-@pass_repository_decorator
-def start(repo):
+def start():
 	"""Starts a literatur repository server deamon
 	"""
 
@@ -216,8 +213,7 @@ def start(repo):
 
 
 @server.command()
-@pass_repository_decorator
-def status(repo):
+def status():
 	"""Checks the status of literatur repository server deamon
 	"""
 
@@ -228,8 +224,7 @@ def status(repo):
 
 
 @server.command()
-@pass_repository_decorator
-def stop(repo):
+def stop():
 	"""Stops a literatur repository server deamon
 	"""
 
@@ -240,14 +235,14 @@ def stop(repo):
 
 
 @script_client.command()
-@pass_repository_decorator
-def stats(repo):
+def stats():
 	"""Display repository statistics
 	"""
 
-	if repo.initialized_bool:
+	try:
+		repo = get_repo_client()
 		__print_stats__(repo.get_stats())
-	else:
+	except not_in_repo_error:
 		click.echo(MSG_DEBUG_NOREPOSITORY)
 
 
