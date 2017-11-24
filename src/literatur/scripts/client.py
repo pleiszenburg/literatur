@@ -164,10 +164,15 @@ def duplicates():
 	nargs = -1,
 	type = click.Path(exists = True)
 	)
-@pass_repository_decorator
-def file(repo, filenames):
+def file(filenames):
 	"""Get meta information on file(s)
 	"""
+
+	try:
+		repo = get_repo_client()
+	except not_in_repo_error:
+		click.echo(MSG_DEBUG_NOREPOSITORY)
+		return
 
 	for filename in filenames:
 		__print_file_metainfo__(repo.get_file_metainfo(filename))
