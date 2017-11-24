@@ -34,7 +34,10 @@ from pprint import pformat as pf
 
 import click
 
-from .server import script_server
+from .server import (
+	get_repo_client,
+	script_server
+	)
 
 from ..const import (
 	KEY_FILES,
@@ -67,8 +70,6 @@ from ..const import (
 	STATUS_RW
 	)
 from ..errors import not_in_repo_error
-from ..repo import repository_client_class
-pass_repository_decorator = click.make_pass_decorator(repository_client_class, ensure = True)
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -76,14 +77,13 @@ pass_repository_decorator = click.make_pass_decorator(repository_client_class, e
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 @click.group()
-@click.pass_context
-def script_client(click_context):
+def script_client():
 	"""LITERATUR
 
 	Literature management with Python, Dropbox and MediaWiki
 	"""
 
-	click_context.obj = repository_client_class()
+	pass
 
 
 @script_client.command()
@@ -92,12 +92,13 @@ def script_client(click_context):
 	nargs = 1,
 	type = click.Choice([KEY_JOURNAL, KEY_MASTER])
 	)
-@pass_repository_decorator
-def backup(repo, branch):
+def backup(branch):
 	"""Backup repository index to journal or master target branches
 	"""
 
-	if not repo.initialized_bool:
+	try:
+		repo = get_repo_client()
+	except not_in_repo_error:
 		click.echo(MSG_DEBUG_NOREPOSITORY)
 		return
 
