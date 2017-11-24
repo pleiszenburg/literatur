@@ -106,12 +106,13 @@ def backup(branch):
 
 
 @script_client.command()
-@pass_repository_decorator
-def diff(repo):
+def diff():
 	"""Show changes to the filesystem currently not captured by the index
 	"""
 
-	if not repo.initialized_bool:
+	try:
+		repo = get_repo_client()
+	except not_in_repo_error:
 		click.echo(MSG_DEBUG_NOREPOSITORY)
 		return
 
@@ -130,15 +131,17 @@ def diff(repo):
 	nargs = 1,
 	default = ''
 	)
-@pass_repository_decorator
-def dump(repo, mode, filename):
+def dump(mode, filename):
 	"""Dump repository database
 	"""
 
-	if repo.initialized_bool:
-		repo.dump(path = filename, mode = mode)
-	else:
+	try:
+		repo = get_repo_client()
+	except not_in_repo_error:
 		click.echo(MSG_DEBUG_NOREPOSITORY)
+		return
+
+	repo.dump(path = filename, mode = mode)
 
 
 @script_client.command()
