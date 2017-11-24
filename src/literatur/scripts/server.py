@@ -37,6 +37,7 @@ from ..const import (
 	ADDRESS_LOCALHOST,
 	FILE_DAEMON_PID,
 	FILE_DAEMON_PORT,
+	FILE_DAEMON_SECRET,
 	PATH_REPO,
 	SECRET_HASH_LENGTH
 	)
@@ -45,12 +46,43 @@ from ..repo import (
 	find_root_path,
 	repository_server_class
 	)
-from ..rpc import get_free_port
+from ..rpc import (
+	get_free_port,
+	mp_client_class
+	)
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # ROUTINES
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+def get_repo_client():
+	"""Returns either a client on a running server daemon or a temporary server
+	"""
+
+	# Find root path: Raises an error if CWD is not in a repo
+	repo_root_path = find_root_path(os.getcwd())
+
+	try:
+		pid = __load_pid__(repo_root_path, FILE_DAEMON_PID):
+		daemon_up = True
+	except no_pid_error:
+		daemon_up = False
+
+	if daemon_up:
+
+		daemon_port = __load_repo_info__(repo_root_path, FILE_DAEMON_PORT)
+		daemon_secret = __load_repo_info__(repo_root_path, FILE_DAEMON_SECRET)
+
+		return mp_client_class(
+			(ADDRESS_LOCALHOST, daemon_port),
+			daemon_secret
+			)
+
+	else:
+
+		return repository_server_class()
+
 
 def get_server_status():
 	"""Returns pid is server is up and None if server is down
@@ -121,6 +153,15 @@ def __load_pid__(repo_root_path, file_name):
 	else:
 		os.remove(pid_path)
 		raise no_pid_error()
+
+
+def __load_repo_info__(repo_root_path, file_name):
+
+	f = open(os.path.join(repo_root_path, PATH_REPO, file_name), 'r')
+	info = f.read()
+	f.close()
+
+	return info
 
 
 def __store_repo_info__(repo_root_path, file_name, secret):

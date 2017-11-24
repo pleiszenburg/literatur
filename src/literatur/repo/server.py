@@ -28,6 +28,7 @@ specific language governing rights and limitations under the License.
 # IMPORT
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+import atexit
 from collections import (
 	Counter,
 	OrderedDict
@@ -108,7 +109,7 @@ from ..parser import ctime_to_datestring
 class repository_server_class():
 
 
-	def __init__(self, server_p_dict, daemon = None):
+	def __init__(self, server_p_dict = None, daemon = None):
 
 		# Init all index related lists and dicts
 		self.__init_index__()
@@ -119,14 +120,16 @@ class repository_server_class():
 		# Store reference to daemon object
 		self.daemon = daemon
 
-		# Start MP server
-		self.server = mp_server_class(
-			(server_p_dict[KEY_ADDRESS], server_p_dict[KEY_PORT]),
-			server_p_dict[KEY_SECRET],
-			server_p_dict[KEY_TERMINATE]
-			)
+		if server_p_dict is not None and type(server_p_dict) is dict:
 
-		# TODO register functions on server
+			# Start MP server
+			self.server = mp_server_class(
+				(server_p_dict[KEY_ADDRESS], server_p_dict[KEY_PORT]),
+				server_p_dict[KEY_SECRET],
+				server_p_dict[KEY_TERMINATE]
+				)
+
+			# TODO register functions on server
 
 
 	def backup(self, branch_name, mode = KEY_MP):
@@ -694,6 +697,12 @@ class repository_server_class():
 				target_entry.p_dict[KEY_TAGS].update({
 					tag_id: self.index_dict_byid_dict[KEY_TAGS][tag_id].p_dict[KEY_NAME]
 					})
+
+
+	@atexit.register
+	def __terminate__(self):
+
+		pass
 
 
 	def __update_index_on_files__(self):

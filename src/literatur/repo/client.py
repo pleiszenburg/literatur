@@ -28,7 +28,14 @@ specific language governing rights and limitations under the License.
 # IMPORT
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-from pprint import pprint as pp
+# from pprint import pprint as pp
+
+from ..const import (
+	KEY_ADDRESS,
+	KEY_PORT,
+	KEY_SECRET
+	)
+from ..rpc import mp_client_class
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -38,6 +45,11 @@ from pprint import pprint as pp
 class repository_client_class():
 
 
-	def __init__(self):
+	def __init__(self, server_interface):
+
+		self.i = server_interface
+
+
+	def terminate(self):
 
 		pass
