@@ -98,11 +98,9 @@ def backup(branch):
 
 	try:
 		repo = get_repo_client()
+		repo.backup(branch)
 	except not_in_repo_error:
 		click.echo(MSG_DEBUG_NOREPOSITORY)
-		return
-
-	repo.backup(branch)
 
 
 @script_client.command()
@@ -112,11 +110,9 @@ def diff():
 
 	try:
 		repo = get_repo_client()
+		__print_diff__(*(repo.diff()))
 	except not_in_repo_error:
 		click.echo(MSG_DEBUG_NOREPOSITORY)
-		return
-
-	__print_diff__(*(repo.diff()))
 
 
 @script_client.command()
@@ -137,11 +133,9 @@ def dump(mode, filename):
 
 	try:
 		repo = get_repo_client()
+		repo.dump(path = filename, mode = mode)
 	except not_in_repo_error:
 		click.echo(MSG_DEBUG_NOREPOSITORY)
-		return
-
-	repo.dump(path = filename, mode = mode)
 
 
 @script_client.command()
@@ -151,11 +145,9 @@ def duplicates():
 
 	try:
 		repo = get_repo_client()
+		__print_duplicates__(repo.find_duplicates())
 	except not_in_repo_error:
 		click.echo(MSG_DEBUG_NOREPOSITORY)
-		return
-
-	__print_duplicates__(repo.find_duplicates())
 
 
 @script_client.command()
@@ -170,12 +162,10 @@ def file(filenames):
 
 	try:
 		repo = get_repo_client()
+		for filename in filenames:
+			__print_file_metainfo__(repo.get_file_metainfo(filename))
 	except not_in_repo_error:
 		click.echo(MSG_DEBUG_NOREPOSITORY)
-		return
-
-	for filename in filenames:
-		__print_file_metainfo__(repo.get_file_metainfo(filename))
 
 
 @script_client.command()
