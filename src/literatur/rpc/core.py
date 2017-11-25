@@ -168,7 +168,7 @@ class mp_server_class():
 				traceback.print_exc()
 
 
-	def server_forever_in_thread(self):
+	def serve_forever_in_thread(self):
 
 		# Start the server in its own thread
 		t = Thread(target = self.serve_forever)

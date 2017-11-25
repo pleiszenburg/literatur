@@ -256,12 +256,12 @@ class repository_server_class():
 		getattr(self.logger, level)(msg)
 
 
-	def run_server(blocking = True):
+	def run_server(self, blocking = True):
 
 		if blocking:
-			self.server.server_forever()
+			self.server.serve_forever()
 		else:
-			self.server.server_forever_in_thread()
+			self.server.serve_forever_in_thread()
 
 
 	def set_cwd(self, target_path):
