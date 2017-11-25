@@ -61,7 +61,6 @@ from ..const import (
 	KEY_FILE,
 	KEY_FILES,
 	KEY_GROUPS,
-	KEY_ID,
 	KEY_INFO,
 	KEY_INODE,
 	KEY_JSON,
@@ -152,10 +151,14 @@ class repository_server_class():
 		It does not care about tags and groups.
 		"""
 
-		if not self.index_loaded_bool:
-			self.__load_index__()
+		try:
+			if not self.index_loaded_bool:
+				self.__load_index__()
 
-		return self.__diff__()
+			return self.__diff__()
+		except:
+			self.logger.exception('DIFF ERROR')
+			raise #
 
 
 	def dump(self, path = None, mode = KEY_JSON):
@@ -475,12 +478,12 @@ class repository_server_class():
 
 		# Convert index into list of entries
 		entries_list = [generate_entry(
-			self, file_dict = item
+			root_path = self.root_path, file_dict = item
 			) for item in files_dict_list]
 
 		# Run index helper
 		for entry in entries_list:
-			entry.generate_id()
+			entry.set_id(self.get_free_id())
 
 		# Restore old CWD
 		os.chdir(self.current_path)
@@ -577,7 +580,7 @@ class repository_server_class():
 		for index_key in INDEX_TYPES:
 			self.index_list_dict[index_key].clear()
 			self.index_list_dict[index_key] += [generate_entry(
-				self, storage_dict = entry_dict
+				root_path = self.root_path, storage_dict = entry_dict
 				) for entry_dict in import_dict[index_key]]
 		self.__update_index_dicts_from_lists__(index_key_list = INDEX_TYPES)
 		self.__update_mirror_dicts__()
@@ -611,9 +614,11 @@ class repository_server_class():
 			raise tag_exists_error()
 
 		# Generate new tag entry
-		new_tag_entry = generate_entry(self, tag_dict = {KEY_NAME: tag_name})
+		new_tag_entry = generate_entry(
+			root_path = self.root_path, tag_dict = {KEY_NAME: tag_name}
+			)
 		# Give the tag an ID
-		new_tag_entry.generate_id()
+		new_tag_entry.set_id(self.get_free_id())
 		# Append tag to list of tags
 		self.index_list_dict[KEY_TAGS].append(new_tag_entry)
 
@@ -627,7 +632,7 @@ class repository_server_class():
 		# Get tag entry
 		tag_entry = self.index_dict_byid_dict[KEY_TAGS][self.tagmirror_dict_bytagname[tag_name]]
 		# Get tag id
-		tag_id = tag_entry.p_dict[KEY_ID]
+		tag_id = tag_entry.id
 
 		# Is tag in use?
 		tag_used_bool = self.__is_tag_in_use__(tag_id)
@@ -689,7 +694,7 @@ class repository_server_class():
 	def __update_index_dicts_from_lists__(self, index_key_list = []):
 
 		tag_id_list = [
-			tag_entry.p_dict[KEY_ID] for tag_entry in self.index_list_dict[KEY_TAGS]
+			tag_entry.id for tag_entry in self.index_list_dict[KEY_TAGS]
 			]
 
 		for index_key in index_key_list:
@@ -698,7 +703,7 @@ class repository_server_class():
 			self.index_dict_byid_dict[index_key].clear()
 			# Rebuild the index dict
 			self.index_dict_byid_dict[index_key].update({
-				entry.p_dict[KEY_ID]: entry for entry in self.index_list_dict[index_key]
+				entry.id: entry for entry in self.index_list_dict[index_key]
 				})
 
 			# Clear [file, group, tag] by TAG_NAME index
@@ -710,7 +715,7 @@ class repository_server_class():
 			# Build tag dicts
 			for entry in self.index_list_dict[index_key]:
 				for entry_tag_id in entry.p_dict[KEY_TAGS].keys():
-					self.index_dict_bytagid_dict[index_key][entry_tag_id][entry.p_dict[KEY_ID]] = entry
+					self.index_dict_bytagid_dict[index_key][entry_tag_id][entry.id] = entry
 
 		# Keep a list of used indexes
 		self.index_id_set.clear()
@@ -722,12 +727,12 @@ class repository_server_class():
 
 		if not only_filenames:
 			self.tagmirror_dict_bytagname = {
-				entry.p_dict[KEY_NAME]: entry.p_dict[KEY_ID] for entry in self.index_list_dict[KEY_TAGS]
+				entry.p_dict[KEY_NAME]: entry.id for entry in self.index_list_dict[KEY_TAGS]
 				}
 
 		if not only_tags:
 			self.filemirror_dict_byabspath = {
 				os.path.abspath(os.path.join(
 					self.root_path, entry.p_dict[KEY_PATH], entry.p_dict[KEY_NAME]
-					)): entry.p_dict[KEY_ID] for entry in self.index_list_dict[KEY_FILES]
+					)): entry.id for entry in self.index_list_dict[KEY_FILES]
 				}
