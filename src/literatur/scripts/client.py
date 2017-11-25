@@ -179,7 +179,7 @@ def init():
 
 	try:
 		root_path = find_root_path(os.getcwd())
-		click.echo(MSG_DEBUG_INREPOSITORY % repo.root_path)
+		click.echo(MSG_DEBUG_INREPOSITORY % root_path)
 	except not_in_repo_error:
 		init_root_path(os.getcwd())
 

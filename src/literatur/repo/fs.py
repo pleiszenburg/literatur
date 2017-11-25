@@ -35,6 +35,7 @@ from .storage import store_data
 from ..const import (
 	FILE_DB_CURRENT,
 	IGNORE_FILE_LIST,
+	INDEX_TYPES,
 	DEFAULT_INDEX_FORMAT,
 	PATH_REPO,
 	PATH_SUB_DB,
@@ -66,7 +67,7 @@ def init_root_path(in_path):
 
 	store_data(os.path.join(
 		in_path, PATH_REPO, PATH_SUB_DB, FILE_DB_CURRENT + '.' + DEFAULT_INDEX_FORMAT
-		), {indey_key: [] for index_key in INDEX_TYPES}, mode = DEFAULT_INDEX_FORMAT)
+		), {index_key: [] for index_key in INDEX_TYPES}, mode = DEFAULT_INDEX_FORMAT)
 
 
 def find_root_path(in_path):
