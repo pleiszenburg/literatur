@@ -119,39 +119,9 @@ class repository_server_class():
 		# Init all index related lists and dicts
 		self.__init_index__()
 
-		# Store reference to daemon object
-		self.daemon = daemon
-
+		# Init server component if required
 		if server_p_dict is not None and type(server_p_dict) is dict:
-
-			# Start MP server
-			self.server = mp_server_class(
-				(server_p_dict[KEY_ADDRESS], server_p_dict[KEY_PORT]),
-				server_p_dict[KEY_SECRET],
-				server_p_dict[KEY_TERMINATE]
-				)
-
-			# Register functions on server
-			for func_name in [
-				'backup',
-				'diff',
-				'dump',
-				'find_duplicates',
-				'get_file_metainfo',
-				'get_free_id',
-				'get_stats',
-				'get_tag_name_list',
-				'run_server',
-				'set_cwd',
-				'tag',
-				'tags_modify',
-				'update'
-				]:
-				self.server.register_function(
-					getattr(self, func_name), func_name
-					)
-
-			atexit.register(self.__terminate__)
+			self.__init_server__(server_p_dict, daemon)
 
 
 	def backup(self, branch_name, mode = KEY_MP):
@@ -532,6 +502,41 @@ class repository_server_class():
 
 		# Have index dicts been loaded?
 		self.index_loaded_bool = False
+
+
+	def __init_server__(self, server_p_dict, daemon):
+
+		# Store reference to daemon object
+		self.daemon = daemon
+
+		# Start MP server
+		self.server = mp_server_class(
+			(server_p_dict[KEY_ADDRESS], server_p_dict[KEY_PORT]),
+			server_p_dict[KEY_SECRET],
+			server_p_dict[KEY_TERMINATE]
+			)
+
+		# Register functions on server
+		for func_name in [
+			'backup',
+			'diff',
+			'dump',
+			'find_duplicates',
+			'get_file_metainfo',
+			'get_free_id',
+			'get_stats',
+			'get_tag_name_list',
+			'run_server',
+			'set_cwd',
+			'tag',
+			'tags_modify',
+			'update'
+			]:
+			self.server.register_function(
+				getattr(self, func_name), func_name
+				)
+
+		atexit.register(self.__terminate__)
 
 
 	def __is_tag_in_use__(self, tag_id):
