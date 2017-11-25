@@ -29,6 +29,7 @@ specific language governing rights and limitations under the License.
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 import os
+import random
 
 import daemonocle
 import psutil
@@ -38,6 +39,10 @@ from ..const import (
 	FILE_DAEMON_PID,
 	FILE_DAEMON_PORT,
 	FILE_DAEMON_SECRET,
+	KEY_ADDRESS,
+	KEY_PORT,
+	KEY_SECRET,
+	KEY_TERMINATE,
 	PATH_REPO,
 	SECRET_HASH_LENGTH
 	)
@@ -118,7 +123,7 @@ def script_server(deamon_command):
 		KEY_TERMINATE: None
 		}
 
-	__store_repo_info__(repo_root_path, FILE_DAEMON_PORT, server_p_dict[KEY_PORT])
+	__store_repo_info__(repo_root_path, FILE_DAEMON_PORT, str(server_p_dict[KEY_PORT]))
 	__store_repo_info__(repo_root_path, FILE_DAEMON_SECRET, server_p_dict[KEY_SECRET])
 
 	repo_server = repository_server_class(

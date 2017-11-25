@@ -60,7 +60,6 @@ def load_data(path, mode = DEFAULT_INDEX_FORMAT):
 		f.close()
 		raise # TODO
 
-	self.index_loaded_bool = True
 	f.close()
 
 	return import_dict
