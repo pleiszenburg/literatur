@@ -54,11 +54,15 @@ from ..const import (
 	IGNORE_FILE_LIST,
 	INDEX_TYPES,
 	KEY_ADDRESS,
+	KEY_CRITICAL,
+	KEY_DEBUG,
+	KEY_ERROR,
 	KEY_EXISTS_BOOL,
 	KEY_FILE,
 	KEY_FILES,
 	KEY_GROUPS,
 	KEY_ID,
+	KEY_INFO,
 	KEY_INODE,
 	KEY_JSON,
 	KEY_JOURNAL,
@@ -78,6 +82,7 @@ from ..const import (
 	KEY_TAGS,
 	KEY_TERMINATE,
 	KEY_YAML,
+	KEY_WARN,
 	PATH_REPO,
 	PATH_SUB_DB,
 	PATH_SUB_DBBACKUP,
@@ -108,10 +113,13 @@ from ..parser import ctime_to_datestring
 class repository_server_class():
 
 
-	def __init__(self, root_path, server_p_dict = None, daemon = None):
+	def __init__(self, root_path, logger, server_p_dict = None, daemon = None):
 
 		# Store root
 		self.root_path = root_path
+
+		# Init logger
+		self.__init_logger__(logger)
 
 		# Update CWD
 		self.set_cwd(self.root_path)
@@ -241,6 +249,11 @@ class repository_server_class():
 				tag_name_list.append(tag_name)
 
 		return tag_name_list
+
+
+	def log(msg, level = KEY_DEBUG):
+
+		getattr(self.logger, level)(msg)
 
 
 	def run_server(blocking = True):
@@ -502,6 +515,11 @@ class repository_server_class():
 		self.index_loaded_bool = False
 
 
+	def __init_logger__(self, logger):
+
+		self.logger = logger
+
+
 	def __init_server__(self, server_p_dict, daemon):
 
 		# Store reference to daemon object
@@ -524,6 +542,7 @@ class repository_server_class():
 			'get_free_id',
 			'get_stats',
 			'get_tag_name_list',
+			'log',
 			'run_server',
 			'set_cwd',
 			'tag',

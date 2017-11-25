@@ -31,6 +31,7 @@ specific language governing rights and limitations under the License.
 
 PATH_SUB_DB = 'db'
 PATH_SUB_DBBACKUP = 'db/backup'
+PATH_SUB_LOGS = 'logs'
 PATH_SUB_REPORTS = 'reports'
 
 PATH_REPO = '.lit'
@@ -52,6 +53,7 @@ FILE_DB_CURRENT = 'index_%s' % KEY_CURRENT # stage 1
 FILE_DB_JOURNAL = 'index_%s' % KEY_JOURNAL # stage 2
 FILE_DB_MASTER = 'index_%s' % KEY_MASTER # stage 3
 
+FILE_DAEMON_LOG = 'daemon.log'
 FILE_DAEMON_PID = 'daemon.pid'
 FILE_DAEMON_PORT = 'daemon.port'
 FILE_DAEMON_SECRET = 'daemon.secret'
@@ -117,8 +119,12 @@ KEY_ANNOTATION = 'annotation'
 KEY_AUTHOR_FIRST = 'author_first'
 KEY_AUTHORS_DICT = 'authors_dict'
 KEY_CLASS = 'class'
+KEY_CRITICAL = 'critical'
+KEY_DAEMON = 'daemon'
+KEY_DEBUG = 'debug'
 KEY_EDITORS_DICT = 'editors_dict'
 KEY_ENTRYTYPE = 'entry_type'
+KEY_ERROR = 'error'
 KEY_ETAL_BOOL = 'etal'
 KEY_EXISTS_BOOL = 'exists'
 KEY_FILE = 'file'
@@ -159,6 +165,7 @@ KEY_TERMINATE = 'terminate'
 KEY_TITLE = 'title'
 KEY_TYPE = 'type'
 # KEY_URL = 'url'
+KEY_WARN = 'warn'
 KEY_YAML = 'yaml'
 KEY_YEAR = 'year'
 

@@ -28,6 +28,7 @@ specific language governing rights and limitations under the License.
 # IMPORT
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+import logging
 import os
 import random
 
@@ -36,14 +37,17 @@ import psutil
 
 from ..const import (
 	ADDRESS_LOCALHOST,
+	FILE_DAEMON_LOG,
 	FILE_DAEMON_PID,
 	FILE_DAEMON_PORT,
 	FILE_DAEMON_SECRET,
 	KEY_ADDRESS,
+	KEY_DAEMON,
 	KEY_PORT,
 	KEY_SECRET,
 	KEY_TERMINATE,
 	PATH_REPO,
+	PATH_SUB_LOGS,
 	SECRET_HASH_LENGTH
 	)
 from ..errors import no_pid_error
@@ -86,7 +90,10 @@ def get_repo_client():
 
 	else:
 
-		return repository_server_class(repo_root_path)
+		return repository_server_class(
+			repo_root_path,
+			__generate_logger__(repo_root_path)
+			)
 
 
 def get_server_status():
@@ -128,12 +135,35 @@ def script_server(deamon_command):
 
 	repo_server = repository_server_class(
 		repo_root_path,
+		logger = __generate_logger__(repo_root_path),
 		server_p_dict = server_p_dict,
 		daemon = lit_daemon
 		)
 	lit_daemon.worker = repo_server.run_server
 
 	lit_daemon.do_action(deamon_command)
+
+
+def __generate_logger__(repo_root_path):
+
+	# create logger with 'spam_application'
+	logger = logging.getLogger(KEY_DAEMON)
+	logger.setLevel(logging.DEBUG)
+
+	# create file handler which logs even debug messages
+	fh = logging.FileHandler(
+		os.path.join(repo_root_path, PATH_REPO, PATH_SUB_LOGS, FILE_DAEMON_LOG)
+		)
+	fh.setLevel(logging.DEBUG)
+
+	# create formatter and add it to the handlers
+	formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+	fh.setFormatter(formatter)
+
+	# add the handlers to the logger
+	logger.addHandler(fh)
+
+	return logger
 
 
 def __generate_secret__():
