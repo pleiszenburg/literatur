@@ -172,8 +172,10 @@ class __entry_class__():
 
 	def import_storage_dict(self, import_dict):
 
-		self.id = import_dict[KEY_ID]
-		self.p_dict.update(import_dict[KEY_PARAM])
+		if KEY_ID in import_dict.keys():
+			self.id = import_dict[KEY_ID]
+		if KEY_PARAM in import_dict.keys():
+			self.p_dict.update(import_dict[KEY_PARAM])
 
 
 	def merge_p_dict(self):
