@@ -39,12 +39,16 @@ from pprint import pprint as pp
 import random
 import shutil
 
+import pyinotify
+
+from .fs import repo_event_handler_class
 from .storage import (
 	load_data,
 	store_data
 	)
 
 from ..const import (
+	AUTO_STORE_SECONDS,
 	DEFAULT_INDEX_FORMAT,
 	FILE_DB_CURRENT,
 	FILE_DB_JOURNAL,
@@ -73,6 +77,7 @@ from ..const import (
 	KEY_MP,
 	KEY_MTIME,
 	KEY_NAME,
+	KEY_PARENT,
 	KEY_PATH,
 	KEY_PORT,
 	KEY_PKL,
@@ -114,6 +119,9 @@ class repository_server_class():
 
 	def __init__(self, root_path, logger, server_p_dict = None, daemon = None):
 
+		# Repo server unique id
+		self.id = ('%0' + str(ID_HASH_LENGTH) + 'x') % random.randrange(16**ID_HASH_LENGTH)
+
 		# Store root
 		self.root_path = root_path
 
@@ -130,6 +138,7 @@ class repository_server_class():
 		self.__init_index__()
 
 		# Init server component if required
+		self.server_up = False
 		if server_p_dict is not None and type(server_p_dict) is dict:
 			self.__init_server__(server_p_dict, daemon)
 
@@ -261,17 +270,19 @@ class repository_server_class():
 
 	def log(self, msg, level = KEY_DEBUG):
 
-		getattr(self.logger, level)(msg)
+		getattr(self.logger, level)(self.id + ' | ' + msg)
 
 
-	def run_server(self, blocking = True):
+	def run_server(self):
 
 		self.log('RUN SERVER ...', level = KEY_INFO)
 
-		if blocking:
-			self.server.serve_forever()
-		else:
-			self.server.serve_forever_in_thread()
+		self.server_up = True
+
+		self.__start_notifier__()
+
+		self.server.serve_forever()
+		# self.server.serve_forever_in_thread()
 
 
 	def set_cwd(self, target_path):
@@ -505,6 +516,11 @@ class repository_server_class():
 		return entries_list
 
 
+	def __handle_fs_event__(self, event_code, event):
+
+		self.log('Code %d: %s' % (event_code, event.pathname))
+
+
 	def __init_index__(self):
 
 		# Index dicts by ID ({ID: entry, ...})
@@ -597,6 +613,27 @@ class repository_server_class():
 		self.log('LOADING INDEX done.', level = KEY_INFO)
 
 
+	def __start_notifier__(self):
+
+		self.log('NOTIFIER START ...', level = KEY_INFO)
+
+		self.notifier_wm = pyinotify.WatchManager()
+
+		self.notifier = pyinotify.ThreadedNotifier(
+			self.notifier_wm, repo_event_handler_class(**{KEY_PARENT: self})
+			)
+
+		self.log('NOTIFIER START ......', level = KEY_INFO)
+
+		self.notifier.start()
+
+		self.notifier_repo = self.notifier_wm.add_watch(
+			self.root_path, pyinotify.ALL_EVENTS, rec = True
+			)
+
+		self.log('NOTIFIER START done.', level = KEY_INFO)
+
+
 	def __store_index__(self,
 		path = None, mode = DEFAULT_INDEX_FORMAT, force_store = False, reset_modified_flag = True
 		):
@@ -685,6 +722,12 @@ class repository_server_class():
 	def __terminate__(self):
 
 		self.log('TERMINATING ...', level = KEY_INFO)
+
+		if self.server_up:
+			self.server_up = False
+			if hasattr(self, 'notifier'):
+				self.notifier_wm.rm_watch(self.notifier_repo.values())
+				self.notifier.stop()
 
 		if self.index_modified:
 			self.__store_index__()

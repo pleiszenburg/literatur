@@ -84,6 +84,7 @@ setup(
 		'networkx',
 		'pdfminer.six',
 		'psutil',
+		'pyinotify',
 		'PyQt5',
 		'python-magic',
 		'PyYAML', # --global-option="--with-libyaml"

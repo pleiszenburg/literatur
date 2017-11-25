@@ -157,7 +157,7 @@ def __generate_logger__(repo_root_path):
 	fh.setLevel(logging.DEBUG)
 
 	# create formatter and add it to the handlers
-	formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+	formatter = logging.Formatter('[%(asctime)s] %(levelname)s: %(message)s')
 	fh.setFormatter(formatter)
 
 	# add the handlers to the logger

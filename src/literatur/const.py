@@ -63,6 +63,8 @@ FILENAME_SHORTLENGTH_INT = 80 # For logging ...
 
 SECRET_HASH_LENGTH = 8
 
+AUTO_STORE_SECONDS = 60
+
 ADDRESS_LOCALHOST = 'localhost'
 
 
@@ -147,6 +149,7 @@ KEY_MTIME = 'mtime'
 KEY_NAME = 'name'
 KEY_PATH = 'path'
 KEY_PARAM = 'param'
+KEY_PARENT = 'parent'
 KEY_PORT = 'port'
 KEY_PKL = 'pkl'
 KEY_REPORT = 'report'
