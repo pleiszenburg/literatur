@@ -64,7 +64,7 @@ def get_repo_client():
 	repo_root_path = find_root_path(os.getcwd())
 
 	try:
-		pid = __load_pid__(repo_root_path):
+		pid = __load_pid__(repo_root_path)
 		daemon_up = True
 	except no_pid_error:
 		daemon_up = False

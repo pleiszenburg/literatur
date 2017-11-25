@@ -151,6 +151,8 @@ class repository_server_class():
 					getattr(self, func_name), func_name
 					)
 
+			atexit.register(self.__terminate__)
+
 
 	def backup(self, branch_name, mode = KEY_MP):
 
@@ -633,7 +635,6 @@ class repository_server_class():
 					})
 
 
-	@atexit.register
 	def __terminate__(self):
 
 		pass
