@@ -373,14 +373,13 @@ class repository_server_class():
 
 	def update(self):
 
-		# TODO server mode?!?
-
 		if not self.index_loaded_bool:
 			self.__load_index__()
 
-		self.__update_index_on_files__()
-		self.__update_index_dicts_from_lists__(index_key_list = [KEY_FILES])
-		self.__update_mirror_dicts__()
+		if self.daemon is None:
+			self.__update_index_on_files__()
+			self.__update_index_dicts_from_lists__(index_key_list = [KEY_FILES])
+			self.__update_mirror_dicts__()
 
 		self.__store_index__()
 
