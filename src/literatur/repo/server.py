@@ -120,6 +120,9 @@ class repository_server_class():
 		# Init logger
 		self.__init_logger__(logger)
 
+		# Verbosity
+		self.log('INIT ...', level = KEY_INFO)
+
 		# Update CWD
 		self.set_cwd(self.root_path)
 
@@ -129,6 +132,12 @@ class repository_server_class():
 		# Init server component if required
 		if server_p_dict is not None and type(server_p_dict) is dict:
 			self.__init_server__(server_p_dict, daemon)
+
+		# Register terminate action
+		atexit.register(self.__terminate__)
+
+		# Verbosity
+		self.log('INIT done.', level = KEY_INFO)
 
 
 	def backup(self, branch_name, mode = KEY_MP):
@@ -521,6 +530,8 @@ class repository_server_class():
 
 	def __init_server__(self, server_p_dict, daemon):
 
+		self.log('SERVER INIT ...', level = KEY_INFO)
+
 		# Store reference to daemon object
 		self.daemon = daemon
 
@@ -538,7 +549,7 @@ class repository_server_class():
 				getattr(self, func_name), func_name
 				)
 
-		atexit.register(self.__terminate__)
+		self.log('SERVER INIT done.', level = KEY_INFO)
 
 
 	def __is_tag_in_use__(self, tag_id):
@@ -551,6 +562,8 @@ class repository_server_class():
 
 
 	def __load_index__(self, mode = DEFAULT_INDEX_FORMAT, force_reload = False):
+
+		self.log('LOADING INDEX ...', level = KEY_INFO)
 
 		if self.index_loaded_bool and not force_reload:
 			raise # TODO
@@ -569,8 +582,12 @@ class repository_server_class():
 
 		self.index_loaded_bool = True
 
+		self.log('LOADING INDEX done.', level = KEY_INFO)
+
 
 	def __store_index__(self, path = None, mode = DEFAULT_INDEX_FORMAT, force_store = False):
+
+		self.log('STORING INDEX ...', level = KEY_INFO)
 
 		export_dict = {}
 		for index_key in INDEX_TYPES:
@@ -587,6 +604,8 @@ class repository_server_class():
 				)
 
 		store_data(path, export_dict, mode = mode)
+
+		self.log('STORING INDEX done.', level = KEY_INFO)
 
 
 	def __tag_create__(self, tag_name):
@@ -648,7 +667,8 @@ class repository_server_class():
 
 	def __terminate__(self):
 
-		pass
+		self.log('TERMINATING ...', level = KEY_INFO)
+		self.log('TERMINATING done.', level = KEY_INFO)
 
 
 	def __update_index_on_files__(self):
