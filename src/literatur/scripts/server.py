@@ -80,7 +80,7 @@ def get_repo_client():
 
 	if daemon_up:
 
-		daemon_port = __load_repo_info__(repo_root_path, FILE_DAEMON_PORT)
+		daemon_port = int(__load_repo_info__(repo_root_path, FILE_DAEMON_PORT))
 		daemon_secret = __load_repo_info__(repo_root_path, FILE_DAEMON_SECRET)
 
 		return mp_client_class(
