@@ -151,14 +151,10 @@ class repository_server_class():
 		It does not care about tags and groups.
 		"""
 
-		try:
-			if not self.index_loaded_bool:
-				self.__load_index__()
+		if not self.index_loaded_bool:
+			self.__load_index__()
 
-			return self.__diff__()
-		except:
-			self.logger.exception('DIFF ERROR')
-			raise #
+		return self.__diff__()
 
 
 	def dump(self, path = None, mode = KEY_JSON):
