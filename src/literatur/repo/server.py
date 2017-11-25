@@ -202,9 +202,7 @@ class repository_server_class():
 			new_id = ('%0' + str(ID_HASH_LENGTH) + 'x') % random.randrange(16**ID_HASH_LENGTH)
 			if new_id not in self.index_id_set:
 				self.index_id_set.update(new_id)
-				break
-
-		return new_id
+				return new_id
 
 
 	def get_stats(self):
@@ -564,6 +562,8 @@ class repository_server_class():
 				) for entry_dict in import_dict[index_key]]
 		self.__update_index_dicts_from_lists__(index_key_list = INDEX_TYPES)
 		self.__update_mirror_dicts__()
+
+		self.index_loaded_bool = True
 
 
 	def __store_index__(self, path = None, mode = DEFAULT_INDEX_FORMAT, force_store = False):
