@@ -51,39 +51,39 @@ def load_data(path, mode = DEFAULT_INDEX_FORMAT):
 	f = open(path, 'rb')
 
 	if mode == KEY_PKL:
-		import_dict = pickle.load(f)
+		out_data = pickle.load(f)
 	elif mode == KEY_MP:
-		import_dict = msgpack.unpackb(f.read(), encoding = 'utf-8')
+		out_data = msgpack.unpackb(f.read(), encoding = 'utf-8')
 	elif mode == KEY_JSON:
-		import_dict = json.load(f)
+		out_data = json.load(f)
 	else:
 		f.close()
 		raise # TODO
 
 	f.close()
 
-	return import_dict
+	return out_data
 
 
 def store_data(path, in_data, mode = DEFAULT_INDEX_FORMAT):
 
 	if mode == KEY_PKL:
 		f = open(path, 'wb+')
-		pickle.dump(export_dict, f, -1)
+		pickle.dump(in_data, f, -1)
 	elif mode == KEY_MP:
 		f = open(path, 'wb+')
-		msg_pack = msgpack.packb(export_dict, use_bin_type = True)
+		msg_pack = msgpack.packb(in_data, use_bin_type = True)
 		f.write(msg_pack)
 	elif mode == KEY_JSON:
 		f = open(path, 'w+')
-		json.dump(export_dict, f, indent = '\t', sort_keys = True)
+		json.dump(in_data, f, indent = '\t', sort_keys = True)
 	elif mode == KEY_YAML:
 		if hasattr(yaml, 'CDumper'):
 			dumper = yaml.CDumper
 		else:
 			dumper = yaml.Dumper
 		f = open(path, 'w+')
-		yaml.dump(export_dict, f, Dumper = dumper, default_flow_style = False)
+		yaml.dump(in_data, f, Dumper = dumper, default_flow_style = False)
 	else:
 		raise # TODO
 
