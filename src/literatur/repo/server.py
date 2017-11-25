@@ -531,23 +531,9 @@ class repository_server_class():
 			server_p_dict[KEY_TERMINATE]
 			)
 
-		# Register functions on server
-		for func_name in [
-			'backup',
-			'diff',
-			'dump',
-			'find_duplicates',
-			'get_file_metainfo',
-			'get_free_id',
-			'get_stats',
-			'get_tag_name_list',
-			'log',
-			'run_server',
-			'set_cwd',
-			'tag',
-			'tags_modify',
-			'update'
-			]:
+		for func_name in [method_name for method_name in dir(self) if (
+			callable(getattr(self, method_name)) and not method_name.startswith('_')
+			)]:
 			self.server.register_function(
 				getattr(self, func_name), func_name
 				)
