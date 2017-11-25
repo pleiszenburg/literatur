@@ -196,7 +196,7 @@ class repository_server_class():
 			pass
 
 		entry = generate_entry(
-			self, filepath_tuple = (self.current_path, filename)
+			root_path = self.root_path, filepath_tuple = (self.current_path, filename)
 			)
 		for routine_name in [
 			'update_file_existence',
