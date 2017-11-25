@@ -138,6 +138,12 @@ class __entry_class__():
 			self.p_dict[KEY_TAGS] = {}
 
 
+	def __getstate__(self):
+		state = self.__dict__.copy()
+		state.pop('parent_repo')
+		return state
+
+
 	def __repr__(self):
 
 		if self.status is None:
