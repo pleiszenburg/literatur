@@ -80,8 +80,8 @@ def get_repo_client():
 
 	if daemon_up:
 
-		daemon_port = int(__load_repo_info__(repo_root_path, FILE_DAEMON_PORT))
-		daemon_secret = __load_repo_info__(repo_root_path, FILE_DAEMON_SECRET)
+		daemon_port = int(__load_repo_info__(repo_root_path, '%s.%d' % (FILE_DAEMON_PORT, pid)))
+		daemon_secret = __load_repo_info__(repo_root_path, '%s.%d' % (FILE_DAEMON_SECRET, pid))
 
 		return mp_client_class(
 			(ADDRESS_LOCALHOST, daemon_port),
@@ -129,9 +129,6 @@ def script_server(deamon_command):
 		KEY_SECRET: __generate_secret__(),
 		KEY_TERMINATE: None
 		}
-
-	__store_repo_info__(repo_root_path, FILE_DAEMON_PORT, str(server_p_dict[KEY_PORT]))
-	__store_repo_info__(repo_root_path, FILE_DAEMON_SECRET, server_p_dict[KEY_SECRET])
 
 	repo_server = repository_server_class(
 		repo_root_path,
@@ -197,10 +194,3 @@ def __load_repo_info__(repo_root_path, file_name):
 	f.close()
 
 	return info
-
-
-def __store_repo_info__(repo_root_path, file_name, secret):
-
-	f = open(os.path.join(repo_root_path, PATH_REPO, file_name), 'w+')
-	f.write(secret)
-	f.close()

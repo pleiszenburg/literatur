@@ -50,6 +50,9 @@ from .storage import (
 from ..const import (
 	AUTO_STORE_SECONDS,
 	DEFAULT_INDEX_FORMAT,
+	FILE_DAEMON_PID,
+	FILE_DAEMON_PORT,
+	FILE_DAEMON_SECRET,
 	FILE_DB_CURRENT,
 	FILE_DB_JOURNAL,
 	FILE_DB_MASTER,
@@ -278,6 +281,7 @@ class repository_server_class():
 		self.log('RUN SERVER ...', level = KEY_INFO)
 
 		self.server_up = True
+		self.__store_repo_info__()
 
 		self.__start_notifier__()
 
@@ -577,6 +581,8 @@ class repository_server_class():
 				getattr(self, func_name), func_name
 				)
 
+		self.server_p_dict = server_p_dict
+
 		self.log('SERVER INIT done.', level = KEY_INFO)
 
 
@@ -660,6 +666,39 @@ class repository_server_class():
 			self.index_modified = False
 
 		self.log('STORING INDEX done.', level = KEY_INFO)
+
+
+	def __store_repo_info__(self):
+
+		def cleanup_info():
+			pass
+
+		def read_file(file_name):
+			f = open(os.path.join(self.root_path, PATH_REPO, file_name), 'r')
+			file_data = f.read()
+			f.close()
+			return file_data
+
+		def store_file(file_name, pid_str, file_data):
+			f = open(os.path.join(self.root_path, PATH_REPO, file_name + '.' + pid_str), 'w+')
+			f.write(file_data)
+			f.close()
+
+		try:
+			pid_str = read_file(FILE_DAEMON_PID)
+		except FileNotFoundError:
+			self.log('no pidfile', level = KEY_ERROR)
+			return
+
+		pid_int = int(pid_str)
+		my_pid = os.getpid()
+
+		if my_pid != pid_int:
+			self.log('pids do not match (%d vs. %d)' % (my_pid, pid_int), level = KEY_ERROR)
+			return
+
+		store_file(FILE_DAEMON_PORT, pid_str, str(self.server_p_dict[KEY_PORT]))
+		store_file(FILE_DAEMON_SECRET, pid_str, self.server_p_dict[KEY_SECRET])
 
 
 	def __tag_create__(self, tag_name):
