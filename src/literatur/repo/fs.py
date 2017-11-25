@@ -40,6 +40,7 @@ from ..const import (
 	PATH_REPO,
 	PATH_SUB_DB,
 	PATH_SUB_DBBACKUP,
+	PATH_SUB_LOGS,
 	PATH_SUB_REPORTS
 	)
 from ..errors import (
@@ -62,7 +63,7 @@ def init_root_path(in_path):
 
 	current_repository = os.path.join(in_path, PATH_REPO)
 	os.makedirs(current_repository)
-	for fld in [PATH_SUB_DB, PATH_SUB_DBBACKUP, PATH_SUB_REPORTS]:
+	for fld in [PATH_SUB_DB, PATH_SUB_DBBACKUP, PATH_SUB_LOGS, PATH_SUB_REPORTS]:
 		os.makedirs(os.path.join(current_repository, fld))
 
 	store_data(os.path.join(
