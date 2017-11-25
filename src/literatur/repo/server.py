@@ -251,7 +251,7 @@ class repository_server_class():
 		return tag_name_list
 
 
-	def log(msg, level = KEY_DEBUG):
+	def log(self, msg, level = KEY_DEBUG):
 
 		getattr(self.logger, level)(msg)
 
