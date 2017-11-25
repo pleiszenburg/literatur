@@ -171,7 +171,7 @@ class repository_server_class():
 		if not self.index_loaded_bool:
 			self.__load_index__()
 
-		self.__store_index__(path = path, mode = mode)
+		self.__store_index__(path = path, mode = mode, reset_modified_flag = False)
 
 
 	def find_duplicates(self):
@@ -266,6 +266,8 @@ class repository_server_class():
 
 	def run_server(self, blocking = True):
 
+		self.log('RUN SERVER ...', level = KEY_INFO)
+
 		if blocking:
 			self.server.serve_forever()
 		else:
@@ -290,9 +292,14 @@ class repository_server_class():
 		if not self.index_loaded_bool:
 			self.__load_index__()
 
+		new_tag_flag = False
 		if tag_name not in self.tagmirror_dict_bytagname.keys():
 			self.__tag_create__(tag_name)
+			new_tag_flag = True
+		if new_tag_flag:
+			self.index_modified = True
 			self.__update_mirror_dicts__(only_tags = True)
+			self.__update_index_dicts_from_lists__(index_key_list = [KEY_TAGS])
 
 		tag_id = self.tagmirror_dict_bytagname[tag_name]
 
@@ -307,6 +314,7 @@ class repository_server_class():
 				file_not_found_list.append(target_filename)
 				continue
 			self.__tag_entry__(target_entry, tag_id, remove_flag = remove_flag)
+			self.index_modified = True
 
 		for target_tag_name in target_tag_list:
 			if target_tag_name not in self.tagmirror_dict_bytagname.keys():
@@ -317,13 +325,13 @@ class repository_server_class():
 				continue
 			target_entry = self.index_dict_byid_dict[KEY_TAGS][target_tag_id]
 			self.__tag_entry__(target_entry, tag_id, remove_flag = remove_flag)
+			self.index_modified = True
 
 		# TODO add tagging for groups
 		# HACK tell user about untagged groups
 		group_not_found_list = target_group_list
 
 		self.__update_index_dicts_from_lists__(index_key_list = INDEX_TYPES)
-		self.__store_index__()
 
 		return file_not_found_list, group_not_found_list, tag_not_found_list
 
@@ -343,6 +351,7 @@ class repository_server_class():
 		for tag_name in create_tag_names_list:
 			try:
 				self.__tag_create__(tag_name)
+				self.index_modified = True
 			except tag_exists_error:
 				tags_exist_list.append(tag_name)
 
@@ -350,6 +359,7 @@ class repository_server_class():
 		for tag_name in delete_tag_names_list:
 			try:
 				self.__tag_delete__(tag_name, force_delete = force_delete)
+				self.index_modified = True
 			except tag_does_not_exists_error:
 				tags_donotexist_list.append(tag_name)
 			except tag_in_use_error:
@@ -358,12 +368,12 @@ class repository_server_class():
 		self.__update_index_dicts_from_lists__(index_key_list = INDEX_TYPES)
 		self.__update_mirror_dicts__(only_tags = True)
 
-		self.__store_index__()
-
 		return tags_donotexist_list, tags_exist_list, tags_inuse_list
 
 
 	def update(self):
+
+		# TODO server mode?!?
 
 		if not self.index_loaded_bool:
 			self.__load_index__()
@@ -522,6 +532,9 @@ class repository_server_class():
 		# Have index dicts been loaded?
 		self.index_loaded_bool = False
 
+		# Flag: Index modified (and not yet stored?)
+		self.index_modified = False
+
 
 	def __init_logger__(self, logger):
 
@@ -585,7 +598,9 @@ class repository_server_class():
 		self.log('LOADING INDEX done.', level = KEY_INFO)
 
 
-	def __store_index__(self, path = None, mode = DEFAULT_INDEX_FORMAT, force_store = False):
+	def __store_index__(self,
+		path = None, mode = DEFAULT_INDEX_FORMAT, force_store = False, reset_modified_flag = True
+		):
 
 		self.log('STORING INDEX ...', level = KEY_INFO)
 
@@ -604,6 +619,9 @@ class repository_server_class():
 				)
 
 		store_data(path, export_dict, mode = mode)
+
+		if reset_modified_flag:
+			self.index_modified = False
 
 		self.log('STORING INDEX done.', level = KEY_INFO)
 
@@ -668,6 +686,10 @@ class repository_server_class():
 	def __terminate__(self):
 
 		self.log('TERMINATING ...', level = KEY_INFO)
+
+		if self.index_modified:
+			self.__store_index__()
+
 		self.log('TERMINATING done.', level = KEY_INFO)
 
 
