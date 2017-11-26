@@ -35,7 +35,7 @@ from collections import (
 	)
 import os
 import pickle
-from pprint import pprint as pp
+from pprint import pformat as pf
 import random
 import shutil
 import stat
@@ -527,7 +527,20 @@ class repository_server_class():
 
 	def __handle_fs_event__(self, event_code, event):
 
-		self.log('Code %d: %s' % (event_code, event.pathname))
+		if event_code in [
+			pyinotify.IN_ACCESS,
+			pyinotify.IN_OPEN,
+			pyinotify.IN_CLOSE_NOWRITE,
+			pyinotify.IN_CLOSE_WRITE
+			]:
+			return
+
+		self.log('Code %d (%s): %s' % (
+			event_code, pyinotify.EventsCodes.maskname(event_code), event.pathname
+			))
+
+		if event_code == pyinotify.IN_MODIFY:
+			self.log(pf(event))
 
 
 	def __init_index__(self):
