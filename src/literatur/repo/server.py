@@ -288,10 +288,11 @@ class repository_server_class():
 
 			self.__store_server_info__()
 
+			self.__load_index__()
+			self.__update_index__()
 			self.__start_notifier__()
 
 			self.server.serve_forever()
-			# self.server.serve_forever_in_thread()
 
 
 	def set_cwd(self, target_path):
@@ -397,11 +398,7 @@ class repository_server_class():
 			self.__load_index__()
 
 		if self.daemon is None:
-			self.__update_index_on_files__()
-			self.__update_index_dicts_from_lists__(index_key_list = [KEY_FILES])
-			self.__update_mirror_dicts__()
-
-		self.__store_index__()
+			self.__update_index__()
 
 
 	def __copy_index_file__(self, merge_source, merge_target):
@@ -812,6 +809,19 @@ class repository_server_class():
 			self.__store_index__()
 
 		self.log('TERMINATING done.', level = KEY_INFO)
+
+
+	def __update_index__(self):
+
+		self.log('UPDATE INDEX ...', level = KEY_INFO)
+
+		self.__update_index_on_files__()
+		self.__update_index_dicts_from_lists__(index_key_list = [KEY_FILES])
+		self.__update_mirror_dicts__()
+
+		self.index_modified = True
+
+		self.log('UPDATE INDEX done.', level = KEY_INFO)
 
 
 	def __update_index_on_files__(self):
