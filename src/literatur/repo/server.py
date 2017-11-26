@@ -684,8 +684,11 @@ class repository_server_class():
 
 	def __store_server_info__(self):
 
-		def cleanup_info():
-			pass
+		def cleanup_info(file_name, pid_str):
+			file_name_new = file_name + '.' + pid_str
+			for file_name_old in next(os.walk(os.path.join(self.root_path, PATH_REPO)))[2]:
+				if file_name_old.startswith(file_name) and file_name_old != file_name_new:
+					os.remove(os.path.join(self.root_path, PATH_REPO, file_name_old))
 
 		def read_file(file_name):
 			f = open(os.path.join(self.root_path, PATH_REPO, file_name), 'r')
@@ -701,7 +704,7 @@ class repository_server_class():
 		try:
 			pid_str = read_file(FILE_DAEMON_PID)
 		except FileNotFoundError:
-			self.log('no pidfile', level = KEY_ERROR)
+			self.log('no pid file', level = KEY_ERROR)
 			return
 
 		pid_int = int(pid_str)
@@ -711,8 +714,12 @@ class repository_server_class():
 			self.log('pids do not match (%d vs. %d)' % (my_pid, pid_int), level = KEY_ERROR)
 			return
 
-		store_file(FILE_DAEMON_PORT, pid_str, str(self.server_p_dict[KEY_PORT]))
-		store_file(FILE_DAEMON_SECRET, pid_str, self.server_p_dict[KEY_SECRET])
+		for file_prefix, file_content in [
+			(FILE_DAEMON_PORT, str(self.server_p_dict[KEY_PORT])),
+			(FILE_DAEMON_SECRET, self.server_p_dict[KEY_SECRET])
+			]:
+			cleanup_info(file_prefix, pid_str)
+			store_file(file_prefix, pid_str, file_content)
 
 
 	def __tag_create__(self, tag_name):
