@@ -38,6 +38,7 @@ import pickle
 from pprint import pprint as pp
 import random
 import shutil
+import stat
 from threading import Thread
 
 import pyinotify
@@ -697,9 +698,11 @@ class repository_server_class():
 			return file_data
 
 		def store_file(file_name, pid_str, file_data):
-			f = open(os.path.join(self.root_path, PATH_REPO, file_name + '.' + pid_str), 'w+')
+			file_path = os.path.join(self.root_path, PATH_REPO, file_name + '.' + pid_str)
+			f = open(file_path, 'w+')
 			f.write(file_data)
 			f.close()
+			os.chmod(file_path, stat.S_IRUSR | stat.S_IWUSR)
 
 		try:
 			pid_str = read_file(FILE_DAEMON_PID)
