@@ -42,7 +42,8 @@ IGNORE_DIR_LIST = [
 	]
 IGNORE_FILE_LIST = [
 	'desktop.ini',
-	'.directory'
+	'.directory',
+	'.*.kate-swp'
 	]
 
 KEY_CURRENT = 'current'

@@ -33,6 +33,7 @@ from collections import (
 	Counter,
 	OrderedDict
 	)
+import fnmatch
 import os
 import pickle
 from pprint import pformat as pf
@@ -471,23 +472,27 @@ class repository_server_class():
 			if item.is_file():
 
 				# Append to list of file is not ignored
-				if item.name not in IGNORE_FILE_LIST:
-					item_stat = item.stat()
-					files_dict_list.append({
-						KEY_EXISTS_BOOL: True,
-						KEY_INODE: item_stat.st_ino,
-						KEY_MODE: item_stat.st_mode,
-						KEY_MTIME: item_stat.st_mtime_ns,
-						KEY_NAME: item.name,
-						KEY_PATH: relative_path,
-						KEY_SIZE: item_stat.st_size
-						})
+				if any(fnmatch.fnmatchcase(item.name, pattern) for pattern in IGNORE_FILE_LIST):
+					continue
+
+				item_stat = item.stat()
+				files_dict_list.append({
+					KEY_EXISTS_BOOL: True,
+					KEY_INODE: item_stat.st_ino,
+					KEY_MODE: item_stat.st_mode,
+					KEY_MTIME: item_stat.st_mtime_ns,
+					KEY_NAME: item.name,
+					KEY_PATH: relative_path,
+					KEY_SIZE: item_stat.st_size
+					})
 
 			elif item.is_dir():
 
 				# Dive deeper if directory is not ignored
-				if item.name not in IGNORE_DIR_LIST:
-					self.__get_recursive_inventory_list__(item.path, files_dict_list)
+				if any(fnmatch.fnmatchcase(item.name, pattern) for pattern in IGNORE_DIR_LIST):
+					continue
+
+				self.__get_recursive_inventory_list__(item.path, files_dict_list)
 
 			elif item.is_symlink():
 
@@ -532,12 +537,30 @@ class repository_server_class():
 			]:
 			return
 
+		if any(fnmatch.fnmatchcase(event.name, pattern) for pattern in IGNORE_FILE_LIST):
+			return
+		if any(fnmatch.fnmatchcase(event.name, pattern) for pattern in IGNORE_DIR_LIST):
+			return # TODO check for files below ignored folders (add to notifier ignore?!?)
+
 		self.log('Code %d (%s): %s' % (
 			event_code, pyinotify.EventsCodes.maskname(event_code), event.pathname
 			))
 
-		if event_code == pyinotify.IN_MODIFY:
-			self.log(pf(event))
+		try:
+
+			# File modify event
+			if event_code == pyinotify.IN_MODIFY and not event.dir:
+				entry = self.index_dict_byid_dict[KEY_FILES][self.filemirror_dict_byabspath[event.pathname]]
+				self.log(pf(entry))
+				for method_name in [
+					'update_file_hash', 'update_file_info', 'update_file_magic', 'update_file_type'
+					]:
+					getattr(entry, method_name)()
+				self.log(pf(entry))
+
+		except:
+
+			self.logger.exception('?!?')
 
 
 	def __init_index__(self):
