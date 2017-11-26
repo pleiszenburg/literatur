@@ -137,6 +137,7 @@ def script_server(deamon_command):
 		daemon = lit_daemon
 		)
 	lit_daemon.worker = repo_server.run_server
+	# lit_daemon.shutdown_callback = repo_server.__terminate__
 
 	lit_daemon.do_action(deamon_command)
 

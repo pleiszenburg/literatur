@@ -38,6 +38,7 @@ import pickle
 from pprint import pprint as pp
 import random
 import shutil
+from threading import Thread
 
 import pyinotify
 
@@ -280,13 +281,16 @@ class repository_server_class():
 
 		self.log('RUN SERVER ...', level = KEY_INFO)
 
-		self.server_up = True
-		self.__store_repo_info__()
+		if not self.server_up:
 
-		self.__start_notifier__()
+			self.server_up = True
 
-		self.server.serve_forever()
-		# self.server.serve_forever_in_thread()
+			self.__store_server_info__()
+
+			self.__start_notifier__()
+
+			self.server.serve_forever()
+			# self.server.serve_forever_in_thread()
 
 
 	def set_cwd(self, target_path):
@@ -625,17 +629,22 @@ class repository_server_class():
 
 		self.notifier_wm = pyinotify.WatchManager()
 
-		self.notifier = pyinotify.ThreadedNotifier(
+		self.notifier = pyinotify.Notifier(
 			self.notifier_wm, repo_event_handler_class(**{KEY_PARENT: self})
 			)
 
 		self.log('NOTIFIER START ......', level = KEY_INFO)
 
-		self.notifier.start()
-
 		self.notifier_repo = self.notifier_wm.add_watch(
-			self.root_path, pyinotify.ALL_EVENTS, rec = True
+			self.root_path, pyinotify.ALL_EVENTS, rec = True, auto_add = True
 			)
+
+		self.log('NOTIFIER START .........', level = KEY_INFO)
+
+		# Start the notifier in its own thread
+		t = Thread(target = self.notifier.loop)
+		t.daemon = True
+		t.start()
 
 		self.log('NOTIFIER START done.', level = KEY_INFO)
 
@@ -668,7 +677,7 @@ class repository_server_class():
 		self.log('STORING INDEX done.', level = KEY_INFO)
 
 
-	def __store_repo_info__(self):
+	def __store_server_info__(self):
 
 		def cleanup_info():
 			pass
@@ -763,8 +772,11 @@ class repository_server_class():
 		self.log('TERMINATING ...', level = KEY_INFO)
 
 		if self.server_up:
+			self.log('TERMINATING ......', level = KEY_INFO)
 			self.server_up = False
+			self.server.up = False
 			if hasattr(self, 'notifier'):
+				self.log('TERMINATING .........', level = KEY_INFO)
 				self.notifier_wm.rm_watch(self.notifier_repo.values())
 				self.notifier.stop()
 
