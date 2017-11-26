@@ -40,6 +40,7 @@ from ..const import (
 	IGNORE_FILE_LIST,
 	INDEX_TYPES,
 	DEFAULT_INDEX_FORMAT,
+	KEY_INFO,
 	KEY_PARENT,
 	PATH_REPO,
 	PATH_SUB_DB,
@@ -128,15 +129,21 @@ class repo_event_handler_class(pyinotify.ProcessEvent):
 	def __init__(self, *args, **kwargs):
 
 		self.parent = kwargs[KEY_PARENT]
+		self.log = self.parent.log
+		self.log('notify event handler init!', level = KEY_INFO)
 		kwargs.pop(KEY_PARENT)
 		super().__init__(*args, **kwargs)
 
 
 	def __get_attr__(self, name):
 
+		self.log('notify event %s ...' % name, level = KEY_INFO)
+
 		prefix = 'process_'
 		if name.startswith(prefix):
+			self.log('notify event %s return handler from parent' % name, level = KEY_INFO)
 			proc_routine = getattr(self.parent, '__handle_fs_event__')
 			return partial(proc_routine, getattr(pyinotify, name[len(prefix):]))
 		else:
+			self.log('notify event %s return handler from super' % name, level = KEY_INFO)
 			return getattr(super(), name)
