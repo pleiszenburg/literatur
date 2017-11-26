@@ -627,8 +627,6 @@ class repository_server_class():
 
 		self.log('NOTIFIER START ... (%s)' % self.root_path, level = KEY_INFO)
 
-		# pyinotify.log = self.logger # HACK
-
 		self.notifier_wm = pyinotify.WatchManager()
 
 		self.notifier = pyinotify.Notifier(
@@ -637,10 +635,9 @@ class repository_server_class():
 
 		self.log('NOTIFIER START ......', level = KEY_INFO)
 
-		# pyinotify.ALL_EVENTS
 		self.notifier_repo = self.notifier_wm.add_watch(
 			self.root_path,
-			pyinotify.IN_ACCESS | pyinotify.IN_MODIFY | pyinotify.IN_OPEN | pyinotify.IN_CREATE,
+			pyinotify.ALL_EVENTS,
 			rec = True, auto_add = True,
 			exclude_filter = pyinotify.ExcludeFilter([
 				'^' + os.path.join(self.root_path, PATH_REPO)
