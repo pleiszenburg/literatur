@@ -627,7 +627,7 @@ class repository_server_class():
 
 		self.log('NOTIFIER START ... (%s)' % self.root_path, level = KEY_INFO)
 
-		pyinotify.log = self.logger # HACK
+		# pyinotify.log = self.logger # HACK
 
 		self.notifier_wm = pyinotify.WatchManager()
 
