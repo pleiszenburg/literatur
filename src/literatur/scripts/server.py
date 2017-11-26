@@ -80,8 +80,8 @@ def get_repo_client():
 
 	if daemon_up:
 
-		daemon_port = int(__load_repo_info__(repo_root_path, FILE_DAEMON_PORT))
-		daemon_secret = __load_repo_info__(repo_root_path, FILE_DAEMON_SECRET)
+		daemon_port = int(__load_repo_info__(repo_root_path, '%s.%d' % (FILE_DAEMON_PORT, pid)))
+		daemon_secret = __load_repo_info__(repo_root_path, '%s.%d' % (FILE_DAEMON_SECRET, pid))
 
 		return mp_client_class(
 			(ADDRESS_LOCALHOST, daemon_port),
@@ -130,9 +130,6 @@ def script_server(deamon_command):
 		KEY_TERMINATE: None
 		}
 
-	__store_repo_info__(repo_root_path, FILE_DAEMON_PORT, str(server_p_dict[KEY_PORT]))
-	__store_repo_info__(repo_root_path, FILE_DAEMON_SECRET, server_p_dict[KEY_SECRET])
-
 	repo_server = repository_server_class(
 		repo_root_path,
 		logger = __generate_logger__(repo_root_path),
@@ -140,6 +137,7 @@ def script_server(deamon_command):
 		daemon = lit_daemon
 		)
 	lit_daemon.worker = repo_server.run_server
+	# lit_daemon.shutdown_callback = repo_server.__terminate__
 
 	lit_daemon.do_action(deamon_command)
 
@@ -157,7 +155,7 @@ def __generate_logger__(repo_root_path):
 	fh.setLevel(logging.DEBUG)
 
 	# create formatter and add it to the handlers
-	formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+	formatter = logging.Formatter('[%(asctime)s] %(levelname)s: %(message)s')
 	fh.setFormatter(formatter)
 
 	# add the handlers to the logger
@@ -197,10 +195,3 @@ def __load_repo_info__(repo_root_path, file_name):
 	f.close()
 
 	return info
-
-
-def __store_repo_info__(repo_root_path, file_name, secret):
-
-	f = open(os.path.join(repo_root_path, PATH_REPO, file_name), 'w+')
-	f.write(secret)
-	f.close()

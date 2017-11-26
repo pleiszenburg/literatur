@@ -38,14 +38,22 @@ import pickle
 from pprint import pprint as pp
 import random
 import shutil
+from threading import Thread
 
+import pyinotify
+
+from .fs import repo_event_handler_class
 from .storage import (
 	load_data,
 	store_data
 	)
 
 from ..const import (
+	AUTO_STORE_SECONDS,
 	DEFAULT_INDEX_FORMAT,
+	FILE_DAEMON_PID,
+	FILE_DAEMON_PORT,
+	FILE_DAEMON_SECRET,
 	FILE_DB_CURRENT,
 	FILE_DB_JOURNAL,
 	FILE_DB_MASTER,
@@ -73,6 +81,7 @@ from ..const import (
 	KEY_MP,
 	KEY_MTIME,
 	KEY_NAME,
+	KEY_PARENT,
 	KEY_PATH,
 	KEY_PORT,
 	KEY_PKL,
@@ -114,6 +123,9 @@ class repository_server_class():
 
 	def __init__(self, root_path, logger, server_p_dict = None, daemon = None):
 
+		# Repo server unique id
+		self.id = ('%0' + str(ID_HASH_LENGTH) + 'x') % random.randrange(16**ID_HASH_LENGTH)
+
 		# Store root
 		self.root_path = root_path
 
@@ -130,6 +142,7 @@ class repository_server_class():
 		self.__init_index__()
 
 		# Init server component if required
+		self.server_up = False
 		if server_p_dict is not None and type(server_p_dict) is dict:
 			self.__init_server__(server_p_dict, daemon)
 
@@ -261,17 +274,23 @@ class repository_server_class():
 
 	def log(self, msg, level = KEY_DEBUG):
 
-		getattr(self.logger, level)(msg)
+		getattr(self.logger, level)(self.id + ' | ' + msg)
 
 
-	def run_server(self, blocking = True):
+	def run_server(self):
 
 		self.log('RUN SERVER ...', level = KEY_INFO)
 
-		if blocking:
+		if not self.server_up:
+
+			self.server_up = True
+
+			self.__store_server_info__()
+
+			self.__start_notifier__()
+
 			self.server.serve_forever()
-		else:
-			self.server.serve_forever_in_thread()
+			# self.server.serve_forever_in_thread()
 
 
 	def set_cwd(self, target_path):
@@ -505,6 +524,11 @@ class repository_server_class():
 		return entries_list
 
 
+	def __handle_fs_event__(self, event_code, event):
+
+		self.log('Code %d: %s' % (event_code, event.pathname))
+
+
 	def __init_index__(self):
 
 		# Index dicts by ID ({ID: entry, ...})
@@ -561,6 +585,8 @@ class repository_server_class():
 				getattr(self, func_name), func_name
 				)
 
+		self.server_p_dict = server_p_dict
+
 		self.log('SERVER INIT done.', level = KEY_INFO)
 
 
@@ -597,6 +623,37 @@ class repository_server_class():
 		self.log('LOADING INDEX done.', level = KEY_INFO)
 
 
+	def __start_notifier__(self):
+
+		self.log('NOTIFIER START ... (%s)' % self.root_path, level = KEY_INFO)
+
+		self.notifier_wm = pyinotify.WatchManager()
+
+		self.notifier = pyinotify.Notifier(
+			self.notifier_wm, repo_event_handler_class(**{KEY_PARENT: self})
+			)
+
+		self.log('NOTIFIER START ......', level = KEY_INFO)
+
+		self.notifier_repo = self.notifier_wm.add_watch(
+			self.root_path,
+			pyinotify.ALL_EVENTS,
+			rec = True, auto_add = True,
+			exclude_filter = pyinotify.ExcludeFilter([
+				'^' + os.path.join(self.root_path, PATH_REPO)
+				])
+			)
+
+		self.log('NOTIFIER START .........', level = KEY_INFO)
+
+		# Start the notifier in its own thread
+		t = Thread(target = self.notifier.loop)
+		t.daemon = True
+		t.start()
+
+		self.log('NOTIFIER START done.', level = KEY_INFO)
+
+
 	def __store_index__(self,
 		path = None, mode = DEFAULT_INDEX_FORMAT, force_store = False, reset_modified_flag = True
 		):
@@ -623,6 +680,39 @@ class repository_server_class():
 			self.index_modified = False
 
 		self.log('STORING INDEX done.', level = KEY_INFO)
+
+
+	def __store_server_info__(self):
+
+		def cleanup_info():
+			pass
+
+		def read_file(file_name):
+			f = open(os.path.join(self.root_path, PATH_REPO, file_name), 'r')
+			file_data = f.read()
+			f.close()
+			return file_data
+
+		def store_file(file_name, pid_str, file_data):
+			f = open(os.path.join(self.root_path, PATH_REPO, file_name + '.' + pid_str), 'w+')
+			f.write(file_data)
+			f.close()
+
+		try:
+			pid_str = read_file(FILE_DAEMON_PID)
+		except FileNotFoundError:
+			self.log('no pidfile', level = KEY_ERROR)
+			return
+
+		pid_int = int(pid_str)
+		my_pid = os.getpid()
+
+		if my_pid != pid_int:
+			self.log('pids do not match (%d vs. %d)' % (my_pid, pid_int), level = KEY_ERROR)
+			return
+
+		store_file(FILE_DAEMON_PORT, pid_str, str(self.server_p_dict[KEY_PORT]))
+		store_file(FILE_DAEMON_SECRET, pid_str, self.server_p_dict[KEY_SECRET])
 
 
 	def __tag_create__(self, tag_name):
@@ -685,6 +775,15 @@ class repository_server_class():
 	def __terminate__(self):
 
 		self.log('TERMINATING ...', level = KEY_INFO)
+
+		if self.server_up:
+			self.log('TERMINATING ......', level = KEY_INFO)
+			self.server_up = False
+			self.server.up = False
+			if hasattr(self, 'notifier'):
+				self.log('TERMINATING .........', level = KEY_INFO)
+				self.notifier_wm.rm_watch(self.notifier_repo.values())
+				self.notifier.stop()
 
 		if self.index_modified:
 			self.__store_index__()

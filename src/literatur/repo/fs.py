@@ -28,7 +28,10 @@ specific language governing rights and limitations under the License.
 # IMPORT
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+from functools import partial
 import os
+
+import pyinotify
 
 from .storage import store_data
 
@@ -37,6 +40,8 @@ from ..const import (
 	IGNORE_FILE_LIST,
 	INDEX_TYPES,
 	DEFAULT_INDEX_FORMAT,
+	KEY_INFO,
+	KEY_PARENT,
 	PATH_REPO,
 	PATH_SUB_DB,
 	PATH_SUB_DBBACKUP,
@@ -112,3 +117,29 @@ def get_file_list(in_path):
 	out_list.sort()
 
 	return out_list
+
+
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# CLASSES
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+class repo_event_handler_class(pyinotify.ProcessEvent):
+
+
+	def __init__(self, *args, **kwargs):
+
+		self.parent = kwargs[KEY_PARENT]
+		self.log = self.parent.log
+		kwargs.pop(KEY_PARENT)
+		self.__event_handler_factory__()
+		super().__init__(*args, **kwargs)
+
+
+	def __event_handler_factory__(self):
+
+		prefix = 'process_'
+		for pyinotify_event_flag in pyinotify.EventsCodes.FLAG_COLLECTIONS['OP_FLAGS'].keys():
+			setattr(self, prefix + pyinotify_event_flag, partial(
+				self.parent.__handle_fs_event__,
+				getattr(pyinotify, pyinotify_event_flag)
+				))
