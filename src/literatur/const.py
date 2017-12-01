@@ -24,15 +24,30 @@ specific language governing rights and limitations under the License.
 
 """
 
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# IMPORTS
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+import os
+
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # REPO STORAGE
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+PATH_SUB_DAEMON = 'daemon'
 PATH_SUB_DB = 'db'
-PATH_SUB_DBBACKUP = 'db/backup'
+PATH_SUB_DBBACKUP = os.path.join(PATH_SUB_DB, 'backup')
 PATH_SUB_LOGS = 'logs'
 PATH_SUB_REPORTS = 'reports'
+
+REPO_PATH_LIST = [
+	PATH_SUB_DAEMON,
+	PATH_SUB_DB,
+	PATH_SUB_DBBACKUP,
+	PATH_SUB_LOGS,
+	PATH_SUB_REPORTS
+	]
 
 PATH_REPO = '.lit'
 
@@ -55,9 +70,9 @@ FILE_DB_JOURNAL = 'index_%s' % KEY_JOURNAL # stage 2
 FILE_DB_MASTER = 'index_%s' % KEY_MASTER # stage 3
 
 FILE_DAEMON_LOG = 'daemon.log'
-FILE_DAEMON_PID = 'daemon.pid'
-FILE_DAEMON_PORT = 'daemon.port'
-FILE_DAEMON_SECRET = 'daemon.secret'
+FILE_DAEMON_PID = 'pid'
+FILE_DAEMON_PORT = 'port'
+FILE_DAEMON_SECRET = 'secret'
 
 FIMENAME_MAXLENGTH_INT = 255 # EXT4 & NTFS
 FILENAME_SHORTLENGTH_INT = 80 # For logging ...

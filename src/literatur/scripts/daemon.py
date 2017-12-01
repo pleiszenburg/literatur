@@ -44,6 +44,7 @@ from ..const import (
 	KEY_SECRET,
 	KEY_TERMINATE,
 	PATH_REPO,
+	PATH_SUB_DAEMON,
 	SECRET_HASH_LENGTH
 	)
 from ..errors import no_pid_error
@@ -76,8 +77,8 @@ def get_repo_client():
 
 	if daemon_up:
 
-		daemon_port = int(__load_repo_info__(repo_root_path, '%s.%d' % (FILE_DAEMON_PORT, pid)))
-		daemon_secret = __load_repo_info__(repo_root_path, '%s.%d' % (FILE_DAEMON_SECRET, pid))
+		daemon_port = int(__load_daemon_info__(repo_root_path, '%s.%d' % (FILE_DAEMON_PORT, pid)))
+		daemon_secret = __load_daemon_info__(repo_root_path, '%s.%d' % (FILE_DAEMON_SECRET, pid))
 
 		return mp_client_class(
 			(ADDRESS_LOCALHOST, daemon_port),
@@ -112,7 +113,7 @@ def script_daemon(deamon_command):
 
 	# Fire up daemon
 	lit_daemon = daemonocle.Daemon(
-		pidfile = os.path.join(repo_root_path, PATH_REPO, FILE_DAEMON_PID),
+		pidfile = os.path.join(repo_root_path, PATH_REPO, PATH_SUB_DAEMON, FILE_DAEMON_PID),
 		workdir = repo_root_path
 		)
 
@@ -142,7 +143,7 @@ def __generate_secret__():
 def __load_pid__(repo_root_path):
 
 	try:
-		pid_data = __load_repo_info__(repo_root_path, FILE_DAEMON_PID)
+		pid_data = __load_daemon_info__(repo_root_path, FILE_DAEMON_PID)
 	except FileNotFoundError:
 		raise no_pid_error()
 
@@ -158,9 +159,9 @@ def __load_pid__(repo_root_path):
 		raise no_pid_error()
 
 
-def __load_repo_info__(repo_root_path, file_name):
+def __load_daemon_info__(repo_root_path, file_name):
 
-	f = open(os.path.join(repo_root_path, PATH_REPO, file_name), 'r')
+	f = open(os.path.join(repo_root_path, PATH_REPO, PATH_SUB_DAEMON, file_name), 'r')
 	info = f.read()
 	f.close()
 
