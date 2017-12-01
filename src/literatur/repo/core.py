@@ -817,10 +817,10 @@ class repository_server_class():
 			self.log('TERMINATING ......', level = KEY_INFO)
 			self.server_up = False
 			self.server.up = False
-			if hasattr(self, 'notifier'):
+			if hasattr(self, '_notifier'):
 				self.log('TERMINATING .........', level = KEY_INFO)
-				self.notifier_wm.rm_watch(self.notifier_repo.values())
-				self.notifier.stop()
+				self._notifier_wm.rm_watch(self.notifier_repo.values())
+				self._notifier.stop()
 
 		if self.index_modified:
 			self.__store_index__()
