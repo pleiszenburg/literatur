@@ -539,13 +539,13 @@ class repository_server_class():
 			return # TODO check for files below ignored folders (add to notifier ignore?!?)
 
 		self.log('Code %d (%s): %s' % (
-			event_code, pyinotify.EventsCodes.maskname(event_code), event.pathname
+			event_code, self._notifier_flags_iv_dict[event_code], event.pathname
 			))
 
 		try:
 
 			# File modify event
-			if event_code == pyinotify.IN_MODIFY and not event.dir:
+			if event_code == self._notifier_flags_dict['IN_MODIFY'] and not event.dir:
 				entry = self.index_dict_byid_dict[KEY_FILES][self.filemirror_dict_byabspath[event.pathname]]
 				self.log(pf(entry))
 				for method_name in [
@@ -671,6 +671,9 @@ class repository_server_class():
 					],
 				self.logger
 				)
+
+		# Invert the flags dict for fast lookup
+		self._notifier_flags_iv_dict = {v: k for k, v in self._notifier_flags_dict.items()}
 
 		self.log('NOTIFIER START ......', level = KEY_INFO)
 
