@@ -51,6 +51,7 @@ from .storage import (
 from ..const import (
 	AUTO_STORE_SECONDS,
 	DEFAULT_INDEX_FORMAT,
+	FILE_DAEMON_LOG,
 	FILE_DAEMON_PID,
 	FILE_DAEMON_PORT,
 	FILE_DAEMON_SECRET,
@@ -63,6 +64,7 @@ from ..const import (
 	INDEX_TYPES,
 	KEY_ADDRESS,
 	KEY_CRITICAL,
+	KEY_DAEMON,
 	KEY_DEBUG,
 	KEY_ERROR,
 	KEY_EXISTS_BOOL,
@@ -93,6 +95,7 @@ from ..const import (
 	PATH_REPO,
 	PATH_SUB_DB,
 	PATH_SUB_DBBACKUP,
+	PATH_SUB_LOGS,
 	PATH_SUB_REPORTS
 	)
 from ..entry import (
