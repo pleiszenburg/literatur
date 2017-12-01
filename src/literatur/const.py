@@ -60,6 +60,9 @@ IGNORE_FILE_LIST = [
 	'.directory',
 	'.*.kate-swp'
 	]
+IGNORE_FILE_TEMPLATE = """
+
+"""
 
 KEY_CURRENT = 'current'
 KEY_JOURNAL = 'journal'
