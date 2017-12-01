@@ -53,7 +53,7 @@ from ..const import (
 from ..errors import no_pid_error
 from ..repo import (
 	find_root_path,
-	repository_server_class
+	repository_class
 	)
 from ..rpc import (
 	get_free_port,
@@ -90,7 +90,7 @@ def get_repo_client():
 
 	else:
 
-		return repository_server_class(
+		return repository_class(
 			repo_root_path,
 			__generate_logger__(repo_root_path)
 			)
@@ -130,7 +130,7 @@ def script_server(deamon_command):
 		KEY_TERMINATE: None
 		}
 
-	repo_server = repository_server_class(
+	repo_server = repository_class(
 		repo_root_path,
 		logger = __generate_logger__(repo_root_path),
 		server_p_dict = server_p_dict,

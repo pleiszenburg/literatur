@@ -28,7 +28,7 @@ specific language governing rights and limitations under the License.
 # IMPORT
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-from .core import repository_server_class
+from .core import repository_class
 from .fs import (
 	init_root_path,
 	find_root_path,

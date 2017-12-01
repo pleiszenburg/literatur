@@ -116,7 +116,7 @@ from ..parser import ctime_to_datestring
 # CLASS
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-class repository_server_class():
+class repository_class():
 
 
 	def __init__(self, root_path, logger, server_p_dict = None, daemon = None):
