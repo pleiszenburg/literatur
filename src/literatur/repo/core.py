@@ -34,6 +34,7 @@ from collections import (
 	OrderedDict
 	)
 import fnmatch
+import logging
 import os
 import pickle
 from pprint import pformat as pf
@@ -119,7 +120,7 @@ from ..parser import ctime_to_datestring
 class repository_class():
 
 
-	def __init__(self, root_path, logger, server_p_dict = None, daemon = None):
+	def __init__(self, root_path, server_p_dict = None, daemon = None):
 
 		# Repo server unique id
 		self.id = ('%0' + str(ID_HASH_LENGTH) + 'x') % random.randrange(16**ID_HASH_LENGTH)
@@ -128,7 +129,7 @@ class repository_class():
 		self.root_path = root_path
 
 		# Init logger
-		self.__init_logger__(logger)
+		self.__init_logger__()
 
 		# Verbosity
 		self.log('INIT ...', level = KEY_INFO)
@@ -589,8 +590,26 @@ class repository_class():
 		self.index_modified = False
 
 
-	def __init_logger__(self, logger):
+	def __init_logger__(self):
 
+		# create logger with 'spam_application'
+		logger = logging.getLogger(KEY_DAEMON)
+		logger.setLevel(logging.DEBUG)
+
+		# create file handler which logs even debug messages
+		fh = logging.FileHandler(
+			os.path.join(repo_root_path, PATH_REPO, PATH_SUB_LOGS, FILE_DAEMON_LOG)
+			)
+		fh.setLevel(logging.DEBUG)
+
+		# create formatter and add it to the handlers
+		formatter = logging.Formatter('[%(asctime)s] %(levelname)s: %(message)s')
+		fh.setFormatter(formatter)
+
+		# add the handlers to the logger
+		logger.addHandler(fh)
+
+		# Store reference
 		self.logger = logger
 
 
