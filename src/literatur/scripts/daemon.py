@@ -96,8 +96,8 @@ def get_repo_client():
 			)
 
 
-def get_server_status():
-	"""Returns pid if server is up and None if server is down
+def get_daemon_pid():
+	"""Returns pid if daemon is up and None if daemon is down
 	"""
 
 	# Find root path: Raises an error if CWD is not in a repo
@@ -110,8 +110,8 @@ def get_server_status():
 		return None
 
 
-def script_server(deamon_command):
-	"""Starts, stops or checks status of server (user commands)
+def script_daemon(deamon_command):
+	"""Starts, stops or checks status of daemon (user commands)
 	"""
 
 	# Find root path: Raises an error if CWD is not in a repo

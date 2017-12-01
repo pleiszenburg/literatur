@@ -34,9 +34,9 @@ from pprint import pformat as pf
 
 import click
 
-from .server import (
+from .daemon import (
 	get_repo_client,
-	script_server
+	script_daemon
 	)
 
 from ..const import (
@@ -207,7 +207,7 @@ def start():
 	"""
 
 	try:
-		script_server(KEY_START)
+		script_daemon(KEY_START)
 	except not_in_repo_error:
 		click.echo(MSG_DEBUG_NOREPOSITORY)
 
@@ -218,7 +218,7 @@ def status():
 	"""
 
 	try:
-		script_server(KEY_STATUS)
+		script_daemon(KEY_STATUS)
 	except not_in_repo_error:
 		click.echo(MSG_DEBUG_NOREPOSITORY)
 
@@ -229,7 +229,7 @@ def stop():
 	"""
 
 	try:
-		script_server(KEY_STOP)
+		script_daemon(KEY_STOP)
 	except not_in_repo_error:
 		click.echo(MSG_DEBUG_NOREPOSITORY)
 
