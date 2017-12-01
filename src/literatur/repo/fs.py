@@ -28,7 +28,6 @@ specific language governing rights and limitations under the License.
 # IMPORT
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-from functools import partial
 import os
 
 from .storage import store_data
@@ -39,7 +38,6 @@ from ..const import (
 	INDEX_TYPES,
 	DEFAULT_INDEX_FORMAT,
 	KEY_INFO,
-	KEY_PARENT,
 	PATH_REPO,
 	PATH_SUB_DB,
 	PATH_SUB_DBBACKUP,

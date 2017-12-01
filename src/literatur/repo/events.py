@@ -28,6 +28,9 @@ specific language governing rights and limitations under the License.
 # IMPORT
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+from functools import partial
+from threading import Thread
+
 import pyinotify
 
 from ..const import (
