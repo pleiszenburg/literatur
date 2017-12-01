@@ -6,7 +6,7 @@ LITERATUR
 Literature management with Python, Dropbox and MediaWiki
 https://github.com/pleiszenburg/literatur
 
-	src/literatur/repo/server.py: Defines a server-side repository class
+	src/literatur/repo/core.py: Defines the core repository class
 
 	Copyright (C) 2017 Sebastian M. Ernst <ernst@pleiszenburg.de>
 
@@ -40,11 +40,8 @@ from pprint import pformat as pf
 import random
 import shutil
 import stat
-from threading import Thread
 
-import pyinotify
-
-from .fs import repo_event_handler_class
+from .events import generate_notifier
 from .storage import (
 	load_data,
 	store_data
@@ -83,7 +80,6 @@ from ..const import (
 	KEY_MP,
 	KEY_MTIME,
 	KEY_NAME,
-	KEY_PARENT,
 	KEY_PATH,
 	KEY_PORT,
 	KEY_PKL,
@@ -529,12 +525,12 @@ class repository_server_class():
 
 	def __handle_fs_event__(self, event_code, event):
 
-		if event_code in [
-			pyinotify.IN_ACCESS,
-			pyinotify.IN_OPEN,
-			pyinotify.IN_CLOSE_NOWRITE,
-			pyinotify.IN_CLOSE_WRITE
-			]:
+		if event_code in [self._notifier_flags_dict[code_name] for code_name in [
+			'IN_ACCESS',
+			'IN_OPEN',
+			'IN_CLOSE_NOWRITE',
+			'IN_CLOSE_WRITE'
+			]]:
 			return
 
 		if any(fnmatch.fnmatchcase(event.name, pattern) for pattern in IGNORE_FILE_LIST):
@@ -661,29 +657,24 @@ class repository_server_class():
 
 		self.log('NOTIFIER START ... (%s)' % self.root_path, level = KEY_INFO)
 
-		self.notifier_wm = pyinotify.WatchManager()
-
-		self.notifier = pyinotify.Notifier(
-			self.notifier_wm, repo_event_handler_class(**{KEY_PARENT: self})
-			)
+		(
+			self._notifier,
+			self._notifier_repo,
+			self._notifier_wm,
+			self._notifier_thread,
+			self._notifier_flags_dict
+			) = generate_notifier(
+				self.__handle_fs_event__,
+				self.root_path,
+				[
+					'^' + os.path.join(self.root_path, PATH_REPO)
+					],
+				self.logger
+				)
 
 		self.log('NOTIFIER START ......', level = KEY_INFO)
 
-		self.notifier_repo = self.notifier_wm.add_watch(
-			self.root_path,
-			pyinotify.ALL_EVENTS,
-			rec = True, auto_add = True,
-			exclude_filter = pyinotify.ExcludeFilter([
-				'^' + os.path.join(self.root_path, PATH_REPO)
-				])
-			)
-
-		self.log('NOTIFIER START .........', level = KEY_INFO)
-
-		# Start the notifier in its own thread
-		t = Thread(target = self.notifier.loop)
-		t.daemon = True
-		t.start()
+		self._notifier_thread.start()
 
 		self.log('NOTIFIER START done.', level = KEY_INFO)
 
