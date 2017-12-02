@@ -91,6 +91,7 @@ from ..const import (
 	KEY_YAML,
 	KEY_WARN,
 	PATH_REPO,
+	PATH_SUB_DAEMON,
 	PATH_SUB_DB,
 	PATH_SUB_DBBACKUP,
 	PATH_SUB_LOGS,
@@ -732,18 +733,18 @@ class repository_class():
 
 		def cleanup_info(file_name, pid_str):
 			file_name_new = file_name + '.' + pid_str
-			for file_name_old in next(os.walk(os.path.join(self.root_path, PATH_REPO)))[2]:
+			for file_name_old in next(os.walk(os.path.join(self.root_path, PATH_REPO, PATH_SUB_DAEMON)))[2]:
 				if file_name_old.startswith(file_name) and file_name_old != file_name_new:
-					os.remove(os.path.join(self.root_path, PATH_REPO, file_name_old))
+					os.remove(os.path.join(self.root_path, PATH_REPO, PATH_SUB_DAEMON, file_name_old))
 
 		def read_file(file_name):
-			f = open(os.path.join(self.root_path, PATH_REPO, file_name), 'r')
+			f = open(os.path.join(self.root_path, PATH_REPO, PATH_SUB_DAEMON, file_name), 'r')
 			file_data = f.read()
 			f.close()
 			return file_data
 
 		def store_file(file_name, pid_str, file_data):
-			file_path = os.path.join(self.root_path, PATH_REPO, file_name + '.' + pid_str)
+			file_path = os.path.join(self.root_path, PATH_REPO, PATH_SUB_DAEMON, file_name + '.' + pid_str)
 			f = open(file_path, 'w+')
 			f.write(file_data)
 			f.close()
