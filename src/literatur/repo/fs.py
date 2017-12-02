@@ -34,7 +34,6 @@ from .storage import store_data
 
 from ..const import (
 	FILE_DB_CURRENT,
-	IGNORE_FILE_LIST,
 	INDEX_TYPES,
 	DEFAULT_INDEX_FORMAT,
 	KEY_INFO,
@@ -95,6 +94,9 @@ def find_root_path(in_path):
 
 
 def get_file_list(in_path):
+	"""Lists all files in `in_path`. Used by rename-ui only.
+	TODO: Make ui use repo daemon instead ...
+	"""
 
 	out_list = []
 
@@ -104,8 +106,7 @@ def get_file_list(in_path):
 	# Clean list
 	for item in ls_list:
 		if os.path.isfile(os.path.join(in_path, item)):
-			if item not in IGNORE_FILE_LIST:
-				out_list.append(item)
+			out_list.append(item)
 
 	# Sort them all
 	out_list.sort()
