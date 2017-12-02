@@ -33,6 +33,7 @@ import os
 from .storage import store_data
 
 from ..const import (
+	FILE_DAEMON_LOG,
 	FILE_DB_CURRENT,
 	FILE_IGNORE,
 	IGNORE_FILE_TEMPLATE,
@@ -41,6 +42,7 @@ from ..const import (
 	KEY_INFO,
 	PATH_REPO,
 	PATH_SUB_DB,
+	PATH_SUB_LOGS,
 	REPO_PATH_LIST
 	)
 from ..errors import (
@@ -55,6 +57,11 @@ from ..errors import (
 
 def init_root_path(in_path):
 
+	def __write_file__(file_path, file_cnt):
+		f = open(file_path, 'w+')
+		f.write(file_cnt)
+		f.close()
+
 	try:
 		root_path = find_root_path(in_path)
 		raise repo_initialized_error()
@@ -66,9 +73,14 @@ def init_root_path(in_path):
 	for fld in REPO_PATH_LIST:
 		os.makedirs(os.path.join(current_repository, fld))
 
-	f = open(os.path.join(in_path, PATH_REPO, FILE_IGNORE), 'w+')
-	f.write(IGNORE_FILE_TEMPLATE)
-	f.close()
+	__write_file__(
+		os.path.join(in_path, PATH_REPO, FILE_IGNORE),
+		IGNORE_FILE_TEMPLATE
+		)
+	__write_file__(
+		os.path.join(in_path, PATH_REPO, PATH_SUB_LOGS, FILE_DAEMON_LOG),
+		'' # TODO add meta info on repo init date/time
+		)
 
 	store_data(os.path.join(
 		in_path, PATH_REPO, PATH_SUB_DB, FILE_DB_CURRENT + '.' + DEFAULT_INDEX_FORMAT

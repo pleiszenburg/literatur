@@ -146,6 +146,8 @@ class repository_class():
 
 		# Init server component if required
 		self.server_up = False
+		# Store reference to daemon object
+		self.daemon = daemon
 		if server_p_dict is not None and type(server_p_dict) is dict:
 			self.__init_server__(server_p_dict, daemon)
 
@@ -598,7 +600,7 @@ class repository_class():
 
 		# create file handler which logs even debug messages
 		fh = logging.FileHandler(
-			os.path.join(repo_root_path, PATH_REPO, PATH_SUB_LOGS, FILE_DAEMON_LOG)
+			os.path.join(self.root_path, PATH_REPO, PATH_SUB_LOGS, FILE_DAEMON_LOG)
 			)
 		fh.setLevel(logging.DEBUG)
 
@@ -616,9 +618,6 @@ class repository_class():
 	def __init_server__(self, server_p_dict, daemon):
 
 		self.log('SERVER INIT ...', level = KEY_INFO)
-
-		# Store reference to daemon object
-		self.daemon = daemon
 
 		# Start MP server
 		self.server = mp_server_class(
