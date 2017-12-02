@@ -34,6 +34,8 @@ from .storage import store_data
 
 from ..const import (
 	FILE_DB_CURRENT,
+	FILE_IGNORE,
+	IGNORE_FILE_TEMPLATE,
 	INDEX_TYPES,
 	DEFAULT_INDEX_FORMAT,
 	KEY_INFO,
@@ -63,6 +65,10 @@ def init_root_path(in_path):
 	os.makedirs(current_repository)
 	for fld in REPO_PATH_LIST:
 		os.makedirs(os.path.join(current_repository, fld))
+
+	f = open(os.path.join(in_path, PATH_REPO, FILE_IGNORE), 'w+')
+	f.write(IGNORE_FILE_TEMPLATE)
+	f.close()
 
 	store_data(os.path.join(
 		in_path, PATH_REPO, PATH_SUB_DB, FILE_DB_CURRENT + '.' + DEFAULT_INDEX_FORMAT

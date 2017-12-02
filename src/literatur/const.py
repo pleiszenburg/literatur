@@ -51,16 +51,18 @@ REPO_PATH_LIST = [
 
 PATH_REPO = '.lit'
 
-IGNORE_DIR_LIST = [
-	PATH_REPO,
-	'.git'
-	]
-IGNORE_FILE_LIST = [
-	'desktop.ini',
-	'.directory',
-	'.*.kate-swp'
-	]
 IGNORE_FILE_TEMPLATE = """
+# IGNORE FILE BASED ON GITIGNORE STYLE PATTERNS
+
+# Git related stuff
+.git
+
+# Desktop environment metainfo
+desktop.ini
+.directory
+
+# Editor temp files
+.*.kate-swp
 
 """
 
@@ -76,6 +78,8 @@ FILE_DAEMON_LOG = 'daemon.log'
 FILE_DAEMON_PID = 'pid'
 FILE_DAEMON_PORT = 'port'
 FILE_DAEMON_SECRET = 'secret'
+
+FILE_IGNORE = 'ignore'
 
 FIMENAME_MAXLENGTH_INT = 255 # EXT4 & NTFS
 FILENAME_SHORTLENGTH_INT = 80 # For logging ...
