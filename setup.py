@@ -82,6 +82,7 @@ setup(
 		'humanize',
 		'msgpack-python',
 		'networkx',
+		'pathspec',
 		'pdfminer.six',
 		'psutil',
 		'pyinotify',

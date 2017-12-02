@@ -33,7 +33,6 @@ from collections import (
 	Counter,
 	OrderedDict
 	)
-import fnmatch
 import logging
 import os
 import pickle
@@ -43,6 +42,7 @@ import shutil
 import stat
 
 from .events import generate_notifier
+from .ignore import is_path_ignored_callable_class
 from .storage import (
 	load_data,
 	store_data
@@ -137,6 +137,9 @@ class repository_class():
 
 		# Update CWD
 		self.set_cwd(self.root_path)
+
+		# Set up path/file ignore method
+		self.__is_path_ignored__ = is_path_ignored_callable_class(self.root_path)
 
 		# Init all index related lists and dicts
 		self.__init_index__()
@@ -469,8 +472,7 @@ class repository_class():
 
 			if item.is_file():
 
-				# Append to list of file is not ignored
-				if any(fnmatch.fnmatchcase(item.name, pattern) for pattern in IGNORE_FILE_LIST):
+				if self.__is_path_ignored__(os.path.join(scan_root_path, item.name)):
 					continue
 
 				item_stat = item.stat()
@@ -485,10 +487,6 @@ class repository_class():
 					})
 
 			elif item.is_dir():
-
-				# Dive deeper if directory is not ignored
-				if any(fnmatch.fnmatchcase(item.name, pattern) for pattern in IGNORE_DIR_LIST):
-					continue
 
 				self.__get_recursive_inventory_list__(item.path, files_dict_list)
 
@@ -535,10 +533,8 @@ class repository_class():
 			]]:
 			return
 
-		if any(fnmatch.fnmatchcase(event.name, pattern) for pattern in IGNORE_FILE_LIST):
+		if self.__is_path_ignored__(event.pathname):
 			return
-		if any(fnmatch.fnmatchcase(event.name, pattern) for pattern in IGNORE_DIR_LIST):
-			return # TODO check for files below ignored folders (add to notifier ignore?!?)
 
 		self.log('Code %d (%s): %s' % (
 			event_code, self._notifier_flags_iv_dict[event_code], event.pathname
@@ -551,7 +547,10 @@ class repository_class():
 				entry = self.index_dict_byid_dict[KEY_FILES][self.filemirror_dict_byabspath[event.pathname]]
 				self.log(pf(entry))
 				for method_name in [
-					'update_file_hash', 'update_file_info', 'update_file_magic', 'update_file_type'
+					'update_file_hash',
+					'update_file_info',
+					'update_file_magic',
+					'update_file_type'
 					]:
 					getattr(entry, method_name)()
 				self.log(pf(entry))
