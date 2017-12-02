@@ -528,6 +528,11 @@ class repository_class():
 
 	def __handle_fs_event__(self, event_code, event):
 
+		# Ignore events on directories
+		if event.dir:
+			return
+
+		# Ignore access, open and close events - they do not change things
 		if event_code in [self._notifier_flags_dict[code_name] for code_name in [
 			'IN_ACCESS',
 			'IN_OPEN',
@@ -536,17 +541,33 @@ class repository_class():
 			]]:
 			return
 
+		# Ignore files and directories from ignore list
 		if self.__is_path_ignored__(event.pathname):
 			return
 
+		# Log the raw event (event code, event name, full path)
 		self.log('Code %d (%s): %s' % (
 			event_code, self._notifier_flags_iv_dict[event_code], event.pathname
 			))
 
 		try:
 
+			# File create event
+			if event_code == self._notifier_flags_dict['IN_CREATE']:
+
+				pass
+
+			# File delete event
+			elif event_code in [
+				self._notifier_flags_dict['IN_DELETE'],
+				self._notifier_flags_dict['IN_DELETE_SELF']
+				]:
+
+				pass
+
 			# File modify event
-			if event_code == self._notifier_flags_dict['IN_MODIFY'] and not event.dir:
+			elif event_code == self._notifier_flags_dict['IN_MODIFY']:
+
 				entry = self.index_dict_byid_dict[KEY_FILES][self.filemirror_dict_byabspath[event.pathname]]
 				self.log(pf(entry))
 				for method_name in [
@@ -558,9 +579,13 @@ class repository_class():
 					getattr(entry, method_name)()
 				self.log(pf(entry))
 
+			else:
+
+				self.log(' ... not yet handled!')
+
 		except:
 
-			self.logger.exception('?!?')
+			self.logger.exception('CRASH in __handle_fs_event__')
 
 
 	def __init_index__(self):
