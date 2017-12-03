@@ -44,7 +44,7 @@ from ..const import (
 # CLASSES
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-def fs_event_notifier_class():
+class fs_event_notifier_class:
 
 
 	def __init__(self, event_handler, root_path, exclude_filter_list, is_path_ignored_func, logger):
@@ -76,7 +76,7 @@ def fs_event_notifier_class():
 			exclude_filter = pyinotify.ExcludeFilter(exclude_filter_list)
 			)
 
-		self.notifier_thread = Thread(target = notifier.loop)
+		self.notifier_thread = Thread(target = self.notifier.loop)
 		self.notifier_thread.daemon = True
 
 
@@ -91,7 +91,7 @@ def fs_event_notifier_class():
 		self.notifier_thread.start()
 
 
-class __handle_raw_fs_event_callable_class__():
+class __handle_raw_fs_event_callable_class__:
 
 
 	def __init__(self, event_handler, root_path, is_path_ignored_func, logger):
