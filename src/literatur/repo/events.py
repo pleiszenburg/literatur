@@ -41,52 +41,55 @@ from ..const import (
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-# ROUTINES
-# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-def generate_notifier(event_handler, root_path, exclude_filter_list, is_path_ignored_func, logger):
-
-	notifier_wm = pyinotify.WatchManager()
-
-	notifier_raw_handler = __handle_raw_fs_event_callable_class__(
-		event_handler,
-		root_path,
-		is_path_ignored_func,
-		logger
-		)
-
-	notifier = pyinotify.Notifier(
-		notifier_wm, __repo_event_handler_class__(**{
-			KEY_HANDLER: notifier_raw_handler,
-			KEY_LOGGER: logger
-			})
-		)
-
-	notifier_repo = notifier_wm.add_watch(
-		root_path,
-		pyinotify.ALL_EVENTS,
-		rec = True,
-		auto_add = True,
-		exclude_filter = pyinotify.ExcludeFilter(exclude_filter_list)
-		)
-
-	# Start the notifier in its own thread
-	notifier_thread = Thread(target = notifier.loop)
-	notifier_thread.daemon = True
-
-	return (
-		notifier,
-		notifier_repo,
-		notifier_raw_handler,
-		notifier_wm,
-		notifier_thread,
-		pyinotify.EventsCodes.FLAG_COLLECTIONS['OP_FLAGS']
-		)
-
-
-# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # CLASSES
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+def fs_event_notifier_class():
+
+
+	def __init__(self, event_handler, root_path, exclude_filter_list, is_path_ignored_func, logger):
+
+		self.logger = logger
+		self.root_path = root_path
+
+		self.notifier_wm = pyinotify.WatchManager()
+
+		self.notifier_raw_handler = __handle_raw_fs_event_callable_class__(
+			event_handler,
+			root_path,
+			is_path_ignored_func,
+			logger
+			)
+
+		self.notifier = pyinotify.Notifier(
+			self.notifier_wm, __repo_event_handler_class__(**{
+				KEY_HANDLER: self.notifier_raw_handler,
+				KEY_LOGGER: logger
+				})
+			)
+
+		self.notifier_repo = self.notifier_wm.add_watch(
+			root_path,
+			pyinotify.ALL_EVENTS,
+			rec = True,
+			auto_add = True,
+			exclude_filter = pyinotify.ExcludeFilter(exclude_filter_list)
+			)
+
+		self.notifier_thread = Thread(target = notifier.loop)
+		self.notifier_thread.daemon = True
+
+
+	# def get_flags(self):
+    #
+	# 	return {v: k for k, v in pyinotify.EventsCodes.FLAG_COLLECTIONS['OP_FLAGS'].items()}
+	# 	return pyinotify.EventsCodes.FLAG_COLLECTIONS['OP_FLAGS']
+
+
+	def start(self):
+
+		self.notifier_thread.start()
+
 
 class __handle_raw_fs_event_callable_class__():
 

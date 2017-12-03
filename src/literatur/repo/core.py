@@ -41,7 +41,7 @@ import random
 import shutil
 import stat
 
-from .events import generate_notifier
+from .events import fs_event_notifier_class
 from .ignore import is_path_ignored_callable_class
 from .storage import (
 	load_data,
@@ -711,14 +711,7 @@ class repository_class():
 
 		self.log('NOTIFIER START ... (%s)' % self.root_path, level = KEY_INFO)
 
-		(
-			self._notifier,
-			self._notifier_repo,
-			self._notifier_raw_handler,
-			self._notifier_wm,
-			self._notifier_thread,
-			self._notifier_flags_dict
-			) = generate_notifier(
+		self._fs_event_notifier = fs_event_notifier_class(
 				self.__handle_fs_event__,
 				self.root_path,
 				[
@@ -728,12 +721,9 @@ class repository_class():
 				self.logger
 				)
 
-		# Invert the flags dict for fast lookup
-		self._notifier_flags_iv_dict = {v: k for k, v in self._notifier_flags_dict.items()}
-
 		self.log('NOTIFIER START ......', level = KEY_INFO)
 
-		self._notifier_thread.start()
+		self._fs_event_notifier.start()
 
 		self.log('NOTIFIER START done.', level = KEY_INFO)
 
