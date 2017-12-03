@@ -207,9 +207,7 @@ class entry_file_class(__entry_class__):
 
 	def get_file_existence(self):
 
-		if os.path.isfile(os.path.join(self.get_file_fullpath(), self.p_dict[KEY_NAME])):
-			return True
-		return False
+		return os.path.isfile(os.path.join(self.get_file_fullpath(), self.p_dict[KEY_NAME]))
 
 
 	def get_file_fullpath(self):

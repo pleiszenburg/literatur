@@ -502,6 +502,24 @@ class repository_class():
 				raise # TODO
 
 
+	def __generate_full_file_entry__(self, file_dict):
+
+		entry = generate_entry(
+			root_path = self.root_path, file_dict = file_dict
+			)
+		entry.set_id(self.get_free_id())
+		for method_name in [
+			'update_file_existence',
+			'update_file_hash',
+			'update_file_info',
+			'update_file_magic',
+			'update_file_type'
+			]:
+			getattr(entry, method_name)()
+
+		return entry
+
+
 	def __generate_light_index_and_return__(self):
 
 		# Set CWD to root
@@ -526,66 +544,58 @@ class repository_class():
 		return entries_list
 
 
-	def __handle_fs_event__(self, event_code, event):
+	def __handle_fs_event__(self, event_dict):
 
-		# Ignore events on directories
-		if event.dir:
-			return
+		self.log(pf(event_dict))
 
-		# Ignore access, open and close events - they do not change things
-		if event_code in [self._notifier_flags_dict[code_name] for code_name in [
-			'IN_ACCESS',
-			'IN_OPEN',
-			'IN_CLOSE_NOWRITE',
-			'IN_CLOSE_WRITE'
-			]]:
-			return
-
-		# Ignore files and directories from ignore list
-		if self.__is_path_ignored__(event.pathname):
-			return
-
-		# Log the raw event (event code, event name, full path)
-		self.log('Code %d (%s): %s' % (
-			event_code, self._notifier_flags_iv_dict[event_code], event.pathname
-			))
-
-		try:
-
-			# File create event
-			if event_code == self._notifier_flags_dict['IN_CREATE']:
-
-				pass
-
-			# File delete event
-			elif event_code in [
-				self._notifier_flags_dict['IN_DELETE'],
-				self._notifier_flags_dict['IN_DELETE_SELF']
-				]:
-
-				pass
-
-			# File modify event
-			elif event_code == self._notifier_flags_dict['IN_MODIFY']:
-
-				entry = self.index_dict_byid_dict[KEY_FILES][self.filemirror_dict_byabspath[event.pathname]]
-				self.log(pf(entry))
-				for method_name in [
-					'update_file_hash',
-					'update_file_info',
-					'update_file_magic',
-					'update_file_type'
-					]:
-					getattr(entry, method_name)()
-				self.log(pf(entry))
-
-			else:
-
-				self.log(' ... not yet handled!')
-
-		except:
-
-			self.logger.exception('CRASH in __handle_fs_event__')
+		# try:
+        #
+		# 	if event_code == self._notifier_flags_dict['IN_CREATE']:
+        #
+		# 		entry = self.__generate_full_file_entry__({
+		# 			KEY_NAME: os.path.basename(event.pathname),
+		# 			KEY_PATH: os.path.relpath(os.path.dirname(event.pathname), self.root_path)
+		# 			})
+        #
+		# 		self.index_list_dict[KEY_FILES].append(entry)
+		# 		self.index_dict_byid_dict[KEY_FILES].update({entry.id: entry})
+		# 		self.filemirror_dict_byabspath.update({
+		# 			os.path.abspath(os.path.join(
+		# 				self.root_path, entry.p_dict[KEY_PATH], entry.p_dict[KEY_NAME]
+		# 				)): entry.id
+		# 			})
+        #
+		# 		self.log(pf(entry))
+        #
+		# 	# File delete event
+		# 	elif event_code in [
+		# 		self._notifier_flags_dict['IN_DELETE'],
+		# 		self._notifier_flags_dict['IN_DELETE_SELF']
+		# 		]:
+        #
+		# 		pass
+        #
+		# 	# File modify event
+		# 	elif event_code == self._notifier_flags_dict['IN_MODIFY']:
+        #
+		# 		entry = self.index_dict_byid_dict[KEY_FILES][self.filemirror_dict_byabspath[event.pathname]]
+		# 		self.log(pf(entry))
+		# 		for method_name in [
+		# 			'update_file_hash',
+		# 			'update_file_info',
+		# 			'update_file_magic',
+		# 			'update_file_type'
+		# 			]:
+		# 			getattr(entry, method_name)()
+		# 		self.log(pf(entry))
+        #
+		# 	else:
+        #
+		# 		self.log(' ... not yet handled!')
+        #
+		# except:
+        #
+		# 	self.logger.exception('CRASH in __handle_fs_event__')
 
 
 	def __init_index__(self):
@@ -704,6 +714,7 @@ class repository_class():
 		(
 			self._notifier,
 			self._notifier_repo,
+			self._notifier_raw_handler,
 			self._notifier_wm,
 			self._notifier_thread,
 			self._notifier_flags_dict
@@ -713,6 +724,7 @@ class repository_class():
 				[
 					'^' + os.path.join(self.root_path, PATH_REPO)
 					],
+				self.__is_path_ignored__,
 				self.logger
 				)
 

@@ -29,6 +29,7 @@ specific language governing rights and limitations under the License.
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 from functools import partial
+from pprint import pformat as pf
 from threading import Thread
 
 import pyinotify
@@ -43,13 +44,20 @@ from ..const import (
 # ROUTINES
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-def generate_notifier(event_handler, root_path, exclude_filter_list, logger):
+def generate_notifier(event_handler, root_path, exclude_filter_list, is_path_ignored_func, logger):
 
 	notifier_wm = pyinotify.WatchManager()
 
+	notifier_raw_handler = __handle_raw_fs_event_callable_class__(
+		event_handler,
+		root_path,
+		is_path_ignored_func,
+		logger
+		)
+
 	notifier = pyinotify.Notifier(
 		notifier_wm, __repo_event_handler_class__(**{
-			KEY_HANDLER: event_handler,
+			KEY_HANDLER: notifier_raw_handler,
 			KEY_LOGGER: logger
 			})
 		)
@@ -69,6 +77,7 @@ def generate_notifier(event_handler, root_path, exclude_filter_list, logger):
 	return (
 		notifier,
 		notifier_repo,
+		notifier_raw_handler,
 		notifier_wm,
 		notifier_thread,
 		pyinotify.EventsCodes.FLAG_COLLECTIONS['OP_FLAGS']
@@ -78,6 +87,43 @@ def generate_notifier(event_handler, root_path, exclude_filter_list, logger):
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # CLASSES
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+class __handle_raw_fs_event_callable_class__():
+
+
+	def __init__(self, event_handler, root_path, is_path_ignored_func, logger):
+
+		self.event_handler = event_handler
+		self.is_path_ignored_func = is_path_ignored_func
+		self.logger = logger
+		self.root_path = root_path
+
+		# self.pending_events = []
+
+
+	def __call__(self, event_code, raw_event):
+
+		# # Ignore events on directories
+		# if raw_event.dir:
+		# 	return
+
+		# Ignore files and directories from ignore list
+		if self.is_path_ignored_func(raw_event.pathname):
+			return
+
+		# Get move cookie
+		_cookie = -1
+		if hasattr(raw_event, 'cookie'):
+			_cookie = raw_event.cookie
+
+		# Log the raw_event ([cookie] raw_event code, raw_event name, full path)
+		self.logger.debug('[%d] Code %d (%s): %s' % (
+			_cookie, event_code, raw_event.maskname, raw_event.pathname
+			))
+
+		# Trigger event in parent
+		self.event_handler({'ping': 'pong'})
+
 
 class __repo_event_handler_class__(pyinotify.ProcessEvent):
 
